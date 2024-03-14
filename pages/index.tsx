@@ -1,8 +1,13 @@
-import { Typography } from "@mui/material";
+import { Stack } from "@mui/material";
 import React from "react";
+import Header from "../components/Header/Header";
 
 const LandingPage = () => {
-  return <Typography variant="h4">Hello World</Typography>;
+  return (
+    <Stack>
+      <Header />
+    </Stack>
+  );
 };
 
 export default LandingPage;
