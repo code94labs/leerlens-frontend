@@ -244,11 +244,41 @@ const PreInterventionForm = () => {
 
       <FormControl>
         <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
       </FormControl>
     </>
   );
 
-  const questionPartTwoForm = <></>;
+  const questionPartTwoForm = (
+    <>
+      <Typography variant="subtitle2" fontWeight={500}>
+        Below are a number of statements. You can answer these statements on a
+        scale from 1 to 6
+      </Typography>
+
+      <Typography variant="subtitle2" fontWeight={500}>
+        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
+        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+      </Typography>
+
+      <FormControl>
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+        <CustomScale />
+      </FormControl>
+    </>
+  );
 
   const formContent = () => {
     switch (activeStep) {

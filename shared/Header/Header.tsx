@@ -1,11 +1,15 @@
 import { Box, Stack } from "@mui/material";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 
 const customStyles = {
   container: {
     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+  },
+  image: {
+    cursor: "pointer",
   },
   box: {
     width: "90%",
@@ -19,6 +23,8 @@ const customStyles = {
 };
 
 const Header = () => {
+  const router = useRouter();
+
   return (
     <Stack sx={customStyles.container}>
       <Box
@@ -29,9 +35,16 @@ const Header = () => {
         px={4}
         py={3}
       >
-        <Image src="/Logo.png" height={40} width={130} alt="logo" />
+        <Image
+          src="/Logo.png"
+          height={40}
+          width={130}
+          alt="logo"
+          style={customStyles.image}
+          onClick={() => router.replace("/")}
+        />
 
-        <Link href="https://remindlearning.nl/" style={customStyles.link}>
+        <Link href="https://remindlearning.nl/" style={customStyles.link} target="_blank">
           Visit Website
         </Link>
       </Box>
