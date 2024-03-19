@@ -13,6 +13,7 @@ import { useState } from "react";
 import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 import QRCode from "qrcode.react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import { useRouter } from "next/router";
 
 const customStyles = {
   card: {
@@ -30,29 +31,21 @@ const customStyles = {
       ml: 1,
     },
   },
-  primaryBtn: {
+  button: {
     backgroundColor: "#A879FF",
     borderRadius: 2,
     textTransform: "initial",
     fontWeight: "bold",
-    marginRight: 2,
-    padding: 1.3,
-    "&:hover": {
-      backgroundColor: "#A879FF",
-    },
-  },
-  secondaryBtn: {
-    backgroundColor: "white",
-    color: "#A879FF",
     border: "2px #A879FF solid",
-    borderRadius: 2,
-    textTransform: "initial",
-    fontWeight: "bold",
-    marginLeft: 2,
     padding: 1.3,
     "&:hover": {
       backgroundColor: "white",
+      color: "#A879FF",
     },
+  },
+  circleIcon: {
+    color: "green",
+    ml: 1,
   },
   modalContent: {
     position: "absolute",
@@ -69,13 +62,29 @@ const customStyles = {
       borderRadius: 3,
     },
   },
+  snackbar: {
+    "& .MuiSnackbarContent-root": {
+      backgroundColor: "white",
+      color: "black",
+      boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+      borderRadius: "8px",
+    },
+  },
+  snackbarMsg: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   copyLinkBtn: {
     transform: "rotate(-45deg)",
   },
 };
 
 const FormCard = (props) => {
-  const { title, description, qrLink, image, isBtnSecondaryType } = props;
+  const { title, description, pagePath, image } = props;
+
+  const router = useRouter();
+
   const [openDialog, setOpenDialog] = useState(false);
   const [displaySnackbar, setDisplaySnackbar] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
@@ -92,9 +101,9 @@ const FormCard = (props) => {
     setDisplaySnackbar(false);
   };
 
-  const handleCopyToClipboard = () => {
-    navigator.clipboard.writeText(qrLink);
-  };
+  const handleFormNavigation = () => {
+    router.push(pagePath);
+  }
 
   const downloadQR = () => {
     const qrCodeURL = document
@@ -126,7 +135,7 @@ const FormCard = (props) => {
         Scan QR Code
       </Typography>
 
-      <QRCode id="qrCodeEl" value={qrLink} />
+      <QRCode id="qrCodeEl" value={pagePath} />
 
       <Stack
         flexDirection="row"
@@ -139,7 +148,7 @@ const FormCard = (props) => {
         </IconButton>
 
         <TextField
-          value={qrLink}
+          value={pagePath}
           variant="outlined"
           margin="normal"
           disabled
@@ -155,7 +164,7 @@ const FormCard = (props) => {
       >
         <Button
           variant="contained"
-          sx={customStyles.secondaryBtn}
+          sx={{ ...customStyles.button, ml: 1 }}
           fullWidth
           onClick={handleClose}
         >
@@ -164,7 +173,7 @@ const FormCard = (props) => {
 
         <Button
           variant="contained"
-          sx={customStyles.primaryBtn}
+          sx={{ ...customStyles.button, mr: 1 }}
           fullWidth
           onClick={downloadQR}
         >
@@ -194,19 +203,16 @@ const FormCard = (props) => {
         <Box sx={customStyles.boxBtn} display="flex" mt={2} mb={2}>
           <Button
             variant="contained"
-            sx={
-              isBtnSecondaryType
-                ? customStyles.secondaryBtn
-                : customStyles.primaryBtn
-            }
+            sx={{ ...customStyles.button, mr: 1 }}
             fullWidth
+            onClick={handleFormNavigation}
           >
             Start {title}
           </Button>
 
           <Button
             variant="contained"
-            sx={customStyles.secondaryBtn}
+            sx={{ ...customStyles.button, ml: 1 }}
             fullWidth
             onClick={handleOpen}
           >
@@ -233,25 +239,13 @@ const FormCard = (props) => {
         autoHideDuration={6000}
         onClose={handleCloseSnackbar}
         message={
-          <span
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
+          <span style={customStyles.snackbarMsg}>
             <span>{notificationMessage}</span>
-            <CheckCircleIcon sx={{ color: "green", ml: 1 }} />
+
+            <CheckCircleIcon sx={customStyles.circleIcon} />
           </span>
         }
-        sx={{
-          "& .MuiSnackbarContent-root": {
-            backgroundColor: "white",
-            color: "black",
-            boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-            borderRadius: "8px",
-          },
-        }}
+        sx={customStyles.snackbar}
       />
     </Stack>
   );

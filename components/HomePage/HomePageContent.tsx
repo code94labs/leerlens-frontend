@@ -17,33 +17,29 @@ const HomePageContent = () => {
       <FormCard
         title="Pre-Intervention"
         description="Great that you are participating in the learning scan! Completing the learning scan takes approximately five minutes. Answer the questions as honestly as possible: there is no right or wrong. With all the answers we collect we can investigate what you think about learning. Goodluck!"
-        qrLink="http://bit.ly/LS1Remind"
+        pagePath="/forms/pre-intervention"
         image="/images/img1.png"
-        isBtnSecondaryType={false}
       />
 
       <FormCard
         title="Post-Intervention"
         description="Great that you are participating in the learning scan! Completing the learning scan takes approximately five minutes. Answer the questions as honestly as possible: there is no right or wrong. With all the answers we collect we can investigate what you think about learning. Goodluck!"
-        qrLink="http://bit.ly/LS1Remind"
+        pagePath="/forms/post-intervention"
         image="/images/img2.png"
-        isBtnSecondaryType={false}
       />
 
       <FormCard
         title="Remind Evaluation"
         description="How cool that you did one or more training sessions with us. We have done our best to make it as fun and educational as possible for you and are very curious about what you thought of it. That's why we have a few questions for you. Answer them honestly, whether you are positive or negative about the training, we can learn from it! :)"
-        qrLink="http://bit.ly/LS1Remind"
+        pagePath="/forms/remind-evaluation"
         image="/images/img3.png"
-        isBtnSecondaryType={true}
       />
 
       <FormCard
         title="Normgroup"
         description="How cool that you did one or more training sessions with us. We have done our best to make it as fun and educational as possible for you and are very curious about what you thought of it. That's why we have a few questions for you. Answer them honestly, whether you are positive or negative about the training, we can learn from it! :)"
-        qrLink="http://bit.ly/LS1Remind"
+        pagePath="/forms/normgroup"
         image="/images/img4.png"
-        isBtnSecondaryType={true}
       />
     </Stack>
   );
