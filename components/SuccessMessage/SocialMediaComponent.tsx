@@ -6,14 +6,15 @@ import { champBlackFontFamily } from "../../shared/typography";
 const customStyles = {
   box: {
     width: "auto",
-    padding: "8px 16px",
+    paddingX: 2,
+    paddingY: 1,
     border: "1px #E6E6E6 solid",
-    gap: "16px",
+    gap: 2,
   },
   label: {
     fontWeight: 900,
     color: "#1A1A1A",
-    fontSize: "13px",
+    fontSize: 13,
     textTransform: "uppercase",
   },
 };

@@ -19,40 +19,41 @@ const customStyles = {
   card: {
     border: "1px #E6E6E6 solid",
     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-    padding: "50px",
+    padding: 6.25,
     borderRadius: 3,
     width: "90%",
-    maxWidth: "826px",
+    maxWidth: 826,
     backgroundColor: "#FFFFFF",
   },
   logoImage: {
     cursor: "pointer",
     width: "auto",
-    height: "84px",
-    marginBottom: "16px",
+    height: 84,
+    marginBottom: 16,
   },
-  icon: { width: "150px", height: "auto", marginBottom: "16px" },
+  icon: { width: 150, height: "auto", marginBottom: 16 },
   thankYouMessage: {
     fontWeight: 900,
     color: "#1A1A1A",
     textTransform: "uppercase",
-    mb: "16px",
+    mb: 2,
   },
   body: {
     fontWeight: 400,
     color: "#4C4C4D",
     textAlign: "center",
-    maxWidth: "438px",
-    mb: "16px",
+    maxWidth: 438,
+    mb: 2,
   },
   box: {
     display: "flex",
-    gap: "14px",
+    gap: 1.75,
   },
 };
 
 const SuccessMessage = () => {
   const router = useRouter();
+
   return (
     <Container sx={customStyles.background} maxWidth={false}>
       <Box sx={customStyles.card} alignItems="center">
@@ -64,6 +65,7 @@ const SuccessMessage = () => {
             alt="logo"
             style={customStyles.logoImage}
           />
+
           <Image
             src={`/images/img5.png`}
             height={200}
@@ -71,12 +73,14 @@ const SuccessMessage = () => {
             style={customStyles.icon}
             alt="img"
           />
+
           <Typography
             sx={customStyles.thankYouMessage}
             fontFamily={champBlackFontFamily}
           >
             Thank you for submitting your answers to the questions.
           </Typography>
+
           <Typography sx={customStyles.body}>
             We appreciate your valuable time.
             <br />
@@ -84,6 +88,7 @@ const SuccessMessage = () => {
             <br />
             Remind trainers!
           </Typography>
+          
           <Box sx={customStyles.box}>
             <SocialMediaComponent
               label={"Follow us on Facebook"}
