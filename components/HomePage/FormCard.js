@@ -75,7 +75,10 @@ const customStyles = {
     },
     // mt: 2,
     // mb: 2,
-    gap: 1,
+    gap: {
+      xs: 1,
+      md: 4,
+    },
   },
   // dialogBtnStack: {
   //   "> :first-child": {
@@ -118,18 +121,58 @@ const customStyles = {
   },
   modalContent: {
     position: "absolute",
-    width: 400,
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     bgcolor: "background.paper",
     boxShadow: 24,
     borderRadius: 2,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    px: 6.25,
+    py: 5.25,
+    width: 514,
+    boxSizing: "border-box",
+  },
+  modalTitle: {
+    fontWeight: 900,
+    fontSize: 25,
+    mb: 2,
+    fontFamily: champBlackFontFamily,
+    textTransform: "uppercase",
+  },
+  modalStack: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    mt: 2,
+    width: 290,
+    gap: 1,
   },
   textField: {
     "& .MuiOutlinedInput-root": {
       borderRadius: 3,
     },
+    margin: 0,
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    textAlign: "center", 
+    fontSize: 14,
+    "& input::placeholder": {
+      fontSize: 14,
+      textAlign: "center",
+    },
+  },
+  dialogBtnStack: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    mt: 4,
+    gap: 2,
   },
   snackbar: {
     "& .MuiSnackbarContent-root": {
@@ -198,26 +241,14 @@ const FormCard = (props) => {
   };
 
   const qrDialogModel = (
-    <Box
-      sx={customStyles.modalContent}
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      p={2}
-      py={4}
-    >
-      <Typography variant="h6" fontWeight={800} mb={2}>
+    <Box sx={customStyles.modalContent}>
+      <Typography variant="h6" sx={customStyles.modalTitle}>
         Scan QR Code
       </Typography>
 
-      <QRCode id="qrCodeEl" value={pagePath} />
+      <QRCode id="qrCodeEl" value={pagePath} size={250} />
 
-      <Stack
-        flexDirection="row"
-        alignItems="center"
-        justifyContent="center"
-        mt={2}
-      >
+      <Stack sx={customStyles.modalStack}>
         <IconButton sx={customStyles.copyLinkBtn}>
           <LinkRoundedIcon />
         </IconButton>
@@ -231,26 +262,23 @@ const FormCard = (props) => {
         />
       </Stack>
 
-      <Stack
-        flexDirection="row"
-        width="100%"
-        sx={customStyles.dialogBtnStack}
-        py={2}
-      >
+      <Stack sx={customStyles.dialogBtnStack}>
         <Button
           variant="contained"
-          sx={{ ...customStyles.button, ml: 1 }}
+          sx={{ ...customStyles.button }}
           fullWidth
           onClick={handleClose}
+          disableElevation
         >
           Cancel
         </Button>
 
         <Button
           variant="contained"
-          sx={{ ...customStyles.button, mr: 1 }}
+          sx={{ ...customStyles.button }}
           fullWidth
           onClick={downloadQR}
+          disableElevation
         >
           Download QR
         </Button>
@@ -272,6 +300,7 @@ const FormCard = (props) => {
             sx={customStyles.button}
             fullWidth
             onClick={handleFormNavigation}
+            disableElevation
           >
             Start {title}
           </Button>
@@ -281,6 +310,7 @@ const FormCard = (props) => {
             sx={customStyles.button}
             fullWidth
             onClick={handleOpen}
+            disableElevation
           >
             View QR Code
           </Button>
