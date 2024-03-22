@@ -26,7 +26,12 @@ type socialMediaComponentProps = {
 
 const SocialMediaComponent = ({ label, image }: socialMediaComponentProps) => {
   return (
-    <Box sx={customStyles.box} display={"flex"} alignItems={"center"}>
+    <Box
+      sx={customStyles.box}
+      display={"flex"}
+      alignItems={"center"}
+      justifyContent={"center"}
+    >
       <Image src={image} height={24} width={24} alt="img" />
 
       <Typography sx={customStyles.label} fontFamily={champBlackFontFamily}>

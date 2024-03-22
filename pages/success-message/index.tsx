@@ -10,7 +10,7 @@ import SocialMediaComponent from "../../components/SuccessMessage/SocialMediaCom
 const customStyles = {
   background: {
     backgroundColor: "#C4B0EB",
-    width: "100vw",
+    width: "100%",
     height: "100vh",
     display: "flex",
     alignItems: "center",
@@ -19,9 +19,25 @@ const customStyles = {
   card: {
     border: "1px #E6E6E6 solid",
     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-    padding: 6.25,
+    padding: {
+      xs: 2,
+      md: 6.25,
+    },
     borderRadius: 3,
-    width: "90%",
+    width: {
+      xs: "100%",
+      md: "90%",
+    },
+    height: {
+      xs: "100%",
+      md: "max-content",
+    },
+    display: "flex",
+    alignItems: {
+      xs: "start",
+      md: "center",
+    },
+    justifyContent: "center",
     maxWidth: 826,
     backgroundColor: "#FFFFFF",
   },
@@ -36,18 +52,35 @@ const customStyles = {
     fontWeight: 900,
     color: "#1A1A1A",
     textTransform: "uppercase",
-    mb: 2,
+    mb: {
+      xs: 1,
+      md: 2,
+    },
+    textAlign: "center",
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
   },
-  body: {
+  bodyText: {
     fontWeight: 400,
     color: "#4C4C4D",
     textAlign: "center",
     maxWidth: 438,
-    mb: 2,
+    fontSize: {
+      xs: 13,
+      md: 16,
+    },
   },
   box: {
     display: "flex",
+    flexDirection: {
+      xs: "column",
+      md: "row",
+    },
+    width: "100%",
     gap: 1.75,
+    mt: 2,
   },
 };
 
@@ -55,8 +88,8 @@ const SuccessMessage = () => {
   const router = useRouter();
 
   return (
-    <Container sx={customStyles.background} maxWidth={false}>
-      <Box sx={customStyles.card} alignItems="center">
+    <Box sx={customStyles.background}>
+      <Box sx={customStyles.card}>
         <Stack justifyContent="center" alignItems={"center"}>
           <Image
             src="/Logo.png"
@@ -81,14 +114,14 @@ const SuccessMessage = () => {
             Thank you for submitting your answers to the questions.
           </Typography>
 
-          <Typography sx={customStyles.body}>
+          <Typography sx={customStyles.bodyText}>
             We appreciate your valuable time.
-            <br />
-            Good luck with your learning, and greetings from all
-            <br />
-            Remind trainers!
           </Typography>
-          
+          <Typography sx={customStyles.bodyText}>
+            Good luck with your learning, and greetings from all
+          </Typography>
+          <Typography sx={customStyles.bodyText}>Remind trainers!</Typography>
+
           <Box sx={customStyles.box}>
             <SocialMediaComponent
               label={"Follow us on Facebook"}
@@ -107,7 +140,7 @@ const SuccessMessage = () => {
           </Box>
         </Stack>
       </Box>
-    </Container>
+    </Box>
   );
 };
 
