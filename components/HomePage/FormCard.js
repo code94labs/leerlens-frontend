@@ -17,6 +17,8 @@ import QRCode from "qrcode.react";
 
 import { champBlackFontFamily } from "../../shared/typography";
 
+import { useWindowSize } from "../../utils/hooks/useWindowSize";
+
 const customStyles = {
   card: {
     border: "1px #E6E6E6 solid",
@@ -130,14 +132,26 @@ const customStyles = {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    px: 6.25,
-    py: 5.25,
-    width: 514,
+    px: {
+      xs: 3,
+      md: 6.25,
+    },
+    py: {
+      xs: 2.5,
+      md: 5.25,
+    },
+    width: {
+      xs: "90%",
+      md: 514,
+    },
     boxSizing: "border-box",
   },
   modalTitle: {
     fontWeight: 900,
-    fontSize: 25,
+    fontSize: {
+      xs: 20,
+      md: 25,
+    },
     mb: 2,
     fontFamily: champBlackFontFamily,
     textTransform: "uppercase",
@@ -148,7 +162,10 @@ const customStyles = {
     alignItems: "center",
     justifyContent: "space-between",
     mt: 2,
-    width: 290,
+    width: {
+      xs: "100%",
+      md: 290,
+    },
     gap: 1,
   },
   textField: {
@@ -159,8 +176,7 @@ const customStyles = {
     width: "100%",
     display: "flex",
     justifyContent: "center",
-    textAlign: "center", 
-    fontSize: 14,
+    textAlign: "center",
     "& input::placeholder": {
       fontSize: 14,
       textAlign: "center",
@@ -168,11 +184,20 @@ const customStyles = {
   },
   dialogBtnStack: {
     display: "flex",
-    flexDirection: "row",
+    flexDirection: {
+      xs: "column",
+      md: "row",
+    },
     justifyContent: "space-between",
     width: "100%",
-    mt: 4,
-    gap: 2,
+    mt: {
+      xs: 2,
+      md: 4,
+    },
+    gap: {
+      xs: 1,
+      md: 2,
+    },
   },
   snackbar: {
     "& .MuiSnackbarContent-root": {
@@ -206,6 +231,8 @@ const FormCard = (props) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [displaySnackbar, setDisplaySnackbar] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
+
+  const size = useWindowSize();
 
   const handleOpen = () => {
     setOpenDialog(true);
@@ -246,7 +273,11 @@ const FormCard = (props) => {
         Scan QR Code
       </Typography>
 
-      <QRCode id="qrCodeEl" value={pagePath} size={250} />
+      <QRCode
+        id="qrCodeEl"
+        value={pagePath}
+        size={size.width > 900 ? 250 : 150}
+      />
 
       <Stack sx={customStyles.modalStack}>
         <IconButton sx={customStyles.copyLinkBtn}>
@@ -259,13 +290,20 @@ const FormCard = (props) => {
           margin="normal"
           disabled
           sx={customStyles.textField}
+          size={size.width > 900 ? "medium" : "small"}
         />
       </Stack>
 
       <Stack sx={customStyles.dialogBtnStack}>
         <Button
           variant="contained"
-          sx={{ ...customStyles.button }}
+          sx={{
+            ...customStyles.button,
+            order: {
+              xs: 2,
+              md: 1,
+            },
+          }}
           fullWidth
           onClick={handleClose}
           disableElevation
@@ -275,7 +313,13 @@ const FormCard = (props) => {
 
         <Button
           variant="contained"
-          sx={{ ...customStyles.button }}
+          sx={{
+            ...customStyles.button,
+            order: {
+              xs: 1,
+              md: 2,
+            },
+          }}
           fullWidth
           onClick={downloadQR}
           disableElevation
