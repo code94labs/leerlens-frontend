@@ -15,6 +15,14 @@ const customStyles = {
     width: "90%",
     maxWidth: 1250,
     margin: "0 auto",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    px: {
+      xs: 0,
+      md: 4,
+    },
+    py: 3,
   },
   link: {
     color: "black",
@@ -27,14 +35,7 @@ const Header = () => {
 
   return (
     <Stack sx={customStyles.container}>
-      <Box
-        sx={customStyles.box}
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        px={4}
-        py={3}
-      >
+      <Box sx={customStyles.box}>
         <Image
           src="/Logo.png"
           height={40}
@@ -44,7 +45,11 @@ const Header = () => {
           onClick={() => router.replace("/")}
         />
 
-        <Link href="https://remindlearning.nl/" style={customStyles.link} target="_blank">
+        <Link
+          href="https://remindlearning.nl/"
+          style={customStyles.link}
+          target="_blank"
+        >
           Visit Website
         </Link>
       </Box>

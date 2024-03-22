@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { useRouter } from "next/router";
+import Image from "next/image";
 import {
   Box,
   Button,
@@ -8,40 +11,106 @@ import {
   IconButton,
   Snackbar,
 } from "@mui/material";
-import Image from "next/image";
-import { useState } from "react";
 import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
-import QRCode from "qrcode.react";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import { useRouter } from "next/router";
+import QRCode from "qrcode.react";
+
+import { champBlackFontFamily } from "../../shared/typography";
 
 const customStyles = {
   card: {
     border: "1px #E6E6E6 solid",
     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+    display: "flex",
+    flexDirection: "row",
+    mx: {
+      xs: 0,
+      md: 4,
+    },
+    p: {
+      xs: 3,
+      md: 5,
+    },
+    borderRadius: 2,
+  },
+  title: {
+    fontWeight: 800,
+    fontSize: {
+      xs: 24,
+      md: 34,
+    },
+    mb: {
+      xs: 1,
+      md: 2,
+    },
+    fontFamily: champBlackFontFamily,
+  },
+  description: {
+    width: {
+      xs: "100%",
+      md: "85%",
+    },
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
+    mb: {
+      xs: 2,
+      md: 4,
+    },
+    textAlign: {
+      xs: "justify",
+      md: "left",
+    },
   },
   boxBtn: {
-    width: "80%",
-  },
-  dialogBtnStack: {
-    "> :first-child": {
-      mr: 1,
+    width: {
+      xs: "100%",
+      md: "80%",
     },
-    "> :last-child": {
-      ml: 1,
+    display: "flex",
+    flexDirection: {
+      xs: "column",
+      md: "row",
     },
+    // mt: 2,
+    // mb: 2,
+    gap: 1,
   },
+  // dialogBtnStack: {
+  //   "> :first-child": {
+  //     mr: {
+  //       xs: 0,
+  //       md: 1,
+  //     },
+  //   },
+  //   "> :last-child": {
+  //     ml: {
+  //       xs: 0,
+  //       md: 1,
+  //     },
+  //   },
+  // },
   button: {
-    backgroundColor: "#A879FF",
+    backgroundColor: "white",
+    color: "#A879FF",
     borderRadius: 2,
     textTransform: "initial",
     fontWeight: "bold",
     border: "2px #A879FF solid",
-    padding: 1.3,
-    "&:hover": {
-      backgroundColor: "white",
-      color: "#A879FF",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
     },
+    "&:hover": {
+      backgroundColor: "#A879FF",
+      color: "white",
+    },
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
+    fontFamily: champBlackFontFamily,
   },
   circleIcon: {
     color: "green",
@@ -78,6 +147,12 @@ const customStyles = {
   copyLinkBtn: {
     transform: "rotate(-45deg)",
   },
+  imageStack: {
+    display: {
+      xs: "none",
+      md: "flex",
+    },
+  },
 };
 
 const FormCard = (props) => {
@@ -103,7 +178,7 @@ const FormCard = (props) => {
 
   const handleFormNavigation = () => {
     router.push(pagePath);
-  }
+  };
 
   const downloadQR = () => {
     const qrCodeURL = document
@@ -184,26 +259,17 @@ const FormCard = (props) => {
   );
 
   return (
-    <Stack
-      sx={customStyles.card}
-      flexDirection="row"
-      mt={4}
-      mx={4}
-      p={5}
-      borderRadius={2}
-    >
+    <Stack sx={customStyles.card}>
       <Stack>
-        <Typography variant="h4" fontWeight={800} mb={2}>
+        <Typography variant="h4" sx={customStyles.title}>
           {title}
         </Typography>
-        <Typography width="85%" mb={2}>
-          {description}
-        </Typography>
+        <Typography sx={customStyles.description}>{description}</Typography>
 
-        <Box sx={customStyles.boxBtn} display="flex" mt={2} mb={2}>
+        <Box sx={customStyles.boxBtn}>
           <Button
             variant="contained"
-            sx={{ ...customStyles.button, mr: 1 }}
+            sx={customStyles.button}
             fullWidth
             onClick={handleFormNavigation}
           >
@@ -212,7 +278,7 @@ const FormCard = (props) => {
 
           <Button
             variant="contained"
-            sx={{ ...customStyles.button, ml: 1 }}
+            sx={customStyles.button}
             fullWidth
             onClick={handleOpen}
           >
@@ -221,7 +287,7 @@ const FormCard = (props) => {
         </Box>
       </Stack>
 
-      <Stack>
+      <Stack sx={customStyles.imageStack}>
         <Image src={image} height={200} width={250} alt="img" />
       </Stack>
 

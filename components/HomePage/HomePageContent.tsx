@@ -7,7 +7,11 @@ const customStyles = {
     width: "90%",
     maxWidth: 1200,
     margin: "0 auto",
-    mb: 20
+    my: 4,
+    gap: {
+      xs: 2,
+      md: 4,
+    },
   },
 };
 
