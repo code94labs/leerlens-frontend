@@ -7,6 +7,8 @@ import Grid from "@mui/material/Unstable_Grid2";
 import { champBlackFontFamily } from "../../shared/typography";
 import SocialMediaComponent from "../../components/SuccessMessage/SocialMediaComponent";
 
+import { useWindowSize } from "../../utils/hooks/useWindowSize";
+
 const customStyles = {
   background: {
     backgroundColor: "#C4B0EB",
@@ -34,7 +36,7 @@ const customStyles = {
     },
     display: "flex",
     alignItems: {
-      xs: "start",
+      xs: "center",
       md: "center",
     },
     justifyContent: "center",
@@ -43,11 +45,9 @@ const customStyles = {
   },
   logoImage: {
     cursor: "pointer",
-    width: "auto",
-    height: 84,
     marginBottom: 16,
   },
-  icon: { width: 150, height: "auto", marginBottom: 16 },
+  icon: { marginBottom: 16 },
   thankYouMessage: {
     fontWeight: 900,
     color: "#1A1A1A",
@@ -87,6 +87,8 @@ const customStyles = {
 const SuccessMessage = () => {
   const router = useRouter();
 
+  const size = useWindowSize();
+
   return (
     <Box sx={customStyles.background}>
       <Box sx={customStyles.card}>
@@ -96,14 +98,22 @@ const SuccessMessage = () => {
             height={40}
             width={130}
             alt="logo"
-            style={customStyles.logoImage}
+            style={{
+              ...customStyles.logoImage,
+              width: "auto",
+              height: size?.width && size?.width > 900 ? 84 : 38,
+            }}
           />
 
           <Image
             src={`/images/img5.png`}
             height={200}
             width={250}
-            style={customStyles.icon}
+            style={{
+              ...customStyles.icon,
+              width: size?.width && size?.width > 900 ? 150 : 100,
+              height: "auto",
+            }}
             alt="img"
           />
 
