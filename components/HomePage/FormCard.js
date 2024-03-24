@@ -31,8 +31,21 @@ const customStyles = {
       ml: 1,
     },
   },
-  button: {
+  primaryBtn: {
     backgroundColor: "#A879FF",
+    borderRadius: 2,
+    textTransform: "initial",
+    fontWeight: "bold",
+    border: "2px #A879FF solid",
+    padding: 1.3,
+    "&:hover": {
+      backgroundColor: "white",
+      color: "#A879FF",
+    },
+  },
+  secondaryBtn: {
+    backgroundColor: "white",
+    color: "#A879FF",
     borderRadius: 2,
     textTransform: "initial",
     fontWeight: "bold",
@@ -164,7 +177,7 @@ const FormCard = (props) => {
       >
         <Button
           variant="contained"
-          sx={{ ...customStyles.button, ml: 1 }}
+          sx={{ ...customStyles.primaryBtn, ml: 1 }}
           fullWidth
           onClick={handleClose}
         >
@@ -173,7 +186,7 @@ const FormCard = (props) => {
 
         <Button
           variant="contained"
-          sx={{ ...customStyles.button, mr: 1 }}
+          sx={{ ...customStyles.secondaryBtn, mr: 1 }}
           fullWidth
           onClick={downloadQR}
         >
@@ -203,7 +216,7 @@ const FormCard = (props) => {
         <Box sx={customStyles.boxBtn} display="flex" mt={2} mb={2}>
           <Button
             variant="contained"
-            sx={{ ...customStyles.button, mr: 1 }}
+            sx={{ ...customStyles.primaryBtn, mr: 1 }}
             fullWidth
             onClick={handleFormNavigation}
           >
@@ -212,7 +225,7 @@ const FormCard = (props) => {
 
           <Button
             variant="contained"
-            sx={{ ...customStyles.button, ml: 1 }}
+            sx={{ ...customStyles.secondaryBtn, ml: 1 }}
             fullWidth
             onClick={handleOpen}
           >

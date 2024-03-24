@@ -13,7 +13,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { ChangeEvent, Fragment, useState } from "react";
+import React, {
+  ChangeEvent,
+  Fragment,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   ageList,
   completeSentenceList,
@@ -24,13 +30,27 @@ import {
 } from "../../utils/constant";
 import { useRouter } from "next/router";
 import CustomScale from "../../shared/CustomScale/CustomScale";
+import { getAllPreInterventionQuestions } from "../../services/leerlens.service";
+
+export type Question = {
+  id: number;
+  questionText: string;
+  positionOrderId: number;
+  minValue: number;
+  maxValue: number;
+  isDelete: boolean;
+};
+
+// export type QuestionAnswer = Question & {
+//   answerValue: number;
+// };
 
 const customStyles = {
   stack: {
     width: "90%",
     maxWidth: 1200,
     margin: "0 auto",
-    mb: 20,
+    mb: 10,
   },
 };
 
@@ -47,10 +67,40 @@ const PreInterventionForm = () => {
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
 
+  const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
+    []
+  );
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<Question[]>(
+    []
+  );
+
+  const [answersPartOne, setAnswersPartOne] = useState<number[]>(
+    Array(questionListPartOne.length).fill(0)
+  );
+  const [answersPartTwo, setAnswersPartTwo] = useState<number[]>(
+    Array(questionListPartTwo.length).fill(0)
+  );
+
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{
     [k: number]: boolean;
   }>({});
+
+  const updateAnswerPartOne = (questionId: number, answer: number) => {
+    setAnswersPartOne((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[questionId] = answer;
+      return newAnswers;
+    });
+  };
+
+  const updateAnswerPartTwo = (questionId: number, answer: number) => {
+    setAnswersPartTwo((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[questionId] = answer;
+      return newAnswers;
+    });
+  };
 
   const handleChangeSchool = (event: SelectChangeEvent) => {
     setSchool(event.target.value as string);
@@ -95,6 +145,10 @@ const PreInterventionForm = () => {
 
   const allStepsCompleted = () => {
     return completedSteps() === totalSteps();
+  };
+
+  const handleSubmit = () => {
+    console.log(answersPartOne)
   };
 
   const handleNext = () => {
@@ -243,14 +297,15 @@ const PreInterventionForm = () => {
       </Typography>
 
       <FormControl>
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
+        {questionListPartOne.map((questionDetails: Question, index: number) => (
+          <CustomScale
+            key={questionDetails.id}
+            {...questionDetails}
+            updateAnswer={(answer: number) =>
+              updateAnswerPartOne(index, answer)
+            }
+          />
+        ))}
       </FormControl>
     </>
   );
@@ -268,14 +323,15 @@ const PreInterventionForm = () => {
       </Typography>
 
       <FormControl>
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
+        {questionListPartTwo.map((questionDetails: Question, index: number) => (
+          <CustomScale
+            key={questionDetails.id}
+            {...questionDetails}
+            updateAnswer={(answer: number) =>
+              updateAnswerPartTwo(index, answer)
+            }
+          />
+        ))}
       </FormControl>
     </>
   );
@@ -295,6 +351,33 @@ const PreInterventionForm = () => {
         break;
     }
   };
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const preInterventionQuestions = await getAllPreInterventionQuestions();
+
+        const questionsWithAnswerValue = preInterventionQuestions.map(
+          (question: Question) => ({
+            ...question,
+            answerValue: 0,
+          })
+        );
+
+        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
+
+        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
+        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
+
+        setQuestionListPartOne(firstHalf);
+        setQuestionListPartTwo(secondHalf);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <Stack sx={customStyles.stack}>
@@ -325,42 +408,38 @@ const PreInterventionForm = () => {
         </Stepper>
 
         <Box>
-          {allStepsCompleted() ? (
-            <Fragment>
-              <Typography sx={{ mt: 2, mb: 1 }}>
-                All steps completed - you&apos;re finished
-              </Typography>
+          <Fragment>
+            <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
+              {formContent()}
+            </Typography>
 
-              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                <Box sx={{ flex: "1 1 auto" }} />
+            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+              <Button
+                color="inherit"
+                variant="outlined"
+                onClick={handleBack}
+                sx={{ mr: 1 }}
+              >
+                Back
+              </Button>
 
-                <Button onClick={handleReset}>Reset</Button>
-              </Box>
-            </Fragment>
-          ) : (
-            <Fragment>
-              <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-                {formContent()}
-              </Typography>
+              <Box sx={{ flex: "1 1 auto" }} />
 
-              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+              {isLastStep() ? (
                 <Button
-                  color="inherit"
                   variant="outlined"
-                  onClick={handleBack}
+                  onClick={handleSubmit}
                   sx={{ mr: 1 }}
                 >
-                  Back
+                  Submit
                 </Button>
-
-                <Box sx={{ flex: "1 1 auto" }} />
-
+              ) : (
                 <Button variant="outlined" onClick={handleNext} sx={{ mr: 1 }}>
                   Next
                 </Button>
-              </Box>
-            </Fragment>
-          )}
+              )}
+            </Box>
+          </Fragment>
         </Box>
       </Box>
     </Stack>

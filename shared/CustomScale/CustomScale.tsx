@@ -1,32 +1,67 @@
 import React, { useState } from "react";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { IconButton, Stack, Typography } from "@mui/material";
 
-const scale = [1, 2, 3, 4, 5, 6];
-
-type Props = {
-  questionId?: number;
-  questionText?: string;
+type CustomScaleProps = {
+  id: number;
+  questionText: string;
+  minValue: number;
+  maxValue: number;
+  positionOrderId: number;
+  updateAnswer: (answer: number) => void;
 };
 
-const CustomScale = (props: Props) => {
-  const { questionId, questionText } = props;
+const generateScaleArr = (min: number, max: number) => {
+  const scale: number[] = [];
+
+  for (let i = min; i <= max; i++) {
+    scale.push(i);
+  }
+
+  return scale;
+};
+
+const CustomScale = (props: CustomScaleProps) => {
+  const { questionText, minValue, maxValue, positionOrderId, updateAnswer } =
+    props;
 
   const [selectedValue, setSelectedValue] = useState(0);
 
-  const handleButtonClick = (value: number) => {
-    setSelectedValue(value);
+  const scale = generateScaleArr(minValue, maxValue);
 
-    handleClick(value);
+  const customStyles = {
+    scaleActiveBtn: {
+      m: 0.5,
+      width: 35,
+      height: 35,
+      border: "1px rgb(155, 155, 155, 0.5) solid",
+      backgroundColor: "#A879FF",
+      color: "white",
+      ":hover": {
+        backgroundColor: "#A879FF",
+      },
+    },
+    scaleInactiveBtn: {
+      m: 0.5,
+      width: 35,
+      height: 35,
+      border: "1px rgb(155, 155, 155, 0.5) solid",
+      backgroundColor: "#FFFFFF",
+      color: "grey",
+      ":hover": {
+        backgroundColor: "#FFFFFF",
+      },
+    },
   };
 
-  const handleClick = (value: number | null) => {
-    console.log(`Selected rating: ${value}`);
+  const handleButtonClick = (value: number) => {
+    setSelectedValue(value);
+    updateAnswer(value);
   };
 
   return (
     <Stack my={4}>
       <Typography mb={2} variant="subtitle2">
-        1. Intelligence is something you are born with and cannot change.
+        {positionOrderId}. {questionText}
       </Typography>
 
       <Stack flexDirection="row" alignItems="center">
@@ -34,24 +69,17 @@ const CustomScale = (props: Props) => {
           Totally disagree
         </Typography>
 
-        {scale.map((value) => (
+        {scale.map((scaleValue, index) => (
           <IconButton
-            key={value}
-            onClick={() => handleButtonClick(value)}
-            sx={{
-              m: 0.5,
-              width: 35,
-              height: 35,
-              border: "1px rgb(155, 155, 155, 0.5) solid",
-              backgroundColor: selectedValue === value ? "#A879FF" : "#FFFFFF",
-              color: selectedValue === value ? "white" : "grey",
-              ":hover": {
-                backgroundColor:
-                  selectedValue === value ? "#A879FF" : "#FFFFFF",
-              },
-            }}
+            key={index}
+            onClick={() => handleButtonClick(scaleValue)}
+            sx={
+              selectedValue === scaleValue
+                ? customStyles.scaleActiveBtn
+                : customStyles.scaleInactiveBtn
+            }
           >
-            <Typography variant="subtitle2">{value}</Typography>
+            <Typography variant="subtitle2">{scaleValue}</Typography>
           </IconButton>
         ))}
 
