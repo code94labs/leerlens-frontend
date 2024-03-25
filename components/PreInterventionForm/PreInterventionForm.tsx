@@ -2,7 +2,9 @@ import {
   Box,
   Button,
   FormControl,
+  InputAdornment,
   InputLabel,
+  ListSubheader,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -17,7 +19,8 @@ import CircularProgress, {
   circularProgressClasses,
   CircularProgressProps,
 } from "@mui/material/CircularProgress";
-import React, { ChangeEvent, Fragment, useState } from "react";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
 import {
   ageList,
   completeSentenceList,
@@ -94,6 +97,7 @@ const PreInterventionForm = () => {
   const router = useRouter();
 
   const [school, setSchool] = useState("");
+  const [searchTextSchool, setSearchTextSchool] = useState("");
   const [studyField, setStudyField] = useState("");
   const [grade, setGrade] = useState("");
   const [studentClass, setClass] = useState("");
@@ -105,6 +109,17 @@ const PreInterventionForm = () => {
   const [completed, setCompleted] = useState<{
     [k: number]: boolean;
   }>({});
+
+  const containsText = (text: string, searchText: string) =>
+    text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
+
+  const displayedSchoolOptions = useMemo(
+    () =>
+      schoolList.filter((option: string) =>
+        containsText(option, searchTextSchool)
+      ),
+    [searchTextSchool]
+  );
 
   const handleChangeSchool = (event: SelectChangeEvent) => {
     setSchool(event.target.value as string);
@@ -240,10 +255,10 @@ const PreInterventionForm = () => {
   const personalDetailsForm = (
     <>
       <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>What school are you at?</InputLabel>
 
-          <Select
+          {/* <Select
             value={school}
             label="What school are you at?"
             onChange={handleChangeSchool}
@@ -253,10 +268,55 @@ const PreInterventionForm = () => {
                 {school}
               </MenuItem>
             ))}
+          </Select> */}
+          <Select
+            // Disables auto focus on MenuItems and allows TextField to be in focus
+            MenuProps={{ autoFocus: false }}
+            labelId="search-select-school"
+            id="search-select"
+            value={school}
+            label="What school are you at?"
+            onChange={handleChangeSchool}
+            onClose={() => setSearchTextSchool("")}
+            // This prevents rendering empty string in Select's value
+            // if search text would exclude currently selected option.
+            renderValue={() => school}
+          >
+            {/* TextField is put into ListSubheader so that it doesn't
+              act as a selectable item in the menu
+              i.e. we can click the TextField without triggering any selection.*/}
+            <ListSubheader>
+              <TextField
+                size="small"
+                // Autofocus on textfield
+                autoFocus
+                placeholder="Type to search..."
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchRoundedIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={(e) => setSearchTextSchool(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Escape") {
+                    // Prevents autoselecting item while typing (default Select behaviour)
+                    e.stopPropagation();
+                  }
+                }}
+              />
+            </ListSubheader>
+            {displayedSchoolOptions.map((school: string, index: number) => (
+              <MenuItem value={school} key={index}>
+                {school}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>What do you study?</InputLabel>
 
           <Select
@@ -274,7 +334,7 @@ const PreInterventionForm = () => {
       </Stack>
 
       <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>What grade are you in?</InputLabel>
 
           <Select
@@ -290,7 +350,7 @@ const PreInterventionForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <TextField
             label="In which class are you?"
             value={studentClass}
@@ -300,7 +360,7 @@ const PreInterventionForm = () => {
       </Stack>
 
       <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>Complete the sentence: I am...</InputLabel>
 
           <Select
@@ -316,7 +376,7 @@ const PreInterventionForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>How old are you?</InputLabel>
 
           <Select
@@ -341,6 +401,7 @@ const PreInterventionForm = () => {
               md: "49.5%",
             },
           }}
+          required
         >
           <InputLabel>Which Remind program are you following?</InputLabel>
 
