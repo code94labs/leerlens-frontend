@@ -1,6 +1,31 @@
 import React, { useState } from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
 
+const customStyles = {
+  stack: {
+    my: {
+      xs: 0,
+      md: 4,
+    },
+  },
+  subTitle: {
+    mb: {
+      xs: 3,
+      md: 2,
+    },
+    fontSize: {
+      xs: 13,
+      md: 16,
+    },
+  },
+  scaleText: {
+    fontSize: {
+      xs: 13,
+      md: 16,
+    },
+  },
+};
+
 const scale = [1, 2, 3, 4, 5, 6];
 
 type Props = {
@@ -24,13 +49,44 @@ const CustomScale = (props: Props) => {
   };
 
   return (
-    <Stack my={4}>
-      <Typography mb={2} variant="subtitle2">
+    <Stack sx={customStyles.stack}>
+      <Typography variant="subtitle2" sx={customStyles.subTitle}>
         1. Intelligence is something you are born with and cannot change.
       </Typography>
 
-      <Stack flexDirection="row" alignItems="center">
-        <Typography mr={2} color="grey">
+      <Stack
+        sx={{
+          display: {
+            xs: "flex",
+            md: "none",
+          },
+          flexDirection: "row",
+          justifyContent: "space-between",
+          mb: 3,
+        }}
+      >
+        <Typography color="grey" sx={customStyles.scaleText}>
+          Totally disagree
+        </Typography>
+        <Typography color="grey" sx={customStyles.scaleText}>
+          Totally disagree
+        </Typography>
+      </Stack>
+
+      <Stack
+        flexDirection="row"
+        alignItems="center"
+        gap={2}
+        justifyContent="space-between"
+      >
+        <Typography
+          color="grey"
+          sx={customStyles.scaleText}
+          display={{
+            xs: "none",
+            md: "flex",
+          }}
+        >
           Totally disagree
         </Typography>
 
@@ -55,7 +111,14 @@ const CustomScale = (props: Props) => {
           </IconButton>
         ))}
 
-        <Typography ml={2} color="grey">
+        <Typography
+          color="grey"
+          sx={customStyles.scaleText}
+          display={{
+            xs: "none",
+            md: "flex",
+          }}
+        >
           Totally disagree
         </Typography>
       </Stack>

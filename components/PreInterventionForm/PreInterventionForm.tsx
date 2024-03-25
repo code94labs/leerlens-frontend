@@ -63,7 +63,7 @@ const customStyles = {
       md: 16,
     },
   },
-  formBox: { mt: 2, mb: 1, py: 1 },
+  formBox: { mb: 1, py: 1 },
   selectStack: {
     flexDirection: {
       xs: "column",
@@ -298,17 +298,47 @@ const PreInterventionForm = () => {
 
   const questionPartOneForm = (
     <>
-      <Typography variant="subtitle2" fontWeight={500}>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#1A1A1A",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 1,
+        }}
+      >
         Below are a number of statements. You can answer these statements on a
         scale from 1 to 6
       </Typography>
 
-      <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#4C4C4D",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 4,
+        }}
+      >
+        1 to 23 statements <br />
+        (1 = completely disagree, 2 = disagree, 3 = somewhat disagree, 4 =
+        somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
 
-      <FormControl>
+      <FormControl
+        sx={{
+          gap: {
+            xs: 4,
+            md: 4,
+          },
+        }}
+      >
         <CustomScale />
         <CustomScale />
         <CustomScale />
@@ -385,7 +415,7 @@ const PreInterventionForm = () => {
           ))}
         </Stepper>
 
-        <Box>
+        <Box sx={{ my: 2 }}>
           {allStepsCompleted() ? (
             <Fragment>
               <Typography sx={{ mt: 2, mb: 1 }}>
