@@ -13,6 +13,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import CircularProgress, {
+  circularProgressClasses,
+  CircularProgressProps,
+} from "@mui/material/CircularProgress";
 import React, { ChangeEvent, Fragment, useState } from "react";
 import {
   ageList,
@@ -23,14 +27,64 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
+
+import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 
 const customStyles = {
   stack: {
-    width: "90%",
+    width: {
+      // xs: "100%",
+      md: "90%",
+    },
     maxWidth: 1200,
-    margin: "0 auto",
-    mb: 20,
+    mx: {
+      xs: 2,
+      md: "auto",
+    },
+    mb: {
+      xs: 0,
+      md: 20,
+    },
+  },
+  titleBox: {
+    py: {
+      xs: 2.5,
+      md: 4,
+    },
+  },
+  title: {
+    fontWeight: {
+      xs: 900,
+      md: 1000,
+    },
+    mb: 1,
+    textTransform: "uppercase",
+    fontFamily: champBlackFontFamily,
+    color: "#1A1A1A",
+  },
+  body: {
+    mb: 1,
+    fontsize: {
+      xs: 13,
+      md: 16,
+    },
+  },
+  formBox: { mb: 1, py: 1 },
+  selectStack: {
+    flexDirection: {
+      xs: "column",
+      md: "row",
+    },
+    gap: 1,
+    mb: {
+      xs: 1,
+      md: 4,
+    },
+    mt: {
+      xs: 0,
+      md: 2,
+    },
   },
 };
 
@@ -126,10 +180,67 @@ const PreInterventionForm = () => {
   };
   // End of form step creation
 
+  function CircularProgressWithLabel(
+    props: CircularProgressProps & { completedStep: number }
+  ) {
+    return (
+      <Box sx={{ position: "relative", display: "inline-flex" }}>
+        <CircularProgress
+          variant="determinate"
+          sx={{
+            color: (theme) =>
+              theme.palette.grey[theme.palette.mode === "light" ? 200 : 800],
+          }}
+          size={64}
+          thickness={4}
+          {...props}
+          value={100}
+        />
+        <CircularProgress
+          variant="determinate"
+          disableShrink
+          sx={{
+            color: (theme) =>
+              theme.palette.mode === "light" ? "#A879FF" : "#A879FF",
+            animationDuration: "550ms",
+            position: "absolute",
+            left: 0,
+            // [`& .${circularProgressClasses.circle}`]: {
+            //   strokeLinecap: "round",
+            // },
+          }}
+          size={64}
+          thickness={4}
+          value={(props.completedStep / 3) * 100}
+          {...props}
+        />
+        <Box
+          sx={{
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            position: "absolute",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography
+            variant="caption"
+            component="div"
+            color="text.secondary"
+            sx={{ fontSize: 16, color: "#A879FF", fontWeight: 600 }}
+          >{`${activeStep} of 3`}</Typography>
+        </Box>
+      </Box>
+    );
+  }
+
   const personalDetailsForm = (
     <>
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth>
           <InputLabel>What school are you at?</InputLabel>
 
           <Select
@@ -137,13 +248,15 @@ const PreInterventionForm = () => {
             label="What school are you at?"
             onChange={handleChangeSchool}
           >
-            {schoolList.map((school) => (
-              <MenuItem value={school}>{school}</MenuItem>
+            {schoolList.map((school: string, index: number) => (
+              <MenuItem value={school} key={index}>
+                {school}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth>
           <InputLabel>What do you study?</InputLabel>
 
           <Select
@@ -151,15 +264,17 @@ const PreInterventionForm = () => {
             label="What do you study?"
             onChange={handleChangeStudyField}
           >
-            {studyFieldList.map((field) => (
-              <MenuItem value={field}>{field}</MenuItem>
+            {studyFieldList.map((field: string, index: number) => (
+              <MenuItem value={field} key={index}>
+                {field}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth>
           <InputLabel>What grade are you in?</InputLabel>
 
           <Select
@@ -167,13 +282,15 @@ const PreInterventionForm = () => {
             label="What grade are you in?"
             onChange={handleChangeGrade}
           >
-            {gradeList.map((gradeItem) => (
-              <MenuItem value={gradeItem}>{gradeItem}</MenuItem>
+            {gradeList.map((gradeItem: string, index: number) => (
+              <MenuItem value={gradeItem} key={index}>
+                {gradeItem}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth>
           <TextField
             label="In which class are you?"
             value={studentClass}
@@ -182,8 +299,8 @@ const PreInterventionForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth>
           <InputLabel>Complete the sentence: I am...</InputLabel>
 
           <Select
@@ -191,13 +308,15 @@ const PreInterventionForm = () => {
             label="Complete the sentence: I am..."
             onChange={handleChangeCompleteSentence}
           >
-            {completeSentenceList.map((sent) => (
-              <MenuItem value={sent}>{sent}</MenuItem>
+            {completeSentenceList.map((sent: string, index: number) => (
+              <MenuItem value={sent} key={index}>
+                {sent}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth>
           <InputLabel>How old are you?</InputLabel>
 
           <Select
@@ -205,15 +324,24 @@ const PreInterventionForm = () => {
             label="How old are you?"
             onChange={handleChangeAge}
           >
-            {ageList.map((age_) => (
-              <MenuItem value={age_}>{age_}</MenuItem>
+            {ageList.map((age_: number, index: number) => (
+              <MenuItem value={age_} key={index}>
+                {age_}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={10} mt={2}>
-        <FormControl sx={{ width: "49.5%" }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl
+          sx={{
+            width: {
+              xs: "100%",
+              md: "49.5%",
+            },
+          }}
+        >
           <InputLabel>Which Remind program are you following?</InputLabel>
 
           <Select
@@ -221,8 +349,10 @@ const PreInterventionForm = () => {
             label="Which Remind program are you following?"
             onChange={handleChangeRemindProgram}
           >
-            {remindProgramList.map((program) => (
-              <MenuItem value={program}>{program}</MenuItem>
+            {remindProgramList.map((program: string, index: number) => (
+              <MenuItem value={program} key={index}>
+                {program}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -232,17 +362,47 @@ const PreInterventionForm = () => {
 
   const questionPartOneForm = (
     <>
-      <Typography variant="subtitle2" fontWeight={500}>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#1A1A1A",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 1,
+        }}
+      >
         Below are a number of statements. You can answer these statements on a
         scale from 1 to 6
       </Typography>
 
-      <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#4C4C4D",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 4,
+        }}
+      >
+        1 to 23 statements <br />
+        (1 = completely disagree, 2 = disagree, 3 = somewhat disagree, 4 =
+        somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
 
-      <FormControl>
+      <FormControl
+        sx={{
+          gap: {
+            xs: 4,
+            md: 4,
+          },
+        }}
+      >
         <CustomScale />
         <CustomScale />
         <CustomScale />
@@ -257,17 +417,48 @@ const PreInterventionForm = () => {
 
   const questionPartTwoForm = (
     <>
-      <Typography variant="subtitle2" fontWeight={500}>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#1A1A1A",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 1,
+        }}
+      >
         Below are a number of statements. You can answer these statements on a
         scale from 1 to 6
       </Typography>
 
-      <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#4C4C4D",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 4,
+        }}
+      >
+        1 to 23 statements
+        <br />
+        (1 = completely disagree, 2 = disagree, 3 = somewhat disagree, 4 =
+        somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
 
-      <FormControl>
+      <FormControl
+        sx={{
+          gap: {
+            xs: 4,
+            md: 4,
+          },
+        }}
+      >
         <CustomScale />
         <CustomScale />
         <CustomScale />
@@ -296,25 +487,45 @@ const PreInterventionForm = () => {
     }
   };
 
+  const getStepName = (step: number) => {
+    switch (step) {
+      case 0:
+        return "Personal Details";
+
+      case 1:
+        return "Questions | Part 01";
+
+      case 2:
+        return "Questions | Part 02";
+
+      default:
+        break;
+    }
+  };
+
   return (
     <Stack sx={customStyles.stack}>
-      <Box py={4}>
-        <Typography
-          variant="h5"
-          fontWeight={1000}
-          mb={1}
-          textTransform="uppercase"
-        >
+      <Box sx={customStyles.titleBox}>
+        <Typography variant="h5" sx={customStyles.title}>
           Pre-Intervention Measurement
         </Typography>
 
-        <Typography variant="body1" mb={1}>
+        <Typography variant="body1" sx={customStyles.body}>
           Here are some general questions about you?
         </Typography>
       </Box>
 
       <Box sx={{ width: "100%" }}>
-        <Stepper nonLinear activeStep={activeStep}>
+        <Stepper
+          nonLinear
+          activeStep={activeStep}
+          sx={{
+            display: {
+              xs: "none",
+              md: "flex",
+            },
+          }}
+        >
           {steps.map((label, index) => (
             <Step key={label} completed={completed[index]}>
               <StepButton color="inherit" onClick={handleStep(index)}>
@@ -324,7 +535,49 @@ const PreInterventionForm = () => {
           ))}
         </Stepper>
 
-        <Box>
+        {activeStep < 3 && (
+          <Box
+            sx={{
+              width: "100%",
+              display: {
+                xs: "flex",
+                md: "none",
+              },
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <CircularProgressWithLabel completedStep={activeStep} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#1A1A1A", fontSize: 13, fontWeight: 700 }}
+              >
+                {getStepName(activeStep)}
+              </Typography>
+              {activeStep < 2 && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#98989A",
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
+                >
+                  Next : {getStepName(activeStep + 1)}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        )}
+
+        <Box sx={{ my: 2 }}>
           {allStepsCompleted() ? (
             <Fragment>
               <Typography sx={{ mt: 2, mb: 1 }}>
@@ -339,9 +592,7 @@ const PreInterventionForm = () => {
             </Fragment>
           ) : (
             <Fragment>
-              <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-                {formContent()}
-              </Typography>
+              <Box sx={customStyles.formBox}>{formContent()}</Box>
 
               <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                 <Button
