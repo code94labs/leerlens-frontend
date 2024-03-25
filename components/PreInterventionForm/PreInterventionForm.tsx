@@ -23,14 +23,61 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
+
+import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 
 const customStyles = {
   stack: {
-    width: "90%",
+    // width: "90%",
     maxWidth: 1200,
-    margin: "0 auto",
-    mb: 20,
+    mx: {
+      xs: 2,
+      md: 2.5,
+    },
+    mb: {
+      xs: 0,
+      md: 20,
+    },
+  },
+  titleBox: {
+    py: {
+      xs: 2.5,
+      md: 4,
+    },
+  },
+  title: {
+    fontWeight: {
+      xs: 900,
+      md: 1000,
+    },
+    mb: 1,
+    textTransform: "uppercase",
+    fontFamily: champBlackFontFamily,
+    color: "#1A1A1A",
+  },
+  body: {
+    mb: 1,
+    fontsize: {
+      xs: 13,
+      md: 16,
+    },
+  },
+  formBox: { mt: 2, mb: 1, py: 1 },
+  selectStack: {
+    flexDirection: {
+      xs: "column",
+      md: "row",
+    },
+    gap: 1,
+    mb: {
+      xs: 1,
+      md: 4,
+    },
+    mt: {
+      xs: 0,
+      md: 2,
+    },
   },
 };
 
@@ -128,8 +175,8 @@ const PreInterventionForm = () => {
 
   const personalDetailsForm = (
     <>
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth>
           <InputLabel>What school are you at?</InputLabel>
 
           <Select
@@ -137,13 +184,15 @@ const PreInterventionForm = () => {
             label="What school are you at?"
             onChange={handleChangeSchool}
           >
-            {schoolList.map((school) => (
-              <MenuItem value={school}>{school}</MenuItem>
+            {schoolList.map((school: string, index: number) => (
+              <MenuItem value={school} key={index}>
+                {school}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth>
           <InputLabel>What do you study?</InputLabel>
 
           <Select
@@ -151,15 +200,17 @@ const PreInterventionForm = () => {
             label="What do you study?"
             onChange={handleChangeStudyField}
           >
-            {studyFieldList.map((field) => (
-              <MenuItem value={field}>{field}</MenuItem>
+            {studyFieldList.map((field: string, index: number) => (
+              <MenuItem value={field} key={index}>
+                {field}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth>
           <InputLabel>What grade are you in?</InputLabel>
 
           <Select
@@ -167,13 +218,15 @@ const PreInterventionForm = () => {
             label="What grade are you in?"
             onChange={handleChangeGrade}
           >
-            {gradeList.map((gradeItem) => (
-              <MenuItem value={gradeItem}>{gradeItem}</MenuItem>
+            {gradeList.map((gradeItem: string, index: number) => (
+              <MenuItem value={gradeItem} key={index}>
+                {gradeItem}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth>
           <TextField
             label="In which class are you?"
             value={studentClass}
@@ -182,8 +235,8 @@ const PreInterventionForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth>
           <InputLabel>Complete the sentence: I am...</InputLabel>
 
           <Select
@@ -191,13 +244,15 @@ const PreInterventionForm = () => {
             label="Complete the sentence: I am..."
             onChange={handleChangeCompleteSentence}
           >
-            {completeSentenceList.map((sent) => (
-              <MenuItem value={sent}>{sent}</MenuItem>
+            {completeSentenceList.map((sent: string, index: number) => (
+              <MenuItem value={sent} key={index}>
+                {sent}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth>
           <InputLabel>How old are you?</InputLabel>
 
           <Select
@@ -205,15 +260,24 @@ const PreInterventionForm = () => {
             label="How old are you?"
             onChange={handleChangeAge}
           >
-            {ageList.map((age_) => (
-              <MenuItem value={age_}>{age_}</MenuItem>
+            {ageList.map((age_: number, index: number) => (
+              <MenuItem value={age_} key={index}>
+                {age_}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={10} mt={2}>
-        <FormControl sx={{ width: "49.5%" }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl
+          sx={{
+            width: {
+              xs: "100%",
+              md: "49.5%",
+            },
+          }}
+        >
           <InputLabel>Which Remind program are you following?</InputLabel>
 
           <Select
@@ -221,8 +285,10 @@ const PreInterventionForm = () => {
             label="Which Remind program are you following?"
             onChange={handleChangeRemindProgram}
           >
-            {remindProgramList.map((program) => (
-              <MenuItem value={program}>{program}</MenuItem>
+            {remindProgramList.map((program: string, index: number) => (
+              <MenuItem value={program} key={index}>
+                {program}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -298,17 +364,12 @@ const PreInterventionForm = () => {
 
   return (
     <Stack sx={customStyles.stack}>
-      <Box py={4}>
-        <Typography
-          variant="h5"
-          fontWeight={1000}
-          mb={1}
-          textTransform="uppercase"
-        >
+      <Box sx={customStyles.titleBox}>
+        <Typography variant="h5" sx={customStyles.title}>
           Pre-Intervention Measurement
         </Typography>
 
-        <Typography variant="body1" mb={1}>
+        <Typography variant="body1" sx={customStyles.body}>
           Here are some general questions about you?
         </Typography>
       </Box>
@@ -339,9 +400,7 @@ const PreInterventionForm = () => {
             </Fragment>
           ) : (
             <Fragment>
-              <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-                {formContent()}
-              </Typography>
+              <Box sx={customStyles.formBox}>{formContent()}</Box>
 
               <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
                 <Button
