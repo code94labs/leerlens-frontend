@@ -1,9 +1,6 @@
 import axios from "axios";
 
-export const postRequest = (
-  api: string,
-  body: object,
-) =>
+export const postRequest = (api: string, body: object) =>
   axios
     .post(api, body)
     .then((response) => response)

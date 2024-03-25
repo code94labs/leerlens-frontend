@@ -13,13 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, {
-  ChangeEvent,
-  Fragment,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
 import {
   ageList,
   completeSentenceList,
@@ -30,7 +24,7 @@ import {
 } from "../../utils/constant";
 import { useRouter } from "next/router";
 import CustomScale from "../../shared/CustomScale/CustomScale";
-import { getAllPreInterventionQuestions } from "../../services/leerlens.service";
+import { getAllPreInterventionQuestions } from "../../services/questionnaire.service";
 
 export type Question = {
   id: number;
@@ -40,10 +34,6 @@ export type Question = {
   maxValue: number;
   isDelete: boolean;
 };
-
-// export type QuestionAnswer = Question & {
-//   answerValue: number;
-// };
 
 const customStyles = {
   stack: {
@@ -148,7 +138,8 @@ const PreInterventionForm = () => {
   };
 
   const handleSubmit = () => {
-    console.log(answersPartOne)
+    console.log(answersPartOne);
+    console.log(answersPartTwo);
   };
 
   const handleNext = () => {
@@ -191,8 +182,10 @@ const PreInterventionForm = () => {
             label="What school are you at?"
             onChange={handleChangeSchool}
           >
-            {schoolList.map((school) => (
-              <MenuItem value={school}>{school}</MenuItem>
+            {schoolList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.schoolName}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -205,8 +198,10 @@ const PreInterventionForm = () => {
             label="What do you study?"
             onChange={handleChangeStudyField}
           >
-            {studyFieldList.map((field) => (
-              <MenuItem value={field}>{field}</MenuItem>
+            {studyFieldList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.studyField}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -221,8 +216,10 @@ const PreInterventionForm = () => {
             label="What grade are you in?"
             onChange={handleChangeGrade}
           >
-            {gradeList.map((gradeItem) => (
-              <MenuItem value={gradeItem}>{gradeItem}</MenuItem>
+            {gradeList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.grade}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -245,8 +242,10 @@ const PreInterventionForm = () => {
             label="Complete the sentence: I am..."
             onChange={handleChangeCompleteSentence}
           >
-            {completeSentenceList.map((sent) => (
-              <MenuItem value={sent}>{sent}</MenuItem>
+            {completeSentenceList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.sentence}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -259,8 +258,10 @@ const PreInterventionForm = () => {
             label="How old are you?"
             onChange={handleChangeAge}
           >
-            {ageList.map((age_) => (
-              <MenuItem value={age_}>{age_}</MenuItem>
+            {ageList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.age}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -275,8 +276,10 @@ const PreInterventionForm = () => {
             label="Which Remind program are you following?"
             onChange={handleChangeRemindProgram}
           >
-            {remindProgramList.map((program) => (
-              <MenuItem value={program}>{program}</MenuItem>
+            {remindProgramList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.sentence}
+              </MenuItem>
             ))}
           </Select>
         </FormControl>
