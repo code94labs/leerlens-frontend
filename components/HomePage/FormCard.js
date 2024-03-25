@@ -82,34 +82,43 @@ const customStyles = {
       md: 4,
     },
   },
-  // dialogBtnStack: {
-  //   "> :first-child": {
-  //     mr: {
-  //       xs: 0,
-  //       md: 1,
-  //     },
-  //   },
-  //   "> :last-child": {
-  //     ml: {
-  //       xs: 0,
-  //       md: 1,
-  //     },
-  //   },
-  // },
-  button: {
+  outlineButton: {
     backgroundColor: "white",
     color: "#A879FF",
     borderRadius: 2,
     textTransform: "initial",
-    fontWeight: "bold",
+    fontWeight: 900,
     border: "2px #A879FF solid",
     padding: {
       xs: 0.5,
       md: 1.3,
     },
     "&:hover": {
-      backgroundColor: "#A879FF",
+      backgroundColor: "#C4B0EB",
       color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
+    fontFamily: champBlackFontFamily,
+  },
+  filledButton: {
+    backgroundColor: "#A879FF",
+    color: "white",
+    borderRadius: 2,
+    textTransform: "initial",
+    fontWeight: 900,
+    border: "2px #A879FF solid",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
+    },
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
     },
     fontSize: {
       xs: 14,
@@ -298,7 +307,7 @@ const FormCard = (props) => {
         <Button
           variant="contained"
           sx={{
-            ...customStyles.button,
+            ...customStyles.outlineButton,
             order: {
               xs: 2,
               md: 1,
@@ -314,7 +323,7 @@ const FormCard = (props) => {
         <Button
           variant="contained"
           sx={{
-            ...customStyles.button,
+            ...customStyles.filledButton,
             order: {
               xs: 1,
               md: 2,
@@ -341,7 +350,7 @@ const FormCard = (props) => {
         <Box sx={customStyles.boxBtn}>
           <Button
             variant="contained"
-            sx={customStyles.button}
+            sx={customStyles.filledButton}
             fullWidth
             onClick={handleFormNavigation}
             disableElevation
@@ -351,7 +360,7 @@ const FormCard = (props) => {
 
           <Button
             variant="contained"
-            sx={customStyles.button}
+            sx={customStyles.outlineButton}
             fullWidth
             onClick={handleOpen}
             disableElevation
