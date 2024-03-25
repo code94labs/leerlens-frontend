@@ -13,6 +13,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import CircularProgress, {
+  circularProgressClasses,
+  CircularProgressProps,
+} from "@mui/material/CircularProgress";
 import React, { ChangeEvent, Fragment, useState } from "react";
 import {
   ageList,
@@ -29,11 +33,14 @@ import CustomScale from "../../shared/CustomScale/CustomScale";
 
 const customStyles = {
   stack: {
-    // width: "90%",
+    width: {
+      // xs: "100%",
+      md: "90%",
+    },
     maxWidth: 1200,
     mx: {
       xs: 2,
-      md: 2.5,
+      md: "auto",
     },
     mb: {
       xs: 0,
@@ -172,6 +179,63 @@ const PreInterventionForm = () => {
     setCompleted({});
   };
   // End of form step creation
+
+  function CircularProgressWithLabel(
+    props: CircularProgressProps & { completedStep: number }
+  ) {
+    return (
+      <Box sx={{ position: "relative", display: "inline-flex" }}>
+        <CircularProgress
+          variant="determinate"
+          sx={{
+            color: (theme) =>
+              theme.palette.grey[theme.palette.mode === "light" ? 200 : 800],
+          }}
+          size={64}
+          thickness={4}
+          {...props}
+          value={100}
+        />
+        <CircularProgress
+          variant="determinate"
+          disableShrink
+          sx={{
+            color: (theme) =>
+              theme.palette.mode === "light" ? "#A879FF" : "#A879FF",
+            animationDuration: "550ms",
+            position: "absolute",
+            left: 0,
+            // [`& .${circularProgressClasses.circle}`]: {
+            //   strokeLinecap: "round",
+            // },
+          }}
+          size={64}
+          thickness={4}
+          value={(props.completedStep / 3) * 100}
+          {...props}
+        />
+        <Box
+          sx={{
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            position: "absolute",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography
+            variant="caption"
+            component="div"
+            color="text.secondary"
+            sx={{ fontSize: 16, color: "#A879FF", fontWeight: 600 }}
+          >{`${activeStep} of 3`}</Typography>
+        </Box>
+      </Box>
+    );
+  }
 
   const personalDetailsForm = (
     <>
@@ -423,6 +487,22 @@ const PreInterventionForm = () => {
     }
   };
 
+  const getStepName = (step: number) => {
+    switch (step) {
+      case 0:
+        return "Personal Details";
+
+      case 1:
+        return "Questions | Part 01";
+
+      case 2:
+        return "Questions | Part 02";
+
+      default:
+        break;
+    }
+  };
+
   return (
     <Stack sx={customStyles.stack}>
       <Box sx={customStyles.titleBox}>
@@ -436,7 +516,16 @@ const PreInterventionForm = () => {
       </Box>
 
       <Box sx={{ width: "100%" }}>
-        <Stepper nonLinear activeStep={activeStep}>
+        <Stepper
+          nonLinear
+          activeStep={activeStep}
+          sx={{
+            display: {
+              xs: "none",
+              md: "flex",
+            },
+          }}
+        >
           {steps.map((label, index) => (
             <Step key={label} completed={completed[index]}>
               <StepButton color="inherit" onClick={handleStep(index)}>
@@ -445,6 +534,48 @@ const PreInterventionForm = () => {
             </Step>
           ))}
         </Stepper>
+
+        {activeStep < 3 && (
+          <Box
+            sx={{
+              width: "100%",
+              display: {
+                xs: "flex",
+                md: "none",
+              },
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <CircularProgressWithLabel completedStep={activeStep} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#1A1A1A", fontSize: 13, fontWeight: 700 }}
+              >
+                {getStepName(activeStep)}
+              </Typography>
+              {activeStep < 2 && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#98989A",
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
+                >
+                  Next : {getStepName(activeStep + 1)}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        )}
 
         <Box sx={{ my: 2 }}>
           {allStepsCompleted() ? (
