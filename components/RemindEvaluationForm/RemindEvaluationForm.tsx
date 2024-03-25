@@ -13,7 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { ChangeEvent, Fragment, useState } from "react";
+import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
 import {
   ageList,
   completeSentenceList,
@@ -23,6 +23,10 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
+import { FormEvaluation } from "../../utils/enum";
+import { Question } from "../PostInterventionForm/PostInterventionForm";
+import CustomScale from "../../shared/CustomScale/CustomScale";
+import { getAllEvaluationQuestions } from "../../services/questionnaire.service";
 
 const customStyles = {
   stack: {
@@ -52,10 +56,40 @@ const RemindEvaluationForm = () => {
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
 
+  const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
+    []
+  );
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<Question[]>(
+    []
+  );
+
+  const [answersPartOne, setAnswersPartOne] = useState<number[]>(
+    Array(questionListPartOne.length).fill(0)
+  );
+  const [answersPartTwo, setAnswersPartTwo] = useState<number[]>(
+    Array(questionListPartTwo.length).fill(0)
+  );
+
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{
     [k: number]: boolean;
   }>({});
+
+  const updateAnswerPartOne = (questionId: number, answer: number) => {
+    setAnswersPartOne((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[questionId] = answer;
+      return newAnswers;
+    });
+  };
+
+  const updateAnswerPartTwo = (questionId: number, answer: number) => {
+    setAnswersPartTwo((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[questionId] = answer;
+      return newAnswers;
+    });
+  };
 
   const handleChangeSchool = (event: SelectChangeEvent) => {
     setSchool(event.target.value as string);
@@ -100,6 +134,47 @@ const RemindEvaluationForm = () => {
 
   const allStepsCompleted = () => {
     return completedSteps() === totalSteps();
+  };
+
+  const formatQuestionnaire = (questionList: Question[], answers: number[]) => {
+    return questionList.map((question, index) => ({
+      questionnaireId: question.id,
+      answer: answers[index],
+    }));
+  };
+
+  const handleSubmit = () => {
+    // Question id of the element refers to (Input Element type & Question)
+    // TODO: We have to look into this once the admin panel is ready or we can replicate it using sample data from the database.
+    const studentDetails = [
+      { questionId: 1, answer: school },
+      { questionId: 2, answer: studyField },
+      { questionId: 3, answer: grade },
+      { questionId: 4, answer: studentClass },
+      { questionId: 5, answer: completeSentence },
+      { questionId: 6, answer: age },
+      { questionId: 7, answer: remindProgram },
+    ];
+
+    const partOneResponses = formatQuestionnaire(
+      questionListPartOne,
+      answersPartOne
+    );
+
+    const partTwoResponses = formatQuestionnaire(
+      questionListPartTwo,
+      answersPartTwo
+    );
+
+    const responses = [...partOneResponses, ...partTwoResponses];
+
+    const request = {
+      formType: FormEvaluation.Evaluation,
+      studentDetails,
+      responses,
+    };
+
+    console.log("request", request);
   };
 
   const handleNext = () => {
@@ -260,14 +335,15 @@ const RemindEvaluationForm = () => {
       </Typography>
 
       <FormControl>
-        {/* <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale /> */}
+        {questionListPartOne.map((questionDetails: Question, index: number) => (
+          <CustomScale
+            key={questionDetails.id}
+            {...questionDetails}
+            updateAnswer={(answer: number) =>
+              updateAnswerPartOne(index, answer)
+            }
+          />
+        ))}
       </FormControl>
     </>
   );
@@ -285,14 +361,15 @@ const RemindEvaluationForm = () => {
       </Typography>
 
       <FormControl>
-        {/* <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale /> */}
+        {questionListPartTwo.map((questionDetails: Question, index: number) => (
+          <CustomScale
+            key={questionDetails.id}
+            {...questionDetails}
+            updateAnswer={(answer: number) =>
+              updateAnswerPartTwo(index, answer)
+            }
+          />
+        ))}
       </FormControl>
     </>
   );
@@ -323,6 +400,34 @@ const RemindEvaluationForm = () => {
     }
   };
 
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const evaluationQuestions = await getAllEvaluationQuestions();
+
+        const questionsWithAnswerValue = evaluationQuestions.map(
+          (question: Question) => ({
+            ...question,
+            answerValue: 0,
+          })
+        );
+
+        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
+
+        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
+        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
+
+        setQuestionListPartOne(firstHalf);
+        setQuestionListPartTwo(secondHalf);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
   return (
     <Stack sx={customStyles.stack}>
       <Box py={4}>
@@ -332,7 +437,7 @@ const RemindEvaluationForm = () => {
           mb={1}
           textTransform="uppercase"
         >
-          Pre-Intervention Measurement
+          Evaluation
         </Typography>
 
         <Typography variant="body1" mb={1}>

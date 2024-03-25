@@ -25,6 +25,7 @@ import {
 import { useRouter } from "next/router";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import { getAllPreInterventionQuestions } from "../../services/questionnaire.service";
+import { FormEvaluation } from "../../utils/enum";
 
 export type Question = {
   id: number;
@@ -137,9 +138,45 @@ const PreInterventionForm = () => {
     return completedSteps() === totalSteps();
   };
 
+  const formatQuestionnaire = (questionList: Question[], answers: number[]) => {
+    return questionList.map((question, index) => ({
+      questionnaireId: question.id,
+      answer: answers[index],
+    }));
+  };
+
   const handleSubmit = () => {
-    console.log(answersPartOne);
-    console.log(answersPartTwo);
+    // Question id of the element refers to (Input Element type & Question)
+    // TODO: We have to look into this once the admin panel is ready or we can replicate it using sample data from the database.
+    const studentDetails = [
+      { questionId: 1, answer: school },
+      { questionId: 2, answer: studyField },
+      { questionId: 3, answer: grade },
+      { questionId: 4, answer: studentClass },
+      { questionId: 5, answer: completeSentence },
+      { questionId: 6, answer: age },
+      { questionId: 7, answer: remindProgram },
+    ];
+
+    const partOneResponses = formatQuestionnaire(
+      questionListPartOne,
+      answersPartOne
+    );
+
+    const partTwoResponses = formatQuestionnaire(
+      questionListPartTwo,
+      answersPartTwo
+    );
+
+    const responses = [...partOneResponses, ...partTwoResponses];
+
+    const request = {
+      formType: FormEvaluation.PreInterventions,
+      studentDetails,
+      responses
+    };
+
+    console.log('request', request);
   };
 
   const handleNext = () => {

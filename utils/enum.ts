@@ -1,9 +1,6 @@
-// export enum SampleType {
-//   Test01 = 1,
-//   Test02 = 2,
-// }
-
-// export const sampleTypeTitle = {
-//   [SampleType.Test01]: "Test 01",
-//   [SampleType.Test02]: "Test 02",
-// };
+export enum FormEvaluation {
+  PreInterventions = 0,
+  PostInterventions = 1,
+  Normgroup = 2,
+  Evaluation = 3,
+}
