@@ -339,20 +339,7 @@ const PreInterventionForm = () => {
       <Stack sx={customStyles.selectStack}>
         <FormControl fullWidth required>
           <InputLabel>What school are you at?</InputLabel>
-
-          {/* <Select
-            value={school}
-            label="What school are you at?"
-            onChange={handleChangeSchool}
-          >
-            {schoolList.map((school: string, index: number) => (
-              <MenuItem value={school} key={index}>
-                {school}
-              </MenuItem>
-            ))}
-          </Select> */}
           <Select
-            // Disables auto focus on MenuItems and allows TextField to be in focus
             MenuProps={{ autoFocus: false }}
             labelId="search-select-school"
             id="search-select"
@@ -360,17 +347,11 @@ const PreInterventionForm = () => {
             label="What school are you at?"
             onChange={handleChangeSchool}
             onClose={() => setSearchTextSchool("")}
-            // This prevents rendering empty string in Select's value
-            // if search text would exclude currently selected option.
             renderValue={() => school}
           >
-            {/* TextField is put into ListSubheader so that it doesn't
-              act as a selectable item in the menu
-              i.e. we can click the TextField without triggering any selection.*/}
             <ListSubheader>
               <TextField
                 size="small"
-                // Autofocus on textfield
                 autoFocus
                 placeholder="Type to search..."
                 fullWidth
@@ -384,7 +365,6 @@ const PreInterventionForm = () => {
                 onChange={(e) => setSearchTextSchool(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key !== "Escape") {
-                    // Prevents autoselecting item while typing (default Select behaviour)
                     e.stopPropagation();
                   }
                 }}
