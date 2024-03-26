@@ -33,6 +33,17 @@ import { useRouter } from "next/router";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
+import { getAllPreInterventionQuestions } from "../../services/questionnaire.service";
+import { FormEvaluation } from "../../utils/enum";
+
+export type Question = {
+  id: number;
+  questionText: string;
+  positionOrderId: number;
+  minValue: number;
+  maxValue: number;
+  isDelete: boolean;
+};
 
 const customStyles = {
   stack: {
@@ -105,18 +116,48 @@ const PreInterventionForm = () => {
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
 
+  const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
+    []
+  );
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<Question[]>(
+    []
+  );
+
+  const [answersPartOne, setAnswersPartOne] = useState<number[]>(
+    Array(questionListPartOne.length).fill(0)
+  );
+  const [answersPartTwo, setAnswersPartTwo] = useState<number[]>(
+    Array(questionListPartTwo.length).fill(0)
+  );
+
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{
     [k: number]: boolean;
   }>({});
+
+  const updateAnswerPartOne = (questionId: number, answer: number) => {
+    setAnswersPartOne((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[questionId] = answer;
+      return newAnswers;
+    });
+  };
+
+  const updateAnswerPartTwo = (questionId: number, answer: number) => {
+    setAnswersPartTwo((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[questionId] = answer;
+      return newAnswers;
+    });
+  };
 
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
   const displayedSchoolOptions = useMemo(
     () =>
-      schoolList.filter((option: string) =>
-        containsText(option, searchTextSchool)
+      schoolList.filter((option) =>
+        containsText(option.schoolName, searchTextSchool)
       ),
     [searchTextSchool]
   );
@@ -164,6 +205,47 @@ const PreInterventionForm = () => {
 
   const allStepsCompleted = () => {
     return completedSteps() === totalSteps();
+  };
+
+  const formatQuestionnaire = (questionList: Question[], answers: number[]) => {
+    return questionList.map((question, index) => ({
+      questionnaireId: question.id,
+      answer: answers[index],
+    }));
+  };
+
+  const handleSubmit = () => {
+    // Question id of the element refers to (Input Element type & Question)
+    // TODO: We have to look into this once the admin panel is ready or we can replicate it using sample data from the database.
+    const studentDetails = [
+      { questionId: 1, answer: school },
+      { questionId: 2, answer: studyField },
+      { questionId: 3, answer: grade },
+      { questionId: 4, answer: studentClass },
+      { questionId: 5, answer: completeSentence },
+      { questionId: 6, answer: age },
+      { questionId: 7, answer: remindProgram },
+    ];
+
+    const partOneResponses = formatQuestionnaire(
+      questionListPartOne,
+      answersPartOne
+    );
+
+    const partTwoResponses = formatQuestionnaire(
+      questionListPartTwo,
+      answersPartTwo
+    );
+
+    const responses = [...partOneResponses, ...partTwoResponses];
+
+    const request = {
+      formType: FormEvaluation.PreInterventions,
+      studentDetails,
+      responses,
+    };
+
+    console.log("request", request);
   };
 
   const handleNext = () => {
@@ -308,9 +390,9 @@ const PreInterventionForm = () => {
                 }}
               />
             </ListSubheader>
-            {displayedSchoolOptions.map((school: string, index: number) => (
-              <MenuItem value={school} key={index}>
-                {school}
+            {displayedSchoolOptions.map((school: any, index: number) => (
+              <MenuItem value={school.id} key={index}>
+                {school.schoolName}
               </MenuItem>
             ))}
           </Select>
@@ -324,9 +406,9 @@ const PreInterventionForm = () => {
             label="What do you study?"
             onChange={handleChangeStudyField}
           >
-            {studyFieldList.map((field: string, index: number) => (
-              <MenuItem value={field} key={index}>
-                {field}
+            {studyFieldList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.studyField}
               </MenuItem>
             ))}
           </Select>
@@ -342,9 +424,9 @@ const PreInterventionForm = () => {
             label="What grade are you in?"
             onChange={handleChangeGrade}
           >
-            {gradeList.map((gradeItem: string, index: number) => (
-              <MenuItem value={gradeItem} key={index}>
-                {gradeItem}
+            {gradeList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.grade}
               </MenuItem>
             ))}
           </Select>
@@ -368,9 +450,9 @@ const PreInterventionForm = () => {
             label="Complete the sentence: I am..."
             onChange={handleChangeCompleteSentence}
           >
-            {completeSentenceList.map((sent: string, index: number) => (
-              <MenuItem value={sent} key={index}>
-                {sent}
+            {completeSentenceList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.sentence}
               </MenuItem>
             ))}
           </Select>
@@ -384,9 +466,9 @@ const PreInterventionForm = () => {
             label="How old are you?"
             onChange={handleChangeAge}
           >
-            {ageList.map((age_: number, index: number) => (
-              <MenuItem value={age_} key={index}>
-                {age_}
+            {ageList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.age}
               </MenuItem>
             ))}
           </Select>
@@ -410,9 +492,9 @@ const PreInterventionForm = () => {
             label="Which Remind program are you following?"
             onChange={handleChangeRemindProgram}
           >
-            {remindProgramList.map((program: string, index: number) => (
-              <MenuItem value={program} key={index}>
-                {program}
+            {remindProgramList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.sentence}
               </MenuItem>
             ))}
           </Select>
@@ -464,14 +546,15 @@ const PreInterventionForm = () => {
           },
         }}
       >
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
+        {questionListPartOne.map((questionDetails: Question, index: number) => (
+          <CustomScale
+            key={questionDetails.id}
+            {...questionDetails}
+            updateAnswer={(answer: number) =>
+              updateAnswerPartOne(index, answer)
+            }
+          />
+        ))}
       </FormControl>
     </>
   );
@@ -512,22 +595,16 @@ const PreInterventionForm = () => {
         somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
 
-      <FormControl
-        sx={{
-          gap: {
-            xs: 4,
-            md: 4,
-          },
-        }}
-      >
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
+      <FormControl>
+        {questionListPartTwo.map((questionDetails: Question, index: number) => (
+          <CustomScale
+            key={questionDetails.id}
+            {...questionDetails}
+            updateAnswer={(answer: number) =>
+              updateAnswerPartTwo(index, answer)
+            }
+          />
+        ))}
       </FormControl>
     </>
   );
@@ -547,6 +624,33 @@ const PreInterventionForm = () => {
         break;
     }
   };
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const preInterventionQuestions = await getAllPreInterventionQuestions();
+
+        const questionsWithAnswerValue = preInterventionQuestions.map(
+          (question: Question) => ({
+            ...question,
+            answerValue: 0,
+          })
+        );
+
+        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
+
+        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
+        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
+
+        setQuestionListPartOne(firstHalf);
+        setQuestionListPartTwo(secondHalf);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const getStepName = (step: number) => {
     switch (step) {
@@ -667,9 +771,23 @@ const PreInterventionForm = () => {
 
                 <Box sx={{ flex: "1 1 auto" }} />
 
-                <Button variant="outlined" onClick={handleNext} sx={{ mr: 1 }}>
-                  Next
-                </Button>
+                {isLastStep() ? (
+                  <Button
+                    variant="outlined"
+                    onClick={handleSubmit}
+                    sx={{ mr: 1 }}
+                  >
+                    Submit
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    onClick={handleNext}
+                    sx={{ mr: 1 }}
+                  >
+                    Next
+                  </Button>
+                )}
               </Box>
             </Fragment>
           )}
