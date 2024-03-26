@@ -17,7 +17,7 @@ import CircularProgress, {
   circularProgressClasses,
   CircularProgressProps,
 } from "@mui/material/CircularProgress";
-import React, { ChangeEvent, Fragment, useState } from "react";
+import React, { ChangeEvent, Fragment, useState, useMemo } from "react";
 import {
   ageList,
   completeSentenceList,
@@ -30,6 +30,17 @@ import { useRouter } from "next/router";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
+import { getAllPreInterventionQuestions } from "../../services/questionnaire.service";
+import { FormEvaluation } from "../../utils/enum";
+
+export type Question = {
+  id: number;
+  questionText: string;
+  positionOrderId: number;
+  minValue: number;
+  maxValue: number;
+  isDelete: boolean;
+};
 
 const customStyles = {
   stack: {
@@ -101,10 +112,40 @@ const PreInterventionForm = () => {
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
 
+  const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
+    []
+  );
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<Question[]>(
+    []
+  );
+
+  const [answersPartOne, setAnswersPartOne] = useState<number[]>(
+    Array(questionListPartOne.length).fill(0)
+  );
+  const [answersPartTwo, setAnswersPartTwo] = useState<number[]>(
+    Array(questionListPartTwo.length).fill(0)
+  );
+
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{
     [k: number]: boolean;
   }>({});
+
+  const updateAnswerPartOne = (questionId: number, answer: number) => {
+    setAnswersPartOne((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[questionId] = answer;
+      return newAnswers;
+    });
+  };
+
+  const updateAnswerPartTwo = (questionId: number, answer: number) => {
+    setAnswersPartTwo((prevAnswers) => {
+      const newAnswers = [...prevAnswers];
+      newAnswers[questionId] = answer;
+      return newAnswers;
+    });
+  };
 
   const handleChangeSchool = (event: SelectChangeEvent) => {
     setSchool(event.target.value as string);
@@ -149,6 +190,47 @@ const PreInterventionForm = () => {
 
   const allStepsCompleted = () => {
     return completedSteps() === totalSteps();
+  };
+
+  const formatQuestionnaire = (questionList: Question[], answers: number[]) => {
+    return questionList.map((question, index) => ({
+      questionnaireId: question.id,
+      answer: answers[index],
+    }));
+  };
+
+  const handleSubmit = () => {
+    // Question id of the element refers to (Input Element type & Question)
+    // TODO: We have to look into this once the admin panel is ready or we can replicate it using sample data from the database.
+    const studentDetails = [
+      { questionId: 1, answer: school },
+      { questionId: 2, answer: studyField },
+      { questionId: 3, answer: grade },
+      { questionId: 4, answer: studentClass },
+      { questionId: 5, answer: completeSentence },
+      { questionId: 6, answer: age },
+      { questionId: 7, answer: remindProgram },
+    ];
+
+    const partOneResponses = formatQuestionnaire(
+      questionListPartOne,
+      answersPartOne
+    );
+
+    const partTwoResponses = formatQuestionnaire(
+      questionListPartTwo,
+      answersPartTwo
+    );
+
+    const responses = [...partOneResponses, ...partTwoResponses];
+
+    const request = {
+      formType: FormEvaluation.PreInterventions,
+      studentDetails,
+      responses,
+    };
+
+    console.log("request", request);
   };
 
   const handleNext = () => {
@@ -198,7 +280,6 @@ const PreInterventionForm = () => {
         />
         <CircularProgress
           variant="determinate"
-          disableShrink
           sx={{
             color: (theme) =>
               theme.palette.mode === "light" ? "#A879FF" : "#A879FF",
@@ -211,7 +292,7 @@ const PreInterventionForm = () => {
           }}
           size={64}
           thickness={4}
-          value={(props.completedStep / 3) * 100}
+          value={((activeStep + 1) / 3) * 100}
           {...props}
         />
         <Box
@@ -231,7 +312,7 @@ const PreInterventionForm = () => {
             component="div"
             color="text.secondary"
             sx={{ fontSize: 16, color: "#A879FF", fontWeight: 600 }}
-          >{`${activeStep} of 3`}</Typography>
+          >{`${activeStep + 1} of 3`}</Typography>
         </Box>
       </Box>
     );
@@ -248,9 +329,9 @@ const PreInterventionForm = () => {
             label="What school are you at?"
             onChange={handleChangeSchool}
           >
-            {schoolList.map((school: string, index: number) => (
-              <MenuItem value={school} key={index}>
-                {school}
+            {schoolList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.schoolName}
               </MenuItem>
             ))}
           </Select>
@@ -264,9 +345,9 @@ const PreInterventionForm = () => {
             label="What do you study?"
             onChange={handleChangeStudyField}
           >
-            {studyFieldList.map((field: string, index: number) => (
-              <MenuItem value={field} key={index}>
-                {field}
+            {studyFieldList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.studyField}
               </MenuItem>
             ))}
           </Select>
@@ -282,9 +363,9 @@ const PreInterventionForm = () => {
             label="What grade are you in?"
             onChange={handleChangeGrade}
           >
-            {gradeList.map((gradeItem: string, index: number) => (
-              <MenuItem value={gradeItem} key={index}>
-                {gradeItem}
+            {gradeList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.grade}
               </MenuItem>
             ))}
           </Select>
@@ -308,9 +389,9 @@ const PreInterventionForm = () => {
             label="Complete the sentence: I am..."
             onChange={handleChangeCompleteSentence}
           >
-            {completeSentenceList.map((sent: string, index: number) => (
-              <MenuItem value={sent} key={index}>
-                {sent}
+            {completeSentenceList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.sentence}
               </MenuItem>
             ))}
           </Select>
@@ -324,9 +405,9 @@ const PreInterventionForm = () => {
             label="How old are you?"
             onChange={handleChangeAge}
           >
-            {ageList.map((age_: number, index: number) => (
-              <MenuItem value={age_} key={index}>
-                {age_}
+            {ageList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.age}
               </MenuItem>
             ))}
           </Select>
@@ -349,9 +430,9 @@ const PreInterventionForm = () => {
             label="Which Remind program are you following?"
             onChange={handleChangeRemindProgram}
           >
-            {remindProgramList.map((program: string, index: number) => (
-              <MenuItem value={program} key={index}>
-                {program}
+            {remindProgramList.map((item, index) => (
+              <MenuItem key={index} value={item.id}>
+                {item.sentence}
               </MenuItem>
             ))}
           </Select>
@@ -403,14 +484,15 @@ const PreInterventionForm = () => {
           },
         }}
       >
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
+        {questionListPartOne.map((questionDetails: Question, index: number) => (
+          <CustomScale
+            key={questionDetails.id}
+            {...questionDetails}
+            updateAnswer={(answer: number) =>
+              updateAnswerPartOne(index, answer)
+            }
+          />
+        ))}
       </FormControl>
     </>
   );
@@ -459,14 +541,15 @@ const PreInterventionForm = () => {
           },
         }}
       >
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
-        <CustomScale />
+        {questionListPartTwo.map((questionDetails: Question, index: number) => (
+          <CustomScale
+            key={questionDetails.id}
+            {...questionDetails}
+            updateAnswer={(answer: number) =>
+              updateAnswerPartTwo(index, answer)
+            }
+          />
+        ))}
       </FormControl>
     </>
   );
@@ -502,6 +585,33 @@ const PreInterventionForm = () => {
         break;
     }
   };
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const preInterventionQuestions = await getAllPreInterventionQuestions();
+
+        const questionsWithAnswerValue = preInterventionQuestions.map(
+          (question: Question) => ({
+            ...question,
+            answerValue: 0,
+          })
+        );
+
+        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
+
+        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
+        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
+
+        setQuestionListPartOne(firstHalf);
+        setQuestionListPartTwo(secondHalf);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <Stack sx={customStyles.stack}>
@@ -606,9 +716,23 @@ const PreInterventionForm = () => {
 
                 <Box sx={{ flex: "1 1 auto" }} />
 
-                <Button variant="outlined" onClick={handleNext} sx={{ mr: 1 }}>
-                  Next
-                </Button>
+                {isLastStep() ? (
+                  <Button
+                    variant="outlined"
+                    onClick={handleSubmit}
+                    sx={{ mr: 1 }}
+                  >
+                    Submit
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    onClick={handleNext}
+                    sx={{ mr: 1 }}
+                  >
+                    Next
+                  </Button>
+                )}
               </Box>
             </Fragment>
           )}

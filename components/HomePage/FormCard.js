@@ -82,9 +82,9 @@ const customStyles = {
       md: 4,
     },
   },
-  outlineButton: {
-    backgroundColor: "white",
-    color: "#A879FF",
+  primaryBtn: {
+    backgroundColor: "#A879FF",
+    color: "white",
     borderRadius: 2,
     textTransform: "initial",
     fontWeight: 900,
@@ -104,12 +104,12 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
   },
-  filledButton: {
-    backgroundColor: "#A879FF",
-    color: "white",
+  secondaryBtn: {
+    backgroundColor: "white",
+    color: "#A879FF",
     borderRadius: 2,
     textTransform: "initial",
-    fontWeight: 900,
+    fontWeight: "bold",
     border: "2px #A879FF solid",
     padding: {
       xs: 0.5,
@@ -307,7 +307,7 @@ const FormCard = (props) => {
         <Button
           variant="contained"
           sx={{
-            ...customStyles.outlineButton,
+            ...customStyles.secondaryBtn,
             order: {
               xs: 2,
               md: 1,
@@ -323,7 +323,7 @@ const FormCard = (props) => {
         <Button
           variant="contained"
           sx={{
-            ...customStyles.filledButton,
+            ...customStyles.primaryBtn,
             order: {
               xs: 1,
               md: 2,
@@ -350,7 +350,7 @@ const FormCard = (props) => {
         <Box sx={customStyles.boxBtn}>
           <Button
             variant="contained"
-            sx={customStyles.filledButton}
+            sx={customStyles.primaryBtn}
             fullWidth
             onClick={handleFormNavigation}
             disableElevation
@@ -360,7 +360,7 @@ const FormCard = (props) => {
 
           <Button
             variant="contained"
-            sx={customStyles.outlineButton}
+            sx={customStyles.secondaryBtn}
             fullWidth
             onClick={handleOpen}
             disableElevation
