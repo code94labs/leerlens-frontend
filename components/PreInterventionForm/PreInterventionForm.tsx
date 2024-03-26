@@ -369,11 +369,13 @@ const PreInterventionForm = () => {
                 }}
               />
             </ListSubheader>
-            {displayedSchoolOptions.map((school: any, index: number) => (
-              <MenuItem value={school.id} key={index}>
-                {school.schoolName}
-              </MenuItem>
-            ))}
+            <Box maxHeight={150}>
+              {displayedSchoolOptions.map((school: any, index: number) => (
+                <MenuItem value={school.id} key={index}>
+                  {school.schoolName}
+                </MenuItem>
+              ))}
+            </Box>
           </Select>
         </FormControl>
 
