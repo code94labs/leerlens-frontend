@@ -13,7 +13,11 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
+import CircularProgress, {
+  circularProgressClasses,
+  CircularProgressProps,
+} from "@mui/material/CircularProgress";
+import React, { ChangeEvent, Fragment, useState, useMemo } from "react";
 import {
   ageList,
   completeSentenceList,
@@ -23,6 +27,8 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
+
+import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import { getAllPreInterventionQuestions } from "../../services/questionnaire.service";
 import { FormEvaluation } from "../../utils/enum";
@@ -38,10 +44,58 @@ export type Question = {
 
 const customStyles = {
   stack: {
-    width: "90%",
+    width: {
+      // xs: "100%",
+      md: "90%",
+    },
     maxWidth: 1200,
-    margin: "0 auto",
-    mb: 10,
+    mx: {
+      xs: 2,
+      md: "auto",
+    },
+    mb: {
+      xs: 0,
+      md: 20,
+    },
+  },
+  titleBox: {
+    py: {
+      xs: 2.5,
+      md: 4,
+    },
+  },
+  title: {
+    fontWeight: {
+      xs: 900,
+      md: 1000,
+    },
+    mb: 1,
+    textTransform: "uppercase",
+    fontFamily: champBlackFontFamily,
+    color: "#1A1A1A",
+  },
+  body: {
+    mb: 1,
+    fontsize: {
+      xs: 13,
+      md: 16,
+    },
+  },
+  formBox: { mb: 1, py: 1 },
+  selectStack: {
+    flexDirection: {
+      xs: "column",
+      md: "row",
+    },
+    gap: 1,
+    mb: {
+      xs: 1,
+      md: 4,
+    },
+    mt: {
+      xs: 0,
+      md: 2,
+    },
   },
 };
 
@@ -173,10 +227,10 @@ const PreInterventionForm = () => {
     const request = {
       formType: FormEvaluation.PreInterventions,
       studentDetails,
-      responses
+      responses,
     };
 
-    console.log('request', request);
+    console.log("request", request);
   };
 
   const handleNext = () => {
@@ -208,10 +262,66 @@ const PreInterventionForm = () => {
   };
   // End of form step creation
 
+  function CircularProgressWithLabel(
+    props: CircularProgressProps & { completedStep: number }
+  ) {
+    return (
+      <Box sx={{ position: "relative", display: "inline-flex" }}>
+        <CircularProgress
+          variant="determinate"
+          sx={{
+            color: (theme) =>
+              theme.palette.grey[theme.palette.mode === "light" ? 200 : 800],
+          }}
+          size={64}
+          thickness={4}
+          {...props}
+          value={100}
+        />
+        <CircularProgress
+          variant="determinate"
+          sx={{
+            color: (theme) =>
+              theme.palette.mode === "light" ? "#A879FF" : "#A879FF",
+            animationDuration: "550ms",
+            position: "absolute",
+            left: 0,
+            // [`& .${circularProgressClasses.circle}`]: {
+            //   strokeLinecap: "round",
+            // },
+          }}
+          size={64}
+          thickness={4}
+          value={((activeStep + 1) / 3) * 100}
+          {...props}
+        />
+        <Box
+          sx={{
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+            position: "absolute",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Typography
+            variant="caption"
+            component="div"
+            color="text.secondary"
+            sx={{ fontSize: 16, color: "#A879FF", fontWeight: 600 }}
+          >{`${activeStep + 1} of 3`}</Typography>
+        </Box>
+      </Box>
+    );
+  }
+
   const personalDetailsForm = (
     <>
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth>
           <InputLabel>What school are you at?</InputLabel>
 
           <Select
@@ -227,7 +337,7 @@ const PreInterventionForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth>
           <InputLabel>What do you study?</InputLabel>
 
           <Select
@@ -244,8 +354,8 @@ const PreInterventionForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth>
           <InputLabel>What grade are you in?</InputLabel>
 
           <Select
@@ -261,7 +371,7 @@ const PreInterventionForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth>
           <TextField
             label="In which class are you?"
             value={studentClass}
@@ -270,8 +380,8 @@ const PreInterventionForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth>
           <InputLabel>Complete the sentence: I am...</InputLabel>
 
           <Select
@@ -287,7 +397,7 @@ const PreInterventionForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth>
           <InputLabel>How old are you?</InputLabel>
 
           <Select
@@ -304,8 +414,15 @@ const PreInterventionForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={10} mt={2}>
-        <FormControl sx={{ width: "49.5%" }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl
+          sx={{
+            width: {
+              xs: "100%",
+              md: "49.5%",
+            },
+          }}
+        >
           <InputLabel>Which Remind program are you following?</InputLabel>
 
           <Select
@@ -326,17 +443,47 @@ const PreInterventionForm = () => {
 
   const questionPartOneForm = (
     <>
-      <Typography variant="subtitle2" fontWeight={500}>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#1A1A1A",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 1,
+        }}
+      >
         Below are a number of statements. You can answer these statements on a
         scale from 1 to 6
       </Typography>
 
-      <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#4C4C4D",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 4,
+        }}
+      >
+        1 to 23 statements <br />
+        (1 = completely disagree, 2 = disagree, 3 = somewhat disagree, 4 =
+        somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
 
-      <FormControl>
+      <FormControl
+        sx={{
+          gap: {
+            xs: 4,
+            md: 4,
+          },
+        }}
+      >
         {questionListPartOne.map((questionDetails: Question, index: number) => (
           <CustomScale
             key={questionDetails.id}
@@ -352,17 +499,48 @@ const PreInterventionForm = () => {
 
   const questionPartTwoForm = (
     <>
-      <Typography variant="subtitle2" fontWeight={500}>
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#1A1A1A",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 1,
+        }}
+      >
         Below are a number of statements. You can answer these statements on a
         scale from 1 to 6
       </Typography>
 
-      <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+      <Typography
+        variant="subtitle2"
+        sx={{
+          color: "#4C4C4D",
+          fontWeight: 500,
+          fontSize: {
+            xs: 13,
+            md: 16,
+          },
+          mb: 4,
+        }}
+      >
+        1 to 23 statements
+        <br />
+        (1 = completely disagree, 2 = disagree, 3 = somewhat disagree, 4 =
+        somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
 
-      <FormControl>
+      <FormControl
+        sx={{
+          gap: {
+            xs: 4,
+            md: 4,
+          },
+        }}
+      >
         {questionListPartTwo.map((questionDetails: Question, index: number) => (
           <CustomScale
             key={questionDetails.id}
@@ -386,6 +564,22 @@ const PreInterventionForm = () => {
 
       case 2:
         return questionPartTwoForm;
+
+      default:
+        break;
+    }
+  };
+
+  const getStepName = (step: number) => {
+    switch (step) {
+      case 0:
+        return "Personal Details";
+
+      case 1:
+        return "Questions | Part 01";
+
+      case 2:
+        return "Questions | Part 02";
 
       default:
         break;
@@ -421,23 +615,27 @@ const PreInterventionForm = () => {
 
   return (
     <Stack sx={customStyles.stack}>
-      <Box py={4}>
-        <Typography
-          variant="h5"
-          fontWeight={1000}
-          mb={1}
-          textTransform="uppercase"
-        >
+      <Box sx={customStyles.titleBox}>
+        <Typography variant="h5" sx={customStyles.title}>
           Pre-Intervention Measurement
         </Typography>
 
-        <Typography variant="body1" mb={1}>
+        <Typography variant="body1" sx={customStyles.body}>
           Here are some general questions about you?
         </Typography>
       </Box>
 
       <Box sx={{ width: "100%" }}>
-        <Stepper nonLinear activeStep={activeStep}>
+        <Stepper
+          nonLinear
+          activeStep={activeStep}
+          sx={{
+            display: {
+              xs: "none",
+              md: "flex",
+            },
+          }}
+        >
           {steps.map((label, index) => (
             <Step key={label} completed={completed[index]}>
               <StepButton color="inherit" onClick={handleStep(index)}>
@@ -447,39 +645,97 @@ const PreInterventionForm = () => {
           ))}
         </Stepper>
 
-        <Box>
-          <Fragment>
-            <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-              {formContent()}
-            </Typography>
-
-            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-              <Button
-                color="inherit"
-                variant="outlined"
-                onClick={handleBack}
-                sx={{ mr: 1 }}
+        {activeStep < 3 && (
+          <Box
+            sx={{
+              width: "100%",
+              display: {
+                xs: "flex",
+                md: "none",
+              },
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <CircularProgressWithLabel completedStep={activeStep} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#1A1A1A", fontSize: 13, fontWeight: 700 }}
               >
-                Back
-              </Button>
-
-              <Box sx={{ flex: "1 1 auto" }} />
-
-              {isLastStep() ? (
-                <Button
-                  variant="outlined"
-                  onClick={handleSubmit}
-                  sx={{ mr: 1 }}
+                {getStepName(activeStep)}
+              </Typography>
+              {activeStep < 2 && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#98989A",
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
                 >
-                  Submit
-                </Button>
-              ) : (
-                <Button variant="outlined" onClick={handleNext} sx={{ mr: 1 }}>
-                  Next
-                </Button>
+                  Next : {getStepName(activeStep + 1)}
+                </Typography>
               )}
             </Box>
-          </Fragment>
+          </Box>
+        )}
+
+        <Box sx={{ my: 2 }}>
+          {allStepsCompleted() ? (
+            <Fragment>
+              <Typography sx={{ mt: 2, mb: 1 }}>
+                All steps completed - you&apos;re finished
+              </Typography>
+
+              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                <Box sx={{ flex: "1 1 auto" }} />
+
+                <Button onClick={handleReset}>Reset</Button>
+              </Box>
+            </Fragment>
+          ) : (
+            <Fragment>
+              <Box sx={customStyles.formBox}>{formContent()}</Box>
+
+              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                <Button
+                  color="inherit"
+                  variant="outlined"
+                  onClick={handleBack}
+                  sx={{ mr: 1 }}
+                >
+                  Back
+                </Button>
+
+                <Box sx={{ flex: "1 1 auto" }} />
+
+                {isLastStep() ? (
+                  <Button
+                    variant="outlined"
+                    onClick={handleSubmit}
+                    sx={{ mr: 1 }}
+                  >
+                    Submit
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    onClick={handleNext}
+                    sx={{ mr: 1 }}
+                  >
+                    Next
+                  </Button>
+                )}
+              </Box>
+            </Fragment>
+          )}
         </Box>
       </Box>
     </Stack>
