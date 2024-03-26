@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
   InputAdornment,
   InputLabel,
   ListSubheader,
@@ -30,6 +31,8 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
+import { useFormik } from "formik";
+import * as yup from "yup";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
@@ -104,6 +107,16 @@ const customStyles = {
 
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
+const validationSchema = yup.object({
+  school: yup.string().required("School is required!"),
+  studyField: yup.string().required("Study field is required!"),
+  grade: yup.string().required("Grade is required!"),
+  studentClass: yup.string().required("Student class is required!"),
+  completeSentence: yup.string().required("Complete sentence is required!"),
+  age: yup.string().required("Age is required!"),
+  remindProgram: yup.string().required("Remind program is required!"),
+});
+
 const PreInterventionForm = () => {
   const router = useRouter();
 
@@ -150,6 +163,23 @@ const PreInterventionForm = () => {
       return newAnswers;
     });
   };
+
+  const formik = useFormik({
+    initialValues: {
+      school: "",
+      studyField: "",
+      grade: "",
+      studentClass: "",
+      completeSentence: "",
+      age: "",
+      remindProgram: "",
+    },
+    validationSchema,
+    onSubmit: () => {
+      // Handle form submission here
+      // You can access form values using formik.values
+    },
+  });
 
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
@@ -341,12 +371,15 @@ const PreInterventionForm = () => {
           <Select
             MenuProps={{ autoFocus: false }}
             labelId="search-select-school"
-            id="search-select"
-            value={school}
+            id="school"
+            name="school"
+            value={formik.values.school}
             label="What school are you at?"
-            onChange={handleChangeSchool}
+            onChange={formik.handleChange}
             onClose={() => setSearchTextSchool("")}
             renderValue={() => school}
+            onBlur={formik.handleBlur}
+            error={formik.touched.school && Boolean(formik.errors.school)}
           >
             <ListSubheader>
               <TextField
@@ -377,15 +410,26 @@ const PreInterventionForm = () => {
               ))}
             </Box>
           </Select>
+          {formik.touched.school && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.school}
+            </FormHelperText>
+          )}
         </FormControl>
 
         <FormControl fullWidth required>
           <InputLabel>What do you study?</InputLabel>
 
           <Select
-            value={studyField}
+            value={formik.values.studyField}
+            id="studyField"
+            name="studyField"
             label="What do you study?"
-            onChange={handleChangeStudyField}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.studyField && Boolean(formik.errors.studyField)
+            }
           >
             {studyFieldList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -393,6 +437,11 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.studyField && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.studyField}
+            </FormHelperText>
+          )}
         </FormControl>
       </Stack>
 
@@ -401,9 +450,13 @@ const PreInterventionForm = () => {
           <InputLabel>What grade are you in?</InputLabel>
 
           <Select
-            value={grade}
+            id="grade"
+            name="grade"
+            value={formik.values.grade}
             label="What grade are you in?"
-            onChange={handleChangeGrade}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.grade && Boolean(formik.errors.grade)}
           >
             {gradeList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -411,14 +464,30 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.grade && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.grade}
+            </FormHelperText>
+          )}
         </FormControl>
 
         <FormControl fullWidth required>
           <TextField
+            id="studentClass"
+            name="studentClass"
             label="In which class are you?"
-            value={studentClass}
-            onChange={handleChangeClass}
+            value={formik.values.studentClass}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.studentClass && Boolean(formik.errors.studentClass)
+            }
           />
+          {formik.touched.studentClass && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.studentClass}
+            </FormHelperText>
+          )}
         </FormControl>
       </Stack>
 
@@ -427,9 +496,16 @@ const PreInterventionForm = () => {
           <InputLabel>Complete the sentence: I am...</InputLabel>
 
           <Select
-            value={completeSentence}
+            id="completeSentence"
+            name="completeSentence"
+            value={formik.values.completeSentence}
             label="Complete the sentence: I am..."
-            onChange={handleChangeCompleteSentence}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.completeSentence &&
+              Boolean(formik.errors.completeSentence)
+            }
           >
             {completeSentenceList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -437,15 +513,24 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.completeSentence && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.completeSentence}
+            </FormHelperText>
+          )}
         </FormControl>
 
         <FormControl fullWidth required>
           <InputLabel>How old are you?</InputLabel>
 
           <Select
-            value={age}
+            id="age"
+            name="age"
+            value={formik.values.age}
             label="How old are you?"
-            onChange={handleChangeAge}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.age && Boolean(formik.errors.age)}
           >
             {ageList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -453,6 +538,11 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.age && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.age}
+            </FormHelperText>
+          )}
         </FormControl>
       </Stack>
 
@@ -469,9 +559,16 @@ const PreInterventionForm = () => {
           <InputLabel>Which Remind program are you following?</InputLabel>
 
           <Select
-            value={remindProgram}
+            id="remindProgram"
+            name="remindProgram"
+            value={formik.values.remindProgram}
             label="Which Remind program are you following?"
-            onChange={handleChangeRemindProgram}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.remindProgram &&
+              Boolean(formik.errors.remindProgram)
+            }
           >
             {remindProgramList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -479,6 +576,11 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.remindProgram && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.remindProgram}
+            </FormHelperText>
+          )}
         </FormControl>
       </Stack>
     </>
