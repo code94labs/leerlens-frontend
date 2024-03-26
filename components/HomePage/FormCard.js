@@ -126,6 +126,28 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
   },
+  secondaryBtn: {
+    backgroundColor: "white",
+    color: "#A879FF",
+    borderRadius: 2,
+    textTransform: "initial",
+    fontWeight: 900,
+    border: "2px #A879FF solid",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
+    },
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
+    fontFamily: champBlackFontFamily,
+  },
   circleIcon: {
     color: "green",
     ml: 1,
@@ -350,9 +372,7 @@ const FormCard = (props) => {
         <Box sx={customStyles.boxBtn}>
           <Button
             variant="contained"
-            sx={{
-              ...customStyles.primaryBtn,
-            }}
+            sx={customStyles.primaryBtn}
             fullWidth
             onClick={handleFormNavigation}
             disableElevation
@@ -362,9 +382,7 @@ const FormCard = (props) => {
 
           <Button
             variant="contained"
-            sx={{
-              ...customStyles.secondaryBtn,
-            }}
+            sx={customStyles.secondaryBtn}
             fullWidth
             onClick={handleOpen}
             disableElevation

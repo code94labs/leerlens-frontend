@@ -137,14 +137,46 @@ export const gradeList = [
 ];
 
 export const remindProgramList = [
-  { id: 1, sentence: "Leerlingentraining" },
-  { id: 2, sentence: "Mentorlessen over slim jezelf zijn" },
-  { id: 3, sentence: "Startdag" },
-  { id: 4, sentence: "Doorstroomprogramma vmbo-mbo of mavo-havo" },
-  { id: 5, sentence: "Examentraining" },
-  { id: 6, sentence: "Zomerschool, herfstschool of lenteschool" },
-  { id: 7, sentence: "Remind in de middag / Ondersteuningsprogramma" },
-  { id: 8, sentence: "Studentenprogramma MBO/HBO" },
+  {
+    id: 1,
+    sentence: "Leerlingentraining",
+    questionSetId: 1,
+  },
+  {
+    id: 2,
+    sentence: "Mentorlessen over slim jezelf zijn",
+    questionSetId: 2,
+  },
+  {
+    id: 3,
+    sentence: "Startdag",
+    questionSetId: 1,
+  },
+  {
+    id: 4,
+    sentence: "Doorstroomprogramma vmbo-mbo of mavo-havo",
+    questionSetId: 2,
+  },
+  {
+    id: 5,
+    sentence: "Examentraining",
+    questionSetId: 2,
+  },
+  {
+    id: 6,
+    sentence: "Zomerschool, herfstschool of lenteschool",
+    questionSetId: 1,
+  },
+  {
+    id: 7,
+    sentence: "Remind in de middag / Ondersteuningsprogramma",
+    questionSetId: 2,
+  },
+  {
+    id: 8,
+    sentence: "Studentenprogramma MBO/HBO",
+    questionSetId: 1,
+  },
 ];
 
 // TODO: GET THE ACTUAL DATA FOR THIS
@@ -164,3 +196,5 @@ export const completeSentenceList = [
   { id: 4, sentence: "Program 04" },
   { id: 5, sentence: "Program 05" },
 ];
+
+export const classList = [];

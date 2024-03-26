@@ -295,7 +295,6 @@ const PreInterventionForm = () => {
         />
         <CircularProgress
           variant="determinate"
-          disableShrink
           sx={{
             color: (theme) =>
               theme.palette.mode === "light" ? "#A879FF" : "#A879FF",
@@ -308,7 +307,7 @@ const PreInterventionForm = () => {
           }}
           size={64}
           thickness={4}
-          value={(props.completedStep / 3) * 100}
+          value={((activeStep + 1) / 3) * 100}
           {...props}
         />
         <Box
@@ -328,7 +327,7 @@ const PreInterventionForm = () => {
             component="div"
             color="text.secondary"
             sx={{ fontSize: 16, color: "#A879FF", fontWeight: 600 }}
-          >{`${activeStep} of 3`}</Typography>
+          >{`${activeStep + 1} of 3`}</Typography>
         </Box>
       </Box>
     );
@@ -575,7 +574,14 @@ const PreInterventionForm = () => {
         somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
 
-      <FormControl>
+      <FormControl
+        sx={{
+          gap: {
+            xs: 4,
+            md: 4,
+          },
+        }}
+      >
         {questionListPartTwo.map((questionDetails: Question, index: number) => (
           <CustomScale
             key={questionDetails.id}
@@ -599,6 +605,22 @@ const PreInterventionForm = () => {
 
       case 2:
         return questionPartTwoForm;
+
+      default:
+        break;
+    }
+  };
+
+  const getStepName = (step: number) => {
+    switch (step) {
+      case 0:
+        return "Personal Details";
+
+      case 1:
+        return "Questions | Part 01";
+
+      case 2:
+        return "Questions | Part 02";
 
       default:
         break;
@@ -631,22 +653,6 @@ const PreInterventionForm = () => {
 
     fetchData();
   }, []);
-
-  const getStepName = (step: number) => {
-    switch (step) {
-      case 0:
-        return "Personal Details";
-
-      case 1:
-        return "Questions | Part 01";
-
-      case 2:
-        return "Questions | Part 02";
-
-      default:
-        break;
-    }
-  };
 
   return (
     <Stack sx={customStyles.stack}>
