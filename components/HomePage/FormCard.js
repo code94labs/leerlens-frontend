@@ -109,7 +109,29 @@ const customStyles = {
     color: "#A879FF",
     borderRadius: 2,
     textTransform: "initial",
-    fontWeight: "bold",
+    fontWeight: 900,
+    border: "2px #A879FF solid",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
+    },
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
+    fontFamily: champBlackFontFamily,
+  },
+  secondaryBtn: {
+    backgroundColor: "white",
+    color: "#A879FF",
+    borderRadius: 2,
+    textTransform: "initial",
+    fontWeight: 900,
     border: "2px #A879FF solid",
     padding: {
       xs: 0.5,

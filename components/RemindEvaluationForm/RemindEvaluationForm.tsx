@@ -27,13 +27,63 @@ import { FormEvaluation } from "../../utils/enum";
 import { Question } from "../PostInterventionForm/PostInterventionForm";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import { getAllEvaluationQuestions } from "../../services/questionnaire.service";
+import { champBlackFontFamily } from "../../shared/typography";
+import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
 
 const customStyles = {
   stack: {
-    width: "90%",
+    width: {
+      // xs: "100%",
+      md: "90%",
+    },
     maxWidth: 1200,
-    margin: "0 auto",
-    mb: 10,
+    mx: {
+      xs: 2,
+      md: "auto",
+    },
+    mb: {
+      xs: 0,
+      md: 20,
+    },
+  },
+  titleBox: {
+    py: {
+      xs: 2.5,
+      md: 4,
+    },
+  },
+  title: {
+    fontWeight: {
+      xs: 900,
+      md: 1000,
+    },
+    mb: 1,
+    textTransform: "uppercase",
+    fontFamily: champBlackFontFamily,
+    color: "#1A1A1A",
+  },
+  body: {
+    mb: 1,
+    fontsize: {
+      xs: 13,
+      md: 16,
+    },
+  },
+  formBox: { mb: 1, py: 1 },
+  selectStack: {
+    flexDirection: {
+      xs: "column",
+      md: "row",
+    },
+    gap: 1,
+    mb: {
+      xs: 1,
+      md: 4,
+    },
+    mt: {
+      xs: 0,
+      md: 2,
+    },
   },
 };
 
@@ -208,8 +258,8 @@ const RemindEvaluationForm = () => {
 
   const personalDetailsForm = (
     <>
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth required>
           <InputLabel>What school are you at?</InputLabel>
 
           <Select
@@ -225,7 +275,7 @@ const RemindEvaluationForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth required>
           <InputLabel>What do you study?</InputLabel>
 
           <Select
@@ -242,8 +292,8 @@ const RemindEvaluationForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth required>
           <InputLabel>What grade are you in?</InputLabel>
 
           <Select
@@ -259,7 +309,7 @@ const RemindEvaluationForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth required>
           <TextField
             label="In which class are you?"
             value={studentClass}
@@ -268,8 +318,8 @@ const RemindEvaluationForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth required>
           <InputLabel>Complete the sentence: I am...</InputLabel>
 
           <Select
@@ -285,7 +335,7 @@ const RemindEvaluationForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth required>
           <InputLabel>How old are you?</InputLabel>
 
           <Select
@@ -302,8 +352,15 @@ const RemindEvaluationForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={10} mt={2}>
-        <FormControl sx={{ width: "49.5%" }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl
+          sx={{
+            width: {
+              xs: "100%",
+              md: "49.5%",
+            },
+          }}
+        >
           <InputLabel>Which Remind program are you following?</InputLabel>
 
           <Select
@@ -427,26 +484,29 @@ const RemindEvaluationForm = () => {
     fetchData();
   }, []);
 
-
   return (
     <Stack sx={customStyles.stack}>
-      <Box py={4}>
-        <Typography
-          variant="h5"
-          fontWeight={1000}
-          mb={1}
-          textTransform="uppercase"
-        >
+      <Box sx={customStyles.titleBox}>
+        <Typography variant="h5" sx={customStyles.title}>
           Evaluation
         </Typography>
 
-        <Typography variant="body1" mb={1}>
+        <Typography variant="body1" sx={customStyles.body}>
           Here are some general questions about you?
         </Typography>
       </Box>
 
       <Box sx={{ width: "100%" }}>
-        <Stepper nonLinear activeStep={activeStep}>
+        <Stepper
+          nonLinear
+          activeStep={activeStep}
+          sx={{
+            display: {
+              xs: "none",
+              md: "flex",
+            },
+          }}
+        >
           {steps.map((label, index) => (
             <Step key={label} completed={completed[index]}>
               <StepButton color="inherit" onClick={handleStep(index)}>
@@ -455,6 +515,48 @@ const RemindEvaluationForm = () => {
             </Step>
           ))}
         </Stepper>
+
+        {activeStep < 5 && (
+          <Box
+            sx={{
+              width: "100%",
+              display: {
+                xs: "flex",
+                md: "none",
+              },
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <CircularProgressWithLabel activeStep={activeStep} totalSteps={5} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#1A1A1A", fontSize: 13, fontWeight: 700 }}
+              >
+                {steps[activeStep]}
+              </Typography>
+              {activeStep < 4 && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#98989A",
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
+                >
+                  Next : {steps[activeStep + 1]}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        )}
 
         <Box>
           {allStepsCompleted() ? (
