@@ -2,7 +2,10 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
+  InputAdornment,
   InputLabel,
+  ListSubheader,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -13,11 +16,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import CircularProgress, {
-  circularProgressClasses,
-  CircularProgressProps,
-} from "@mui/material/CircularProgress";
-import React, { ChangeEvent, Fragment, useState, useMemo } from "react";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
 import {
   ageList,
   completeSentenceList,
@@ -27,10 +27,15 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
+import { Formik, useFormik } from "formik";
+import * as yup from "yup";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
+import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
+
 import { getAllPreInterventionQuestions } from "../../services/questionnaire.service";
+
 import { FormEvaluation } from "../../utils/enum";
 
 export type Question = {
@@ -101,10 +106,21 @@ const customStyles = {
 
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
+const validationSchema = yup.object({
+  school: yup.string().required("School is required!"),
+  studyField: yup.string().required("Study field is required!"),
+  grade: yup.string().required("Grade is required!"),
+  studentClass: yup.string().required("Student class is required!"),
+  completeSentence: yup.string().required("Complete sentence is required!"),
+  age: yup.string().required("Age is required!"),
+  remindProgram: yup.string().required("Remind program is required!"),
+});
+
 const PreInterventionForm = () => {
   const router = useRouter();
 
   const [school, setSchool] = useState("");
+  const [searchTextSchool, setSearchTextSchool] = useState("");
   const [studyField, setStudyField] = useState("");
   const [grade, setGrade] = useState("");
   const [studentClass, setClass] = useState("");
@@ -147,33 +163,61 @@ const PreInterventionForm = () => {
     });
   };
 
-  const handleChangeSchool = (event: SelectChangeEvent) => {
-    setSchool(event.target.value as string);
-  };
+  const formik = useFormik({
+    initialValues: {
+      school: "",
+      studyField: "",
+      grade: "",
+      studentClass: "",
+      completeSentence: "",
+      age: "",
+      remindProgram: "",
+    },
+    validationSchema,
+    onSubmit: () => {
+      // Handle form submission here
+      // You can access form values using formik.values
+    },
+  });
 
-  const handleChangeClass = (event: ChangeEvent<HTMLInputElement>) => {
-    setClass(event.target.value as string);
-  };
+  const containsText = (text: string, searchText: string) =>
+    text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
-  const handleChangeRemindProgram = (event: SelectChangeEvent) => {
-    setRemindProgram(event.target.value as string);
-  };
+  const displayedSchoolOptions = useMemo(
+    () =>
+      schoolList.filter((option) =>
+        containsText(option.schoolName, searchTextSchool)
+      ),
+    [searchTextSchool]
+  );
 
-  const handleChangeStudyField = (event: SelectChangeEvent) => {
-    setStudyField(event.target.value as string);
-  };
+  // const handleChangeSchool = (event: SelectChangeEvent) => {
+  //   setSchool(event.target.value as string);
+  // };
 
-  const handleChangeGrade = (event: SelectChangeEvent) => {
-    setGrade(event.target.value as string);
-  };
+  // const handleChangeClass = (event: ChangeEvent<HTMLInputElement>) => {
+  //   setClass(event.target.value as string);
+  // };
 
-  const handleChangeCompleteSentence = (event: SelectChangeEvent) => {
-    setCompleteSentence(event.target.value as string);
-  };
+  // const handleChangeRemindProgram = (event: SelectChangeEvent) => {
+  //   setRemindProgram(event.target.value as string);
+  // };
 
-  const handleChangeAge = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
-  };
+  // const handleChangeStudyField = (event: SelectChangeEvent) => {
+  //   setStudyField(event.target.value as string);
+  // };
+
+  // const handleChangeGrade = (event: SelectChangeEvent) => {
+  //   setGrade(event.target.value as string);
+  // };
+
+  // const handleChangeCompleteSentence = (event: SelectChangeEvent) => {
+  //   setCompleteSentence(event.target.value as string);
+  // };
+
+  // const handleChangeAge = (event: SelectChangeEvent) => {
+  //   setAge(event.target.value as string);
+  // };
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -262,88 +306,75 @@ const PreInterventionForm = () => {
   };
   // End of form step creation
 
-  function CircularProgressWithLabel(
-    props: CircularProgressProps & { completedStep: number }
-  ) {
-    return (
-      <Box sx={{ position: "relative", display: "inline-flex" }}>
-        <CircularProgress
-          variant="determinate"
-          sx={{
-            color: (theme) =>
-              theme.palette.grey[theme.palette.mode === "light" ? 200 : 800],
-          }}
-          size={64}
-          thickness={4}
-          {...props}
-          value={100}
-        />
-        <CircularProgress
-          variant="determinate"
-          sx={{
-            color: (theme) =>
-              theme.palette.mode === "light" ? "#A879FF" : "#A879FF",
-            animationDuration: "550ms",
-            position: "absolute",
-            left: 0,
-            // [`& .${circularProgressClasses.circle}`]: {
-            //   strokeLinecap: "round",
-            // },
-          }}
-          size={64}
-          thickness={4}
-          value={((activeStep + 1) / 3) * 100}
-          {...props}
-        />
-        <Box
-          sx={{
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0,
-            position: "absolute",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Typography
-            variant="caption"
-            component="div"
-            color="text.secondary"
-            sx={{ fontSize: 16, color: "#A879FF", fontWeight: 600 }}
-          >{`${activeStep + 1} of 3`}</Typography>
-        </Box>
-      </Box>
-    );
-  }
+  console.log(formik.errors);
 
   const personalDetailsForm = (
     <>
       <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>What school are you at?</InputLabel>
-
           <Select
-            value={school}
+            MenuProps={{ autoFocus: false }}
+            labelId="search-select-school"
+            id="school"
+            name="school"
+            value={formik.values.school}
             label="What school are you at?"
-            onChange={handleChangeSchool}
+            onChange={formik.handleChange}
+            onClose={() => setSearchTextSchool("")}
+            renderValue={() => formik.values.school}
+            onBlur={formik.handleBlur}
+            error={formik.touched.school && Boolean(formik.errors.school)}
           >
-            {schoolList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.schoolName}
-              </MenuItem>
-            ))}
+            <ListSubheader>
+              <TextField
+                size="small"
+                autoFocus
+                placeholder="Type to search..."
+                fullWidth
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchRoundedIcon />
+                    </InputAdornment>
+                  ),
+                }}
+                onChange={(e) => setSearchTextSchool(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key !== "Escape") {
+                    e.stopPropagation();
+                  }
+                }}
+              />
+            </ListSubheader>
+            <Box maxHeight={150}>
+              {displayedSchoolOptions.map((school: any, index: number) => (
+                <MenuItem value={school.id} key={index}>
+                  {school.schoolName}
+                </MenuItem>
+              ))}
+            </Box>
           </Select>
+          {formik.touched.school && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.school}
+            </FormHelperText>
+          )}
         </FormControl>
 
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>What do you study?</InputLabel>
 
           <Select
-            value={studyField}
+            value={formik.values.studyField}
+            id="studyField"
+            name="studyField"
             label="What do you study?"
-            onChange={handleChangeStudyField}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.studyField && Boolean(formik.errors.studyField)
+            }
           >
             {studyFieldList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -351,17 +382,26 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.studyField && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.studyField}
+            </FormHelperText>
+          )}
         </FormControl>
       </Stack>
 
       <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>What grade are you in?</InputLabel>
 
           <Select
-            value={grade}
+            id="grade"
+            name="grade"
+            value={formik.values.grade}
             label="What grade are you in?"
-            onChange={handleChangeGrade}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.grade && Boolean(formik.errors.grade)}
           >
             {gradeList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -369,25 +409,48 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.grade && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.grade}
+            </FormHelperText>
+          )}
         </FormControl>
 
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <TextField
+            id="studentClass"
+            name="studentClass"
             label="In which class are you?"
-            value={studentClass}
-            onChange={handleChangeClass}
+            value={formik.values.studentClass}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.studentClass && Boolean(formik.errors.studentClass)
+            }
           />
+          {formik.touched.studentClass && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.studentClass}
+            </FormHelperText>
+          )}
         </FormControl>
       </Stack>
 
       <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>Complete the sentence: I am...</InputLabel>
 
           <Select
-            value={completeSentence}
+            id="completeSentence"
+            name="completeSentence"
+            value={formik.values.completeSentence}
             label="Complete the sentence: I am..."
-            onChange={handleChangeCompleteSentence}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.completeSentence &&
+              Boolean(formik.errors.completeSentence)
+            }
           >
             {completeSentenceList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -395,15 +458,24 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.completeSentence && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.completeSentence}
+            </FormHelperText>
+          )}
         </FormControl>
 
-        <FormControl fullWidth>
+        <FormControl fullWidth required>
           <InputLabel>How old are you?</InputLabel>
 
           <Select
-            value={age}
+            id="age"
+            name="age"
+            value={formik.values.age}
             label="How old are you?"
-            onChange={handleChangeAge}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.age && Boolean(formik.errors.age)}
           >
             {ageList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -411,6 +483,11 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.age && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.age}
+            </FormHelperText>
+          )}
         </FormControl>
       </Stack>
 
@@ -422,13 +499,21 @@ const PreInterventionForm = () => {
               md: "49.5%",
             },
           }}
+          required
         >
           <InputLabel>Which Remind program are you following?</InputLabel>
 
           <Select
-            value={remindProgram}
+            id="remindProgram"
+            name="remindProgram"
+            value={formik.values.remindProgram}
             label="Which Remind program are you following?"
-            onChange={handleChangeRemindProgram}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.remindProgram &&
+              Boolean(formik.errors.remindProgram)
+            }
           >
             {remindProgramList.map((item, index) => (
               <MenuItem key={index} value={item.id}>
@@ -436,6 +521,11 @@ const PreInterventionForm = () => {
               </MenuItem>
             ))}
           </Select>
+          {formik.touched.remindProgram && (
+            <FormHelperText sx={{ color: "red" }}>
+              {formik.errors.remindProgram}
+            </FormHelperText>
+          )}
         </FormControl>
       </Stack>
     </>
@@ -658,7 +748,7 @@ const PreInterventionForm = () => {
               gap: 2,
             }}
           >
-            <CircularProgressWithLabel completedStep={activeStep} />
+            <CircularProgressWithLabel activeStep={activeStep} />
             <Box
               sx={{
                 display: "flex",
@@ -729,6 +819,7 @@ const PreInterventionForm = () => {
                     variant="outlined"
                     onClick={handleNext}
                     sx={{ mr: 1 }}
+                    disabled={!(formik.isValid && formik.dirty)}
                   >
                     Next
                   </Button>
