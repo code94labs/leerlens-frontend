@@ -507,7 +507,7 @@ const PostInterventionForm = () => {
               gap: 2,
             }}
           >
-            <CircularProgressWithLabel activeStep={activeStep} />
+            <CircularProgressWithLabel activeStep={activeStep} totalSteps={3}/>
             <Box
               sx={{
                 display: "flex",

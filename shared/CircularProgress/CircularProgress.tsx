@@ -4,10 +4,13 @@ import CircularProgress, {
   CircularProgressProps,
 } from "@mui/material/CircularProgress";
 
+type AdditionalProps = {
+  activeStep: number;
+  totalSteps: number;
+};
+
 export function CircularProgressWithLabel(
-  props: CircularProgressProps & {
-    activeStep: number;
-  }
+  props: CircularProgressProps & AdditionalProps
 ) {
   return (
     <Box sx={{ position: "relative", display: "inline-flex" }}>
@@ -30,13 +33,10 @@ export function CircularProgressWithLabel(
           animationDuration: "550ms",
           position: "absolute",
           left: 0,
-          // [`& .${circularProgressClasses.circle}`]: {
-          //   strokeLinecap: "round",
-          // },
         }}
         size={64}
         thickness={4}
-        value={((props.activeStep + 1) / 3) * 100}
+        value={((props.activeStep + 1) / props.totalSteps) * 100}
         {...props}
       />
       <Box
@@ -56,7 +56,7 @@ export function CircularProgressWithLabel(
           component="div"
           color="text.secondary"
           sx={{ fontSize: 16, color: "#A879FF", fontWeight: 600 }}
-        >{`${props.activeStep + 1} of 3`}</Typography>
+        >{`${props.activeStep + 1} of ${props.totalSteps}`}</Typography>
       </Box>
     </Box>
   );
