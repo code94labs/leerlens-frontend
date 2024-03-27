@@ -27,7 +27,7 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
-import { useFormik } from "formik";
+import { Formik, useFormik } from "formik";
 import * as yup from "yup";
 
 import { champBlackFontFamily } from "../../shared/typography";
@@ -191,33 +191,33 @@ const PreInterventionForm = () => {
     [searchTextSchool]
   );
 
-  const handleChangeSchool = (event: SelectChangeEvent) => {
-    setSchool(event.target.value as string);
-  };
+  // const handleChangeSchool = (event: SelectChangeEvent) => {
+  //   setSchool(event.target.value as string);
+  // };
 
-  const handleChangeClass = (event: ChangeEvent<HTMLInputElement>) => {
-    setClass(event.target.value as string);
-  };
+  // const handleChangeClass = (event: ChangeEvent<HTMLInputElement>) => {
+  //   setClass(event.target.value as string);
+  // };
 
-  const handleChangeRemindProgram = (event: SelectChangeEvent) => {
-    setRemindProgram(event.target.value as string);
-  };
+  // const handleChangeRemindProgram = (event: SelectChangeEvent) => {
+  //   setRemindProgram(event.target.value as string);
+  // };
 
-  const handleChangeStudyField = (event: SelectChangeEvent) => {
-    setStudyField(event.target.value as string);
-  };
+  // const handleChangeStudyField = (event: SelectChangeEvent) => {
+  //   setStudyField(event.target.value as string);
+  // };
 
-  const handleChangeGrade = (event: SelectChangeEvent) => {
-    setGrade(event.target.value as string);
-  };
+  // const handleChangeGrade = (event: SelectChangeEvent) => {
+  //   setGrade(event.target.value as string);
+  // };
 
-  const handleChangeCompleteSentence = (event: SelectChangeEvent) => {
-    setCompleteSentence(event.target.value as string);
-  };
+  // const handleChangeCompleteSentence = (event: SelectChangeEvent) => {
+  //   setCompleteSentence(event.target.value as string);
+  // };
 
-  const handleChangeAge = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
-  };
+  // const handleChangeAge = (event: SelectChangeEvent) => {
+  //   setAge(event.target.value as string);
+  // };
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -306,6 +306,8 @@ const PreInterventionForm = () => {
   };
   // End of form step creation
 
+  console.log(formik.errors);
+
   const personalDetailsForm = (
     <>
       <Stack sx={customStyles.selectStack}>
@@ -320,7 +322,7 @@ const PreInterventionForm = () => {
             label="What school are you at?"
             onChange={formik.handleChange}
             onClose={() => setSearchTextSchool("")}
-            renderValue={() => school}
+            renderValue={() => formik.values.school}
             onBlur={formik.handleBlur}
             error={formik.touched.school && Boolean(formik.errors.school)}
           >
@@ -817,6 +819,7 @@ const PreInterventionForm = () => {
                     variant="outlined"
                     onClick={handleNext}
                     sx={{ mr: 1 }}
+                    disabled={!(formik.isValid && formik.dirty)}
                   >
                     Next
                   </Button>
