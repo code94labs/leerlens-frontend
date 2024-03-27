@@ -23,8 +23,11 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
+
+import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import { getAllPostInterventionQuestions } from "../../services/questionnaire.service";
+import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
 
 export type Question = {
   id: number;
@@ -37,10 +40,58 @@ export type Question = {
 
 const customStyles = {
   stack: {
-    width: "90%",
+    width: {
+      // xs: "100%",
+      md: "90%",
+    },
     maxWidth: 1200,
-    margin: "0 auto",
-    mb: 10,
+    mx: {
+      xs: 2,
+      md: "auto",
+    },
+    mb: {
+      xs: 0,
+      md: 20,
+    },
+  },
+  titleBox: {
+    py: {
+      xs: 2.5,
+      md: 4,
+    },
+  },
+  title: {
+    fontWeight: {
+      xs: 900,
+      md: 1000,
+    },
+    mb: 1,
+    textTransform: "uppercase",
+    fontFamily: champBlackFontFamily,
+    color: "#1A1A1A",
+  },
+  body: {
+    mb: 1,
+    fontsize: {
+      xs: 13,
+      md: 16,
+    },
+  },
+  formBox: { mb: 1, py: 1 },
+  selectStack: {
+    flexDirection: {
+      xs: "column",
+      md: "row",
+    },
+    gap: 1,
+    mb: {
+      xs: 1,
+      md: 4,
+    },
+    mt: {
+      xs: 0,
+      md: 2,
+    },
   },
 };
 
@@ -173,8 +224,8 @@ const PostInterventionForm = () => {
 
   const personalDetailsForm = (
     <>
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth required>
           <InputLabel>What school are you at?</InputLabel>
 
           <Select
@@ -190,7 +241,7 @@ const PostInterventionForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth required>
           <InputLabel>What do you study?</InputLabel>
 
           <Select
@@ -207,8 +258,8 @@ const PostInterventionForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth required>
           <InputLabel>What grade are you in?</InputLabel>
 
           <Select
@@ -224,7 +275,7 @@ const PostInterventionForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth required>
           <TextField
             label="In which class are you?"
             value={studentClass}
@@ -233,8 +284,8 @@ const PostInterventionForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl fullWidth required>
           <InputLabel>Complete the sentence: I am...</InputLabel>
 
           <Select
@@ -250,7 +301,7 @@ const PostInterventionForm = () => {
           </Select>
         </FormControl>
 
-        <FormControl fullWidth sx={{ ml: 1 }}>
+        <FormControl fullWidth required>
           <InputLabel>How old are you?</InputLabel>
 
           <Select
@@ -267,8 +318,15 @@ const PostInterventionForm = () => {
         </FormControl>
       </Stack>
 
-      <Stack flexDirection="row" mb={10} mt={2}>
-        <FormControl sx={{ width: "49.5%" }}>
+      <Stack sx={customStyles.selectStack}>
+        <FormControl
+          sx={{
+            width: {
+              xs: "100%",
+              md: "49.5%",
+            },
+          }}
+        >
           <InputLabel>Which Remind program are you following?</InputLabel>
 
           <Select
@@ -355,6 +413,22 @@ const PostInterventionForm = () => {
     }
   };
 
+  const getStepName = (step: number) => {
+    switch (step) {
+      case 0:
+        return "Personal Details";
+
+      case 1:
+        return "Questions | Part 01";
+
+      case 2:
+        return "Questions | Part 02";
+
+      default:
+        break;
+    }
+  };
+
   useMemo(() => {
     const fetchData = async () => {
       try {
@@ -401,7 +475,16 @@ const PostInterventionForm = () => {
       </Box>
 
       <Box sx={{ width: "100%" }}>
-        <Stepper nonLinear activeStep={activeStep}>
+        <Stepper
+          nonLinear
+          activeStep={activeStep}
+          sx={{
+            display: {
+              xs: "none",
+              md: "flex",
+            },
+          }}
+        >
           {steps.map((label, index) => (
             <Step key={label} completed={completed[index]}>
               <StepButton color="inherit" onClick={handleStep(index)}>
@@ -410,6 +493,48 @@ const PostInterventionForm = () => {
             </Step>
           ))}
         </Stepper>
+
+        {activeStep < 3 && (
+          <Box
+            sx={{
+              width: "100%",
+              display: {
+                xs: "flex",
+                md: "none",
+              },
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <CircularProgressWithLabel activeStep={activeStep} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#1A1A1A", fontSize: 13, fontWeight: 700 }}
+              >
+                {getStepName(activeStep)}
+              </Typography>
+              {activeStep < 2 && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#98989A",
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
+                >
+                  Next : {getStepName(activeStep + 1)}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        )}
 
         <Box>
           <Fragment>
