@@ -413,22 +413,6 @@ const PostInterventionForm = () => {
     }
   };
 
-  const getStepName = (step: number) => {
-    switch (step) {
-      case 0:
-        return "Personal Details";
-
-      case 1:
-        return "Questions | Part 01";
-
-      case 2:
-        return "Questions | Part 02";
-
-      default:
-        break;
-    }
-  };
-
   useMemo(() => {
     const fetchData = async () => {
       try {
@@ -459,17 +443,12 @@ const PostInterventionForm = () => {
 
   return (
     <Stack sx={customStyles.stack}>
-      <Box py={4}>
-        <Typography
-          variant="h5"
-          fontWeight={1000}
-          mb={1}
-          textTransform="uppercase"
-        >
+      <Box sx={customStyles.titleBox}>
+        <Typography variant="h5" sx={customStyles.title}>
           Post-Intervention Measurement
         </Typography>
 
-        <Typography variant="body1" mb={1}>
+        <Typography variant="body1" sx={customStyles.body}>
           Here are some general questions about you?
         </Typography>
       </Box>
@@ -507,7 +486,7 @@ const PostInterventionForm = () => {
               gap: 2,
             }}
           >
-            <CircularProgressWithLabel activeStep={activeStep} totalSteps={3}/>
+            <CircularProgressWithLabel activeStep={activeStep} totalSteps={3} />
             <Box
               sx={{
                 display: "flex",
@@ -518,7 +497,7 @@ const PostInterventionForm = () => {
                 variant="caption"
                 sx={{ color: "#1A1A1A", fontSize: 13, fontWeight: 700 }}
               >
-                {getStepName(activeStep)}
+                {steps[activeStep]}
               </Typography>
               {activeStep < 2 && (
                 <Typography
@@ -529,7 +508,7 @@ const PostInterventionForm = () => {
                     fontWeight: 700,
                   }}
                 >
-                  Next : {getStepName(activeStep + 1)}
+                  Next : {steps[activeStep + 1]}
                 </Typography>
               )}
             </Box>
