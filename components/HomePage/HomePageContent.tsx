@@ -15,34 +15,36 @@ const customStyles = {
   },
 };
 
+const BASE_URL = "http://localhost:3000";
+
 const HomePageContent = () => {
   return (
     <Stack sx={customStyles.stack}>
       <FormCard
         title="Pre-Intervention"
         description="Great that you are participating in the learning scan! Completing the learning scan takes approximately five minutes. Answer the questions as honestly as possible: there is no right or wrong. With all the answers we collect we can investigate what you think about learning. Goodluck!"
-        pagePath="/forms/pre-intervention"
+        pagePath={`${BASE_URL}/forms/pre-intervention`}
         image="/images/img1.png"
       />
 
       <FormCard
         title="Post-Intervention"
         description="Great that you are participating in the learning scan! Completing the learning scan takes approximately five minutes. Answer the questions as honestly as possible: there is no right or wrong. With all the answers we collect we can investigate what you think about learning. Goodluck!"
-        pagePath="/forms/post-intervention"
+        pagePath={`${BASE_URL}/forms/post-intervention`}
         image="/images/img2.png"
       />
 
       <FormCard
         title="Remind Evaluation"
         description="How cool that you did one or more training sessions with us. We have done our best to make it as fun and educational as possible for you and are very curious about what you thought of it. That's why we have a few questions for you. Answer them honestly, whether you are positive or negative about the training, we can learn from it! :)"
-        pagePath="/forms/remind-evaluation"
+        pagePath={`${BASE_URL}/forms/remind-evaluation`}
         image="/images/img3.png"
       />
 
       <FormCard
         title="Normgroup"
         description="How cool that you did one or more training sessions with us. We have done our best to make it as fun and educational as possible for you and are very curious about what you thought of it. That's why we have a few questions for you. Answer them honestly, whether you are positive or negative about the training, we can learn from it! :)"
-        pagePath="/forms/normgroup"
+        pagePath={`${BASE_URL}/forms/normgroup`}
         image="/images/img4.png"
       />
     </Stack>

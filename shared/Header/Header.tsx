@@ -30,6 +30,9 @@ const customStyles = {
   },
 };
 
+const baseRoute = "/";
+const companySite = "https://remindlearning.nl/";
+
 const Header = () => {
   const router = useRouter();
 
@@ -42,16 +45,18 @@ const Header = () => {
           width={130}
           alt="logo"
           style={customStyles.image}
-          onClick={() => router.replace("/")}
+          onClick={() => router.replace(baseRoute)}
         />
 
-        <Link
-          href="https://remindlearning.nl/"
-          style={customStyles.link}
-          target="_blank"
-        >
-          Visit Website
-        </Link>
+        {router.pathname === baseRoute && (
+          <Link
+            href={companySite}
+            style={customStyles.link}
+            target="_blank"
+          >
+            Visit Website
+          </Link>
+        )}
       </Box>
     </Stack>
   );
