@@ -748,7 +748,7 @@ const PreInterventionForm = () => {
               gap: 2,
             }}
           >
-            <CircularProgressWithLabel activeStep={activeStep} />
+            <CircularProgressWithLabel activeStep={activeStep} totalSteps={3} />
             <Box
               sx={{
                 display: "flex",
@@ -759,7 +759,7 @@ const PreInterventionForm = () => {
                 variant="caption"
                 sx={{ color: "#1A1A1A", fontSize: 13, fontWeight: 700 }}
               >
-                {getStepName(activeStep)}
+                {steps[activeStep]}
               </Typography>
               {activeStep < 2 && (
                 <Typography
@@ -770,7 +770,7 @@ const PreInterventionForm = () => {
                     fontWeight: 700,
                   }}
                 >
-                  Next : {getStepName(activeStep + 1)}
+                  Next : {steps[activeStep + 1]}
                 </Typography>
               )}
             </Box>

@@ -10,6 +10,7 @@ import {
   TextField,
   IconButton,
   Snackbar,
+  Alert,
 } from "@mui/material";
 import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -126,28 +127,6 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
   },
-  secondaryBtn: {
-    backgroundColor: "white",
-    color: "#A879FF",
-    borderRadius: 2,
-    textTransform: "initial",
-    fontWeight: 900,
-    border: "2px #A879FF solid",
-    padding: {
-      xs: 0.5,
-      md: 1.3,
-    },
-    "&:hover": {
-      backgroundColor: "#C4B0EB",
-      color: "white",
-      border: "2px #C4B0EB solid",
-    },
-    fontSize: {
-      xs: 14,
-      md: 16,
-    },
-    fontFamily: champBlackFontFamily,
-  },
   circleIcon: {
     color: "green",
     ml: 1,
@@ -173,6 +152,10 @@ const customStyles = {
     },
     width: {
       xs: "90%",
+      md: 514,
+    },
+    maxWidth: {
+      xs: 360,
       md: 514,
     },
     boxSizing: "border-box",
@@ -260,7 +243,9 @@ const FormCard = (props) => {
   const router = useRouter();
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [displaySnackbar, setDisplaySnackbar] = useState(false);
+  const [displayCopyLinkSnackbar, setDisplayCopyLinkSnackbar] = useState(false);
+  const [displayDownloadQRSnackbar, setDisplayDownloadQRSnackbar] =
+    useState(false);
   const [notificationMessage, setNotificationMessage] = useState("");
 
   const size = useWindowSize();
@@ -271,10 +256,6 @@ const FormCard = (props) => {
 
   const handleClose = () => {
     setOpenDialog(false);
-  };
-
-  const handleCloseSnackbar = () => {
-    setDisplaySnackbar(false);
   };
 
   const handleFormNavigation = () => {
@@ -295,7 +276,7 @@ const FormCard = (props) => {
     document.body.removeChild(aEl);
 
     setNotificationMessage("Successfully downloaded QR Code");
-    setDisplaySnackbar(true);
+    setDisplayDownloadQRSnackbar(true);
   };
 
   const qrDialogModel = (
@@ -310,7 +291,13 @@ const FormCard = (props) => {
         size={size.width > 900 ? 250 : 150}
       />
 
-      <Stack sx={customStyles.modalStack}>
+      <Stack
+        sx={customStyles.modalStack}
+        onClick={() => {
+          navigator.clipboard.writeText(pagePath);
+          setDisplayCopyLinkSnackbar(true);
+        }}
+      >
         <IconButton sx={customStyles.copyLinkBtn}>
           <LinkRoundedIcon />
         </IconButton>
@@ -406,18 +393,48 @@ const FormCard = (props) => {
       </Modal>
 
       <Snackbar
-        open={displaySnackbar}
+        open={displayCopyLinkSnackbar}
         autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        message={
-          <span style={customStyles.snackbarMsg}>
-            <span>{notificationMessage}</span>
+        onClose={() => setDisplayCopyLinkSnackbar(false)}
+      >
+        <Alert
+          onClose={() => setDisplayCopyLinkSnackbar(false)}
+          severity="success"
+          variant="outlined"
+          icon={false}
+          sx={{
+            width: "100%",
+            bgcolor: "white",
+            color: "#A879FF",
+            fontWeight: 600,
+            border: 0,
+          }}
+        >
+          Link copied Successfully!
+        </Alert>
+      </Snackbar>
 
-            <CheckCircleIcon sx={customStyles.circleIcon} />
-          </span>
-        }
-        sx={customStyles.snackbar}
-      />
+      <Snackbar
+        open={displayDownloadQRSnackbar}
+        autoHideDuration={6000}
+        onClose={() => setDisplayDownloadQRSnackbar(false)}
+      >
+        <Alert
+          onClose={() => setDisplayDownloadQRSnackbar(false)}
+          severity="success"
+          variant="outlined"
+          icon={false}
+          sx={{
+            width: "100%",
+            bgcolor: "white",
+            color: "#A879FF",
+            fontWeight: 600,
+            border: 0,
+          }}
+        >
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 };
