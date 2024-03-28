@@ -22,7 +22,6 @@ import { useWindowSize } from "../../utils/hooks/useWindowSize";
 const customStyles = {
   card: {
     border: "1px #E6E6E6 solid",
-    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
     display: "flex",
     flexDirection: "row",
     mx: {
@@ -33,10 +32,11 @@ const customStyles = {
       xs: 3,
       md: 5,
     },
-    borderRadius: 2,
+    borderRadius: 3,
   },
   title: {
     fontWeight: 800,
+    textTransform: "uppercase",
     fontSize: {
       xs: 24,
       md: 34,
@@ -48,6 +48,7 @@ const customStyles = {
     fontFamily: champBlackFontFamily,
   },
   description: {
+    color: "#4C4C4D",
     width: {
       xs: "100%",
       md: "85%",

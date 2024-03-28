@@ -6,7 +6,7 @@ import React from "react";
 
 const customStyles = {
   container: {
-    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+    borderBottom: "1px #E6E6E6 solid",
   },
   image: {
     cursor: "pointer",
