@@ -258,10 +258,6 @@ const FormCard = (props) => {
     setOpenDialog(false);
   };
 
-  const handleCloseDownloadQRSnackbar = () => {
-    setDisplayDownloadQRSnackbar(false);
-  };
-
   const handleFormNavigation = () => {
     router.push(pagePath);
   };
@@ -421,16 +417,24 @@ const FormCard = (props) => {
       <Snackbar
         open={displayDownloadQRSnackbar}
         autoHideDuration={6000}
-        onClose={handleCloseDownloadQRSnackbar}
-        message={
-          <span style={customStyles.snackbarMsg}>
-            <span>{notificationMessage}</span>
-
-            <CheckCircleIcon sx={customStyles.circleIcon} />
-          </span>
-        }
-        sx={customStyles.snackbar}
-      />
+        onClose={() => setDisplayDownloadQRSnackbar(false)}
+      >
+        <Alert
+          onClose={() => setDisplayDownloadQRSnackbar(false)}
+          severity="success"
+          variant="outlined"
+          icon={false}
+          sx={{
+            width: "100%",
+            bgcolor: "white",
+            color: "#A879FF",
+            fontWeight: 600,
+            border: 0,
+          }}
+        >
+          {notificationMessage}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 };
