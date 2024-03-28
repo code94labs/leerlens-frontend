@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { IconButton, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 
 const customStyles = {
   stack: {
