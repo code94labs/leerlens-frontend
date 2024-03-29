@@ -2,7 +2,11 @@ import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
+  Grid,
+  InputAdornment,
   InputLabel,
+  ListSubheader,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -13,30 +17,21 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
-import {
-  ageList,
-  completeSentenceList,
-  gradeList,
-  remindProgramList,
-  schoolList,
-  studyFieldList,
-} from "../../utils/constant";
 import { useRouter } from "next/router";
+import { Formik, useFormik } from "formik";
+import * as yup from "yup";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
-import { getAllPostInterventionQuestions } from "../../services/questionnaire.service";
+import {
+  getAllPostInterventionQuestions,
+  getStudentFormInfo,
+} from "../../services/questionnaire.service";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
-
-export type Question = {
-  id: number;
-  questionText: string;
-  positionOrderId: number;
-  minValue: number;
-  maxValue: number;
-  isDelete: boolean;
-};
+import { DropDownOptions, Question } from "../../utils/types";
+import { FieldType } from "../../utils/enum";
 
 const customStyles = {
   stack: {
@@ -107,7 +102,10 @@ const PostInterventionForm = () => {
   const [completeSentence, setCompleteSentence] = useState("");
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
+  
+  const [searchTextSchool, setSearchTextSchool] = useState("");
 
+  const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
   const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
     []
   );
@@ -223,126 +221,84 @@ const PostInterventionForm = () => {
   // End of form step creation
 
   const personalDetailsForm = (
-    <>
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>What school are you at?</InputLabel>
-
-          <Select
-            value={school}
-            label="What school are you at?"
-            onChange={handleChangeSchool}
-          >
-            {schoolList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.schoolName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <InputLabel>What do you study?</InputLabel>
-
-          <Select
-            value={studyField}
-            label="What do you study?"
-            onChange={handleChangeStudyField}
-          >
-            {studyFieldList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.studyField}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>What grade are you in?</InputLabel>
-
-          <Select
-            value={grade}
-            label="What grade are you in?"
-            onChange={handleChangeGrade}
-          >
-            {gradeList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.grade}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <TextField
-            label="In which class are you?"
-            value={studentClass}
-            onChange={handleChangeClass}
-          />
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>Complete the sentence: I am...</InputLabel>
-
-          <Select
-            value={completeSentence}
-            label="Complete the sentence: I am..."
-            onChange={handleChangeCompleteSentence}
-          >
-            {completeSentenceList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <InputLabel>How old are you?</InputLabel>
-
-          <Select
-            value={age}
-            label="How old are you?"
-            onChange={handleChangeAge}
-          >
-            {ageList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.age}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl
-          sx={{
-            width: {
-              xs: "100%",
-              md: "49.5%",
-            },
-          }}
-        >
-          <InputLabel>Which Remind program are you following?</InputLabel>
-
-          <Select
-            value={remindProgram}
-            label="Which Remind program are you following?"
-            onChange={handleChangeRemindProgram}
-          >
-            {remindProgramList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-    </>
+    <Grid container rowSpacing={1} columnSpacing={1}>
+      {studentFormInfo &&
+        studentFormInfo.map((question: Question) => (
+          <Grid item xs={12} md={6}>
+            <FormControl fullWidth required>
+              {question.fieldType === FieldType.DropDown ? (
+                <>
+                  <InputLabel>{question.questionText}</InputLabel>
+                  <Select
+                    MenuProps={{ autoFocus: false }}
+                    labelId="search-select-school"
+                    id="school"
+                    name="school"
+                    value={formik.values.school}
+                    label="What school are you at?"
+                    onChange={formik.handleChange}
+                    onClose={() => setSearchTextSchool("")}
+                    renderValue={() => formik.values.school}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.school && Boolean(formik.errors.school)
+                    }
+                  >
+                    <ListSubheader>
+                      <TextField
+                        size="small"
+                        autoFocus
+                        placeholder="Type to search..."
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        onChange={(e) => setSearchTextSchool(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") {
+                            e.stopPropagation();
+                          }
+                        }}
+                      />
+                    </ListSubheader>
+                    <Box maxHeight={150}>
+                      {question.dropdownOptions
+                        .filter((item) => !item.isDelete)
+                        .map((item: DropDownOptions, index: number) => (
+                          <MenuItem value={item.id} key={index}>
+                            {item.item}
+                          </MenuItem>
+                        ))}
+                    </Box>
+                  </Select>
+                </>
+              ) : (
+                <TextField
+                  id="studentClass"
+                  name="studentClass"
+                  label={question.questionText}
+                  value={formik.values.studentClass}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.studentClass &&
+                    Boolean(formik.errors.studentClass)
+                  }
+                />
+              )}
+              {formik.touched.school && (
+                <FormHelperText sx={{ color: "red" }}>
+                  {formik.errors.school}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+        ))}
+    </Grid>
   );
 
   const questionPartOneForm = (
@@ -416,6 +372,20 @@ const PostInterventionForm = () => {
   useMemo(() => {
     const fetchData = async () => {
       try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setStudentFormInfo(studentFormInfoQuestions);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
         const postInterventionQuestions =
           await getAllPostInterventionQuestions();
 
@@ -440,6 +410,34 @@ const PostInterventionForm = () => {
 
     fetchData();
   }, []);
+
+  const validationSchema = yup.object({
+    school: yup.string().required("School is required!"),
+    studyField: yup.string().required("Study field is required!"),
+    grade: yup.string().required("Grade is required!"),
+    studentClass: yup.string().required("Student class is required!"),
+    completeSentence: yup.string().required("Complete sentence is required!"),
+    age: yup.string().required("Age is required!"),
+    remindProgram: yup.string().required("Remind program is required!"),
+  });
+
+
+  const formik = useFormik({
+    initialValues: {
+      school: "",
+      studyField: "",
+      grade: "",
+      studentClass: "",
+      completeSentence: "",
+      age: "",
+      remindProgram: "",
+    },
+    validationSchema,
+    onSubmit: () => {
+      // Handle form submission here
+      // You can access form values using formik.values
+    },
+  });
 
   return (
     <Stack sx={customStyles.stack}>

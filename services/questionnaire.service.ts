@@ -1,6 +1,21 @@
 import { leerLensApi } from "../api/api";
 import { getRequest } from "../api/requests";
 
+export const getStudentFormInfo = async () => {
+  try {
+    const response = await getRequest(leerLensApi.studentFormInfo);
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error("Failed to fetch student info questions");
+    }
+  } catch (error) {
+    console.error("Error fetching student info questions:", error);
+    throw error;
+  }
+};
+
 export const getAllPreInterventionQuestions = async () => {
   try {
     const response = await getRequest(leerLensApi.preIntervention);

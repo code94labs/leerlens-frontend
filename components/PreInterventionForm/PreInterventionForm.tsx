@@ -18,7 +18,13 @@ import {
   Typography,
 } from "@mui/material";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
+import React, {
+  ChangeEvent,
+  Fragment,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   ageList,
   completeSentenceList,
@@ -35,18 +41,13 @@ import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
 
-import { getAllPreInterventionQuestions } from "../../services/questionnaire.service";
+import {
+  getAllPreInterventionQuestions,
+  getStudentFormInfo,
+} from "../../services/questionnaire.service";
 
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
-
-export type Question = {
-  id: number;
-  questionText: string;
-  positionOrderId: number;
-  minValue: number;
-  maxValue: number;
-  isDelete: boolean;
-};
+import { DropDownOptions, Question } from "../../utils/types";
 
 const customStyles = {
   stack: {
@@ -105,87 +106,7 @@ const customStyles = {
   },
 };
 
-interface DropDownOptions {
-  id: number;
-  item: string;
-  isDelete: boolean;
-}
-
-interface QuestionResponse {
-  id: number;
-  formType: FormEvaluation;
-  questionText: string;
-  fieldType: FieldType;
-  sectionType: SectionType;
-  positionOrderId: number;
-  dropdownOptions: DropDownOptions[];
-  minValue: number;
-  maxValue: number;
-}
-
-const sampleResponse: QuestionResponse[] = [
-  {
-    id: 1,
-    formType: 3,
-    questionText: "What school are you from",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "Royal Institute",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "Lyceum",
-        isDelete: false,
-      },
-      {
-        id: 3,
-        item: "Gateway",
-        isDelete: true,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 2,
-    formType: 3,
-    questionText: "What's your age group",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "18",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "19",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-];
-
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
-
-const validationSchema = yup.object({
-  school: yup.string().required("School is required!"),
-  studyField: yup.string().required("Study field is required!"),
-  grade: yup.string().required("Grade is required!"),
-  studentClass: yup.string().required("Student class is required!"),
-  completeSentence: yup.string().required("Complete sentence is required!"),
-  age: yup.string().required("Age is required!"),
-  remindProgram: yup.string().required("Remind program is required!"),
-});
 
 const PreInterventionForm = () => {
   const router = useRouter();
@@ -198,6 +119,8 @@ const PreInterventionForm = () => {
   const [completeSentence, setCompleteSentence] = useState("");
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
+
+  const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
 
   const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
     []
@@ -233,6 +156,39 @@ const PreInterventionForm = () => {
       return newAnswers;
     });
   };
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setStudentFormInfo(studentFormInfoQuestions);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const validationSchema = yup.object({
+    school: yup.string().required("School is required!"),
+    studyField: yup.string().required("Study field is required!"),
+    grade: yup.string().required("Grade is required!"),
+    studentClass: yup.string().required("Student class is required!"),
+    completeSentence: yup.string().required("Complete sentence is required!"),
+    age: yup.string().required("Age is required!"),
+    remindProgram: yup.string().required("Remind program is required!"),
+  });
+
+  // const validationSchema = Yup.object().shape({
+  //   ...Object.fromEntries(
+  //     formData.fields.map((field) => [
+  //       field.name,
+  //       Yup.string().required(`${field.label} is required`),
+  //     ])
+  //   ),
+  // });
 
   const formik = useFormik({
     initialValues: {
@@ -349,59 +305,76 @@ const PreInterventionForm = () => {
   };
   // End of form step creation
 
-  console.log(formik.errors);
-
   const personalDetailsForm = (
-    <>
-      <Grid container rowSpacing={1} columnSpacing={1}>
-        {sampleResponse.map((question: QuestionResponse) => (
+    <Grid container rowSpacing={1} columnSpacing={1}>
+      {studentFormInfo &&
+        studentFormInfo.map((question: Question) => (
           <Grid item xs={12} md={6}>
             <FormControl fullWidth required>
-              <InputLabel>{question.questionText}</InputLabel>
-              <Select
-                MenuProps={{ autoFocus: false }}
-                labelId="search-select-school"
-                id="school"
-                name="school"
-                value={formik.values.school}
-                label="What school are you at?"
-                onChange={formik.handleChange}
-                onClose={() => setSearchTextSchool("")}
-                renderValue={() => formik.values.school}
-                onBlur={formik.handleBlur}
-                error={formik.touched.school && Boolean(formik.errors.school)}
-              >
-                <ListSubheader>
-                  <TextField
-                    size="small"
-                    autoFocus
-                    placeholder="Type to search..."
-                    fullWidth
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchRoundedIcon />
-                        </InputAdornment>
-                      ),
-                    }}
-                    onChange={(e) => setSearchTextSchool(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key !== "Escape") {
-                        e.stopPropagation();
-                      }
-                    }}
-                  />
-                </ListSubheader>
-                <Box maxHeight={150}>
-                  {question.dropdownOptions
-                    .filter((item) => !item.isDelete)
-                    .map((item: DropDownOptions, index: number) => (
-                      <MenuItem value={item.id} key={index}>
-                        {item.item}
-                      </MenuItem>
-                    ))}
-                </Box>
-              </Select>
+              {question.fieldType === FieldType.DropDown ? (
+                <>
+                  <InputLabel>{question.questionText}</InputLabel>
+                  <Select
+                    MenuProps={{ autoFocus: false }}
+                    labelId="search-select-school"
+                    id="school"
+                    name="school"
+                    value={formik.values.school}
+                    label="What school are you at?"
+                    onChange={formik.handleChange}
+                    onClose={() => setSearchTextSchool("")}
+                    renderValue={() => formik.values.school}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched.school && Boolean(formik.errors.school)
+                    }
+                  >
+                    <ListSubheader>
+                      <TextField
+                        size="small"
+                        autoFocus
+                        placeholder="Type to search..."
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        onChange={(e) => setSearchTextSchool(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") {
+                            e.stopPropagation();
+                          }
+                        }}
+                      />
+                    </ListSubheader>
+                    <Box maxHeight={150}>
+                      {question.dropdownOptions
+                        .filter((item) => !item.isDelete)
+                        .map((item: DropDownOptions, index: number) => (
+                          <MenuItem value={item.id} key={index}>
+                            {item.item}
+                          </MenuItem>
+                        ))}
+                    </Box>
+                  </Select>
+                </>
+              ) : (
+                <TextField
+                  id="studentClass"
+                  name="studentClass"
+                  label={question.questionText}
+                  value={formik.values.studentClass}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.studentClass &&
+                    Boolean(formik.errors.studentClass)
+                  }
+                />
+              )}
               {formik.touched.school && (
                 <FormHelperText sx={{ color: "red" }}>
                   {formik.errors.school}
@@ -410,175 +383,7 @@ const PreInterventionForm = () => {
             </FormControl>
           </Grid>
         ))}
-        {/* <Grid item xs={12} md={6}>
-          <FormControl fullWidth required>
-            <InputLabel>What do you study?</InputLabel>
-
-            <Select
-              value={formik.values.studyField}
-              id="studyField"
-              name="studyField"
-              label="What do you study?"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.studyField && Boolean(formik.errors.studyField)
-              }
-            >
-              {studyFieldList.map((item, index) => (
-                <MenuItem key={index} value={item.id}>
-                  {item.studyField}
-                </MenuItem>
-              ))}
-            </Select>
-            {formik.touched.studyField && (
-              <FormHelperText sx={{ color: "red" }}>
-                {formik.errors.studyField}
-              </FormHelperText>
-            )}
-          </FormControl>
-        </Grid> */}
-      </Grid>
-
-      {/* <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>What grade are you in?</InputLabel>
-
-          <Select
-            id="grade"
-            name="grade"
-            value={formik.values.grade}
-            label="What grade are you in?"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.grade && Boolean(formik.errors.grade)}
-          >
-            {gradeList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.grade}
-              </MenuItem>
-            ))}
-          </Select>
-          {formik.touched.grade && (
-            <FormHelperText sx={{ color: "red" }}>
-              {formik.errors.grade}
-            </FormHelperText>
-          )}
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <TextField
-            id="studentClass"
-            name="studentClass"
-            label="In which class are you?"
-            value={formik.values.studentClass}
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.studentClass && Boolean(formik.errors.studentClass)
-            }
-          />
-          {formik.touched.studentClass && (
-            <FormHelperText sx={{ color: "red" }}>
-              {formik.errors.studentClass}
-            </FormHelperText>
-          )}
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>Complete the sentence: I am...</InputLabel>
-
-          <Select
-            id="completeSentence"
-            name="completeSentence"
-            value={formik.values.completeSentence}
-            label="Complete the sentence: I am..."
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.completeSentence &&
-              Boolean(formik.errors.completeSentence)
-            }
-          >
-            {completeSentenceList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-          {formik.touched.completeSentence && (
-            <FormHelperText sx={{ color: "red" }}>
-              {formik.errors.completeSentence}
-            </FormHelperText>
-          )}
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <InputLabel>How old are you?</InputLabel>
-
-          <Select
-            id="age"
-            name="age"
-            value={formik.values.age}
-            label="How old are you?"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={formik.touched.age && Boolean(formik.errors.age)}
-          >
-            {ageList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.age}
-              </MenuItem>
-            ))}
-          </Select>
-          {formik.touched.age && (
-            <FormHelperText sx={{ color: "red" }}>
-              {formik.errors.age}
-            </FormHelperText>
-          )}
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl
-          sx={{
-            width: {
-              xs: "100%",
-              md: "49.5%",
-            },
-          }}
-          required
-        >
-          <InputLabel>Which Remind program are you following?</InputLabel>
-
-          <Select
-            id="remindProgram"
-            name="remindProgram"
-            value={formik.values.remindProgram}
-            label="Which Remind program are you following?"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            error={
-              formik.touched.remindProgram &&
-              Boolean(formik.errors.remindProgram)
-            }
-          >
-            {remindProgramList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-          {formik.touched.remindProgram && (
-            <FormHelperText sx={{ color: "red" }}>
-              {formik.errors.remindProgram}
-            </FormHelperText>
-          )}
-        </FormControl>
-      </Stack> */}
-    </>
+    </Grid>
   );
 
   const questionPartOneForm = (
