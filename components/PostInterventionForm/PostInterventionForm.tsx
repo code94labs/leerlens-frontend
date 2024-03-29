@@ -162,7 +162,7 @@ const PostInterventionForm = () => {
   const [completeSentence, setCompleteSentence] = useState("");
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
-  
+
   const [searchTextSchool, setSearchTextSchool] = useState("");
 
   const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
@@ -199,34 +199,6 @@ const PostInterventionForm = () => {
       newAnswers[questionId] = answer;
       return newAnswers;
     });
-  };
-
-  const handleChangeSchool = (event: SelectChangeEvent) => {
-    setSchool(event.target.value as string);
-  };
-
-  const handleChangeClass = (event: ChangeEvent<HTMLInputElement>) => {
-    setClass(event.target.value as string);
-  };
-
-  const handleChangeRemindProgram = (event: SelectChangeEvent) => {
-    setRemindProgram(event.target.value as string);
-  };
-
-  const handleChangeStudyField = (event: SelectChangeEvent) => {
-    setStudyField(event.target.value as string);
-  };
-
-  const handleChangeGrade = (event: SelectChangeEvent) => {
-    setGrade(event.target.value as string);
-  };
-
-  const handleChangeCompleteSentence = (event: SelectChangeEvent) => {
-    setCompleteSentence(event.target.value as string);
-  };
-
-  const handleChangeAge = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
   };
 
   // These functions are used to handle the form step changes
@@ -280,60 +252,107 @@ const PostInterventionForm = () => {
   };
   // End of form step creation
 
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setStudentFormInfo(studentFormInfoQuestions);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const postInterventionQuestions =
+          await getAllPostInterventionQuestions();
+
+        const questionsWithAnswerValue = postInterventionQuestions.map(
+          (question: Question) => ({
+            ...question,
+            answerValue: 0,
+          })
+        );
+
+        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
+
+        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
+        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
+
+        setQuestionListPartOne(firstHalf);
+        setQuestionListPartTwo(secondHalf);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const validationSchema = yup
+    .object()
+    .shape(
+      studentFormInfo.length > 0
+        ? Object.fromEntries(
+            studentFormInfo.map((field) => [
+              field.id,
+              yup.string().required(`Response is required`),
+            ])
+          )
+        : {}
+    );
+
+  const formik = useFormik({
+    initialValues: studentFormInfo
+      ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
+      : {},
+    validationSchema,
+    onSubmit: () => {
+      // Handle form submission here
+      // You can access form values using formik.values
+    },
+  });
+
+  const handleChange = (event: any) => {
+    const { name, value } = event.target;
+    formik.setFieldValue(name, value);
+  };
+
   const personalDetailsForm = (
     <Grid container rowSpacing={1} columnSpacing={1}>
       {studentFormInfo &&
         studentFormInfo.map((question: Question) => (
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} key={question.id}>
             <FormControl fullWidth required>
               {question.fieldType === FieldType.DropDown ? (
                 <>
                   <InputLabel>{question.questionText}</InputLabel>
                   <Select
                     MenuProps={{ autoFocus: false }}
-                    labelId="search-select-school"
-                    id="school"
-                    name="school"
-                    value={formik.values.school}
-                    label="What school are you at?"
-                    onChange={formik.handleChange}
-                    onClose={() => setSearchTextSchool("")}
-                    renderValue={() => formik.values.school}
+                    labelId={`search-select-`}
+                    id={String(question.id)}
+                    name={String(question.id)}
+                    value={formik.values[question.id]}
+                    label={question.questionText}
+                    onChange={handleChange}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.school && Boolean(formik.errors.school)
+                      formik.touched[question.id] &&
+                      Boolean(formik.errors[question.id])
                     }
                   >
-                    <ListSubheader>
-                      <TextField
-                        size="small"
-                        autoFocus
-                        placeholder="Type to search..."
-                        fullWidth
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchRoundedIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                        onChange={(e) => setSearchTextSchool(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key !== "Escape") {
-                            e.stopPropagation();
-                          }
-                        }}
-                      />
-                    </ListSubheader>
-                    <Box maxHeight={150}>
-                      {question.dropdownOptions
-                        .filter((item) => !item.isDelete)
-                        .map((item: DropDownOptions, index: number) => (
-                          <MenuItem value={item.id} key={index}>
-                            {item.item}
-                          </MenuItem>
-                        ))}
-                    </Box>
+                    {question.dropdownOptions
+                      .filter((item) => !item.isDelete)
+                      .map((item: DropDownOptions, index: number) => (
+                        <MenuItem value={item.item} key={index}>
+                          {item.item}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </>
               ) : (
@@ -341,18 +360,18 @@ const PostInterventionForm = () => {
                   id="studentClass"
                   name="studentClass"
                   label={question.questionText}
-                  value={formik.values.studentClass}
+                  value={formik.values[question.id]}
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   error={
-                    formik.touched.studentClass &&
-                    Boolean(formik.errors.studentClass)
+                    formik.touched[question.id] &&
+                    Boolean(formik.errors[question.id])
                   }
                 />
               )}
-              {formik.touched.school && (
+              {formik.touched[question.id] && (
                 <FormHelperText sx={{ color: "red" }}>
-                  {formik.errors.school}
+                  {formik.errors[question.id]}
                 </FormHelperText>
               )}
             </FormControl>
@@ -428,76 +447,6 @@ const PostInterventionForm = () => {
         break;
     }
   };
-
-  useMemo(() => {
-    const fetchData = async () => {
-      try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
-
-        setStudentFormInfo(studentFormInfoQuestions);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  useMemo(() => {
-    const fetchData = async () => {
-      try {
-        const postInterventionQuestions =
-          await getAllPostInterventionQuestions();
-
-        const questionsWithAnswerValue = postInterventionQuestions.map(
-          (question: Question) => ({
-            ...question,
-            answerValue: 0,
-          })
-        );
-
-        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
-
-        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
-        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
-
-        setQuestionListPartOne(firstHalf);
-        setQuestionListPartTwo(secondHalf);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const validationSchema = yup.object({
-    school: yup.string().required("School is required!"),
-    studyField: yup.string().required("Study field is required!"),
-    grade: yup.string().required("Grade is required!"),
-    studentClass: yup.string().required("Student class is required!"),
-    completeSentence: yup.string().required("Complete sentence is required!"),
-    age: yup.string().required("Age is required!"),
-    remindProgram: yup.string().required("Remind program is required!"),
-  });
-
-
-  const formik = useFormik({
-    initialValues: {
-      school: "",
-      studyField: "",
-      grade: "",
-      studentClass: "",
-      completeSentence: "",
-      age: "",
-      remindProgram: "",
-    },
-    validationSchema,
-    onSubmit: () => {
-      // Handle form submission here
-      // You can access form values using formik.values
-    },
-  });
 
   return (
     <Stack sx={customStyles.stack}>
@@ -621,6 +570,7 @@ const PostInterventionForm = () => {
                   variant="outlined"
                   onClick={handleNext}
                   sx={customStyles.primaryButton}
+                  disabled={!(formik.isValid && formik.dirty)}
                 >
                   Next
                 </Button>

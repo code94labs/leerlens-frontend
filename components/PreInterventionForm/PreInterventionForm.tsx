@@ -231,16 +231,6 @@ const PreInterventionForm = () => {
     fetchData();
   }, []);
 
-  // const validationSchema = yup.object({
-  //   school: yup.string().required("School is required!"),
-  //   studyField: yup.string().required("Study field is required!"),
-  //   grade: yup.string().required("Grade is required!"),
-  //   studentClass: yup.string().required("Student class is required!"),
-  //   completeSentence: yup.string().required("Complete sentence is required!"),
-  //   age: yup.string().required("Age is required!"),
-  //   remindProgram: yup.string().required("Remind program is required!"),
-  // });
-
   const validationSchema = yup
     .object()
     .shape(
@@ -266,7 +256,6 @@ const PreInterventionForm = () => {
   });
 
   const handleChange = (event: any) => {
-    console.log(event);
     const { name, value } = event.target;
     formik.setFieldValue(name, value);
   };
@@ -599,22 +588,6 @@ const PreInterventionForm = () => {
 
       case 2:
         return questionPartTwoForm;
-
-      default:
-        break;
-    }
-  };
-
-  const getStepName = (step: number) => {
-    switch (step) {
-      case 0:
-        return "Personal Details";
-
-      case 1:
-        return "Questions | Part 01";
-
-      case 2:
-        return "Questions | Part 02";
 
       default:
         break;
