@@ -297,7 +297,7 @@ const FormCard = (props) => {
       <Stack
         sx={customStyles.modalStack}
         onClick={() => {
-          navigator.clipboard.writeText(pagePath);
+          navigator.clipboard.writeText(process.env.BASE_URL + pagePath);
           setDisplayCopyLinkSnackbar(true);
         }}
       >
