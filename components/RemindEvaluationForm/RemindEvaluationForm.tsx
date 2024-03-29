@@ -1,8 +1,11 @@
+import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
 import {
   Box,
   Button,
   Divider,
   FormControl,
+  FormHelperText,
+  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -14,7 +17,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import * as yup from "yup";
+
+import CustomScale from "../../shared/CustomScale/CustomScale";
+import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
+
 import {
   ageList,
   completeSentenceList,
@@ -23,13 +31,15 @@ import {
   schoolList,
   studyFieldList,
 } from "../../utils/constant";
-import { useRouter } from "next/router";
-import { FormEvaluation } from "../../utils/enum";
-import { Question } from "../PostInterventionForm/PostInterventionForm";
-import CustomScale from "../../shared/CustomScale/CustomScale";
-import { getAllEvaluationQuestions } from "../../services/questionnaire.service";
+import { FieldType, FormEvaluation } from "../../utils/enum";
+import { DropDownOptions, Question } from "../../utils/types";
 import { champBlackFontFamily } from "../../shared/typography";
-import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
+
+import {
+  getAllEvaluationQuestions,
+  getStudentFormInfo,
+} from "../../services/questionnaire.service";
+import { useFormik } from "formik";
 
 const customStyles = {
   mainBox: {
@@ -123,6 +133,11 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
     fontWeight: 400,
+    "&:disabled": {
+      backgroundColor: "#E6E6E6",
+      color: "#98989A",
+      border: "2px #E6E6E6 solid",
+    },
   },
   secondaryButton: {
     backgroundColor: "white",
@@ -162,6 +177,8 @@ const RemindEvaluationForm = () => {
   const [completeSentence, setCompleteSentence] = useState("");
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
+
+  const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
 
   const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
     []
@@ -313,127 +330,104 @@ const RemindEvaluationForm = () => {
   };
   // End of form step creation
 
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setStudentFormInfo(studentFormInfoQuestions);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const validationSchema = yup
+    .object()
+    .shape(
+      studentFormInfo.length > 0
+        ? Object.fromEntries(
+            studentFormInfo.map((field) => [
+              field.id,
+              yup.string().required(`Response is required`),
+            ])
+          )
+        : {}
+    );
+
+  const formik = useFormik({
+    initialValues: studentFormInfo
+      ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
+      : {},
+    validationSchema,
+    onSubmit: () => {
+      // Handle form submission here
+      // You can access form values using formik.values
+    },
+  });
+
+  const handleChange = (event: any) => {
+    const { name, value } = event.target;
+    formik.setFieldValue(name, value);
+  };
+
   const personalDetailsForm = (
-    <>
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>What school are you at?</InputLabel>
-
-          <Select
-            value={school}
-            label="What school are you at?"
-            onChange={handleChangeSchool}
-          >
-            {schoolList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.schoolName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <InputLabel>What do you study?</InputLabel>
-
-          <Select
-            value={studyField}
-            label="What do you study?"
-            onChange={handleChangeStudyField}
-          >
-            {studyFieldList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.studyField}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>What grade are you in?</InputLabel>
-
-          <Select
-            value={grade}
-            label="What grade are you in?"
-            onChange={handleChangeGrade}
-          >
-            {gradeList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.grade}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <TextField
-            label="In which class are you?"
-            value={studentClass}
-            onChange={handleChangeClass}
-          />
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>Complete the sentence: I am...</InputLabel>
-
-          <Select
-            value={completeSentence}
-            label="Complete the sentence: I am..."
-            onChange={handleChangeCompleteSentence}
-          >
-            {completeSentenceList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <InputLabel>How old are you?</InputLabel>
-
-          <Select
-            value={age}
-            label="How old are you?"
-            onChange={handleChangeAge}
-          >
-            {ageList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.age}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl
-          sx={{
-            width: {
-              xs: "100%",
-              md: "49.5%",
-            },
-          }}
-        >
-          <InputLabel>Which Remind program are you following?</InputLabel>
-
-          <Select
-            value={remindProgram}
-            label="Which Remind program are you following?"
-            onChange={handleChangeRemindProgram}
-          >
-            {remindProgramList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-    </>
+    <Grid container rowSpacing={1} columnSpacing={1}>
+      {studentFormInfo &&
+        studentFormInfo.map((question: Question) => (
+          <Grid item xs={12} md={6} key={question.id}>
+            <FormControl fullWidth required>
+              {question.fieldType === FieldType.DropDown ? (
+                <>
+                  <InputLabel>{question.questionText}</InputLabel>
+                  <Select
+                    MenuProps={{ autoFocus: false }}
+                    labelId={`search-select-`}
+                    id={String(question.id)}
+                    name={String(question.id)}
+                    value={formik.values[question.id]}
+                    label={question.questionText}
+                    onChange={handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched[question.id] &&
+                      Boolean(formik.errors[question.id])
+                    }
+                  >
+                    {question.dropdownOptions
+                      .filter((item) => !item.isDelete)
+                      .map((item: DropDownOptions, index: number) => (
+                        <MenuItem value={item.item} key={index}>
+                          {item.item}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </>
+              ) : (
+                <TextField
+                  id="studentClass"
+                  name="studentClass"
+                  label={question.questionText}
+                  value={formik.values[question.id]}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched[question.id] &&
+                    Boolean(formik.errors[question.id])
+                  }
+                />
+              )}
+              {formik.touched[question.id] && (
+                <FormHelperText sx={{ color: "red" }}>
+                  {formik.errors[question.id]}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+        ))}
+    </Grid>
   );
 
   const questionPartOneForm = (
@@ -663,6 +657,7 @@ const RemindEvaluationForm = () => {
                   variant="outlined"
                   onClick={handleNext}
                   sx={customStyles.primaryButton}
+                  disabled={!(formik.isValid && formik.dirty)}
                 >
                   Next
                 </Button>
