@@ -6,7 +6,7 @@ import React from "react";
 
 const customStyles = {
   container: {
-    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+    borderBottom: "1px #E6E6E6 solid",
   },
   image: {
     cursor: "pointer",
@@ -30,6 +30,9 @@ const customStyles = {
   },
 };
 
+const baseRoute = "/";
+const companySite = "https://remindlearning.nl/";
+
 const Header = () => {
   const router = useRouter();
 
@@ -42,16 +45,18 @@ const Header = () => {
           width={130}
           alt="logo"
           style={customStyles.image}
-          onClick={() => router.replace("/")}
+          onClick={() => router.replace(baseRoute)}
         />
 
-        <Link
-          href="https://remindlearning.nl/"
-          style={customStyles.link}
-          target="_blank"
-        >
-          Visit Website
-        </Link>
+        {router.pathname === baseRoute && (
+          <Link
+            href={companySite}
+            style={customStyles.link}
+            target="_blank"
+          >
+            Visit Website
+          </Link>
+        )}
       </Box>
     </Stack>
   );

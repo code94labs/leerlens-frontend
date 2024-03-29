@@ -6,6 +6,9 @@ const nextConfig = {
       allowFutureImage: true,
     },
   },
+  env: {
+    BASE_URL: process.env.BASE_URL,
+  },
 };
 
 export default nextConfig;

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { motion } from "framer-motion";
+
 import Image from "next/image";
 import {
   Box,
@@ -23,7 +25,6 @@ import { useWindowSize } from "../../utils/hooks/useWindowSize";
 const customStyles = {
   card: {
     border: "1px #E6E6E6 solid",
-    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
     display: "flex",
     flexDirection: "row",
     mx: {
@@ -34,10 +35,11 @@ const customStyles = {
       xs: 3,
       md: 5,
     },
-    borderRadius: 2,
+    borderRadius: 3,
   },
   title: {
     fontWeight: 800,
+    textTransform: "uppercase",
     fontSize: {
       xs: 24,
       md: 34,
@@ -49,6 +51,7 @@ const customStyles = {
     fontFamily: champBlackFontFamily,
   },
   description: {
+    color: "#4C4C4D",
     width: {
       xs: "100%",
       md: "85%",
@@ -287,14 +290,14 @@ const FormCard = (props) => {
 
       <QRCode
         id="qrCodeEl"
-        value={pagePath}
+        value={process.env.BASE_URL + pagePath}
         size={size.width > 900 ? 250 : 150}
       />
 
       <Stack
         sx={customStyles.modalStack}
         onClick={() => {
-          navigator.clipboard.writeText(pagePath);
+          navigator.clipboard.writeText(process.env.BASE_URL + pagePath);
           setDisplayCopyLinkSnackbar(true);
         }}
       >
@@ -303,7 +306,7 @@ const FormCard = (props) => {
         </IconButton>
 
         <TextField
-          value={pagePath}
+          value={process.env.BASE_URL + pagePath}
           variant="outlined"
           margin="normal"
           disabled
@@ -349,93 +352,101 @@ const FormCard = (props) => {
   );
 
   return (
-    <Stack sx={customStyles.card}>
-      <Stack>
-        <Typography variant="h4" sx={customStyles.title}>
-          {title}
-        </Typography>
-        <Typography sx={customStyles.description}>{description}</Typography>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.5 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.5 }}
+      transition={{ duration: 0.5 }}
+      sx={customStyles.card}
+    >
+      <Stack sx={customStyles.card}>
+        <Stack>
+          <Typography variant="h4" sx={customStyles.title}>
+            {title}
+          </Typography>
+          <Typography sx={customStyles.description}>{description}</Typography>
 
-        <Box sx={customStyles.boxBtn}>
-          <Button
-            variant="contained"
-            sx={customStyles.primaryBtn}
-            fullWidth
-            onClick={handleFormNavigation}
-            disableElevation
-          >
-            Start {title}
-          </Button>
+          <Box sx={customStyles.boxBtn}>
+            <Button
+              variant="contained"
+              sx={customStyles.primaryBtn}
+              fullWidth
+              onClick={handleFormNavigation}
+              disableElevation
+            >
+              Start {title}
+            </Button>
 
-          <Button
-            variant="contained"
-            sx={customStyles.secondaryBtn}
-            fullWidth
-            onClick={handleOpen}
-            disableElevation
-          >
-            View QR Code
-          </Button>
-        </Box>
-      </Stack>
+            <Button
+              variant="contained"
+              sx={customStyles.secondaryBtn}
+              fullWidth
+              onClick={handleOpen}
+              disableElevation
+            >
+              View QR Code
+            </Button>
+          </Box>
+        </Stack>
 
-      <Stack sx={customStyles.imageStack}>
-        <Image src={image} height={200} width={250} alt="img" />
-      </Stack>
+        <Stack sx={customStyles.imageStack}>
+          <Image src={image} height={200} width={250} alt="img" />
+        </Stack>
 
-      <Modal
-        open={openDialog}
-        onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        {qrDialogModel}
-      </Modal>
+        <Modal
+          open={openDialog}
+          onClose={handleClose}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          {qrDialogModel}
+        </Modal>
 
-      <Snackbar
-        open={displayCopyLinkSnackbar}
-        autoHideDuration={6000}
-        onClose={() => setDisplayCopyLinkSnackbar(false)}
-      >
-        <Alert
+        <Snackbar
+          open={displayCopyLinkSnackbar}
+          autoHideDuration={6000}
           onClose={() => setDisplayCopyLinkSnackbar(false)}
-          severity="success"
-          variant="outlined"
-          icon={false}
-          sx={{
-            width: "100%",
-            bgcolor: "white",
-            color: "#A879FF",
-            fontWeight: 600,
-            border: 0,
-          }}
         >
-          Link copied Successfully!
-        </Alert>
-      </Snackbar>
+          <Alert
+            onClose={() => setDisplayCopyLinkSnackbar(false)}
+            severity="success"
+            variant="outlined"
+            icon={false}
+            sx={{
+              width: "100%",
+              bgcolor: "white",
+              color: "#A879FF",
+              fontWeight: 600,
+              border: 0,
+            }}
+          >
+            Link copied Successfully!
+          </Alert>
+        </Snackbar>
 
-      <Snackbar
-        open={displayDownloadQRSnackbar}
-        autoHideDuration={6000}
-        onClose={() => setDisplayDownloadQRSnackbar(false)}
-      >
-        <Alert
+        <Snackbar
+          open={displayDownloadQRSnackbar}
+          autoHideDuration={6000}
           onClose={() => setDisplayDownloadQRSnackbar(false)}
-          severity="success"
-          variant="outlined"
-          icon={false}
-          sx={{
-            width: "100%",
-            bgcolor: "white",
-            color: "#A879FF",
-            fontWeight: 600,
-            border: 0,
-          }}
         >
-          {notificationMessage}
-        </Alert>
-      </Snackbar>
-    </Stack>
+          <Alert
+            onClose={() => setDisplayDownloadQRSnackbar(false)}
+            severity="success"
+            variant="outlined"
+            icon={false}
+            sx={{
+              width: "100%",
+              bgcolor: "white",
+              color: "#A879FF",
+              fontWeight: 600,
+              border: 0,
+            }}
+          >
+            {notificationMessage}
+          </Alert>
+        </Snackbar>
+      </Stack>
+    </motion.div>
   );
 };
 
