@@ -290,7 +290,7 @@ const FormCard = (props) => {
 
       <QRCode
         id="qrCodeEl"
-        value={pagePath}
+        value={process.env.BASE_URL + pagePath}
         size={size.width > 900 ? 250 : 150}
       />
 
@@ -306,7 +306,7 @@ const FormCard = (props) => {
         </IconButton>
 
         <TextField
-          value={pagePath}
+          value={process.env.BASE_URL + pagePath}
           variant="outlined"
           margin="normal"
           disabled
