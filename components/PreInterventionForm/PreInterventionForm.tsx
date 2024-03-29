@@ -171,41 +171,45 @@ const PreInterventionForm = () => {
     fetchData();
   }, []);
 
-  const validationSchema = yup.object({
-    school: yup.string().required("School is required!"),
-    studyField: yup.string().required("Study field is required!"),
-    grade: yup.string().required("Grade is required!"),
-    studentClass: yup.string().required("Student class is required!"),
-    completeSentence: yup.string().required("Complete sentence is required!"),
-    age: yup.string().required("Age is required!"),
-    remindProgram: yup.string().required("Remind program is required!"),
-  });
-
-  // const validationSchema = Yup.object().shape({
-  //   ...Object.fromEntries(
-  //     formData.fields.map((field) => [
-  //       field.name,
-  //       Yup.string().required(`${field.label} is required`),
-  //     ])
-  //   ),
+  // const validationSchema = yup.object({
+  //   school: yup.string().required("School is required!"),
+  //   studyField: yup.string().required("Study field is required!"),
+  //   grade: yup.string().required("Grade is required!"),
+  //   studentClass: yup.string().required("Student class is required!"),
+  //   completeSentence: yup.string().required("Complete sentence is required!"),
+  //   age: yup.string().required("Age is required!"),
+  //   remindProgram: yup.string().required("Remind program is required!"),
   // });
 
+  const validationSchema = yup
+    .object()
+    .shape(
+      studentFormInfo.length > 0
+        ? Object.fromEntries(
+            studentFormInfo.map((field) => [
+              field.id,
+              yup.string().required(`Response is required`),
+            ])
+          )
+        : {}
+    );
+
   const formik = useFormik({
-    initialValues: {
-      school: "",
-      studyField: "",
-      grade: "",
-      studentClass: "",
-      completeSentence: "",
-      age: "",
-      remindProgram: "",
-    },
+    initialValues: studentFormInfo
+      ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
+      : {},
     validationSchema,
     onSubmit: () => {
       // Handle form submission here
       // You can access form values using formik.values
     },
   });
+
+  const handleChange = (event: any) => {
+    console.log(event);
+    const { name, value } = event.target;
+    formik.setFieldValue(name, value);
+  };
 
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
@@ -309,24 +313,73 @@ const PreInterventionForm = () => {
     <Grid container rowSpacing={1} columnSpacing={1}>
       {studentFormInfo &&
         studentFormInfo.map((question: Question) => (
-          <Grid item xs={12} md={6}>
+          <Grid item xs={12} md={6} key={question.id}>
             <FormControl fullWidth required>
               {question.fieldType === FieldType.DropDown ? (
                 <>
                   <InputLabel>{question.questionText}</InputLabel>
                   <Select
                     MenuProps={{ autoFocus: false }}
-                    labelId="search-select-school"
-                    id="school"
-                    name="school"
-                    value={formik.values.school}
-                    label="What school are you at?"
-                    onChange={formik.handleChange}
-                    onClose={() => setSearchTextSchool("")}
-                    renderValue={() => formik.values.school}
+                    labelId={`search-select-`}
+                    id={String(question.id)}
+                    name={String(question.id)}
+                    value={formik.values[question.id]}
+                    label={question.questionText}
+                    onChange={handleChange}
                     onBlur={formik.handleBlur}
                     error={
-                      formik.touched.school && Boolean(formik.errors.school)
+                      formik.touched[question.id] &&
+                      Boolean(formik.errors[question.id])
+                    }
+                  >
+                    {question.dropdownOptions
+                      .filter((item) => !item.isDelete)
+                      .map((item: DropDownOptions, index: number) => (
+                        <MenuItem value={item.item} key={index}>
+                          {item.item}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </>
+              ) : (
+                <TextField
+                  id="studentClass"
+                  name="studentClass"
+                  label={question.questionText}
+                  value={formik.values[question.id]}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched[question.id] &&
+                    Boolean(formik.errors[question.id])
+                  }
+                />
+              )}
+              {formik.touched[question.id] && (
+                <FormHelperText sx={{ color: "red" }}>
+                  {formik.errors[question.id]}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+        ))}
+      {/* <Select
+                    MenuProps={{ autoFocus: false }}
+                    labelId="search-select-school"
+                    id={String(question.id)}
+                    name={String(question.id)}
+                    value={formik.values[question.id]}
+                    label={question.questionText}
+                    onChange={(e) => {
+                      console.log(e);
+                      handleChange(e);
+                    }}
+                    onClose={() => setSearchTextSchool("")}
+                    renderValue={() => formik.values[question.id]}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched[question.id] &&
+                      Boolean(formik.errors[question.id])
                     }
                   >
                     <ListSubheader>
@@ -359,30 +412,7 @@ const PreInterventionForm = () => {
                           </MenuItem>
                         ))}
                     </Box>
-                  </Select>
-                </>
-              ) : (
-                <TextField
-                  id="studentClass"
-                  name="studentClass"
-                  label={question.questionText}
-                  value={formik.values.studentClass}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched.studentClass &&
-                    Boolean(formik.errors.studentClass)
-                  }
-                />
-              )}
-              {formik.touched.school && (
-                <FormHelperText sx={{ color: "red" }}>
-                  {formik.errors.school}
-                </FormHelperText>
-              )}
-            </FormControl>
-          </Grid>
-        ))}
+                  </Select> */}
     </Grid>
   );
 
