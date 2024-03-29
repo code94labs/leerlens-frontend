@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Divider,
   FormControl,
   InputLabel,
   MenuItem,
@@ -31,6 +32,12 @@ import { champBlackFontFamily } from "../../shared/typography";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
 
 const customStyles = {
+  mainBox: {
+    width: "100%",
+    border: "1px #E6E6E6 solid",
+    p: 5,
+    borderRadius: 2,
+  },
   stack: {
     width: {
       // xs: "100%",
@@ -84,6 +91,56 @@ const customStyles = {
       xs: 0,
       md: 2,
     },
+  },
+  step: {
+    "& .MuiStepLabel-iconContainer > .Mui-active": {
+      color: "#A879FF",
+    },
+
+    "& .MuiStepLabel-label": {
+      fontWeight: 600,
+    },
+  },
+  primaryButton: {
+    backgroundColor: "#A879FF",
+    color: "white",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 180,
+    border: "2px #A879FF solid",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
+    },
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
+    fontFamily: champBlackFontFamily,
+    fontWeight: 400,
+  },
+  secondaryButton: {
+    backgroundColor: "white",
+    color: "#A879FF",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 180,
+    border: "2px #A879FF solid",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
+    },
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontFamily: champBlackFontFamily,
   },
 };
 
@@ -496,7 +553,7 @@ const RemindEvaluationForm = () => {
         </Typography>
       </Box>
 
-      <Box sx={{ width: "100%" }}>
+      <Box sx={customStyles.mainBox}>
         <Stepper
           nonLinear
           activeStep={activeStep}
@@ -508,7 +565,11 @@ const RemindEvaluationForm = () => {
           }}
         >
           {steps.map((label, index) => (
-            <Step key={label} completed={completed[index]}>
+            <Step
+              key={label}
+              completed={completed[index]}
+              sx={customStyles.step}
+            >
               <StepButton color="inherit" onClick={handleStep(index)}>
                 {label}
               </StepButton>
@@ -558,43 +619,56 @@ const RemindEvaluationForm = () => {
           </Box>
         )}
 
+        <Divider sx={{ py: 3, mb: 2 }} />
+
         <Box>
-          {allStepsCompleted() ? (
-            <Fragment>
-              <Typography sx={{ mt: 2, mb: 1 }}>
-                All steps completed - you&apos;re finished
-              </Typography>
+          <Fragment>
+            <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
+              {formContent()}
+            </Typography>
 
-              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                <Box sx={{ flex: "1 1 auto" }} />
-
-                <Button onClick={handleReset}>Reset</Button>
-              </Box>
-            </Fragment>
-          ) : (
-            <Fragment>
-              <Typography sx={{ mt: 2, mb: 1, py: 1 }}>
-                {formContent()}
-              </Typography>
-
-              <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+            <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+              {activeStep === 0 ? (
                 <Button
                   color="inherit"
                   variant="outlined"
                   onClick={handleBack}
-                  sx={{ mr: 1 }}
+                  sx={customStyles.secondaryButton}
+                >
+                  Cancel
+                </Button>
+              ) : (
+                <Button
+                  color="inherit"
+                  variant="outlined"
+                  onClick={handleBack}
+                  sx={customStyles.secondaryButton}
                 >
                   Back
                 </Button>
+              )}
 
-                <Box sx={{ flex: "1 1 auto" }} />
+              <Box sx={{ flex: "1 1 auto" }} />
 
-                <Button variant="outlined" onClick={handleNext} sx={{ mr: 1 }}>
+              {isLastStep() ? (
+                <Button
+                  variant="outlined"
+                  onClick={handleSubmit}
+                  sx={customStyles.primaryButton}
+                >
+                  Complete
+                </Button>
+              ) : (
+                <Button
+                  variant="outlined"
+                  onClick={handleNext}
+                  sx={customStyles.primaryButton}
+                >
                   Next
                 </Button>
-              </Box>
-            </Fragment>
-          )}
+              )}
+            </Box>
+          </Fragment>
         </Box>
       </Box>
     </Stack>

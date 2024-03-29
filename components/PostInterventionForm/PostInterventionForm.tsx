@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Divider,
   FormControl,
   InputLabel,
   MenuItem,
@@ -39,6 +40,12 @@ export type Question = {
 };
 
 const customStyles = {
+  mainBox: {
+    width: "100%",
+    border: "1px #E6E6E6 solid",
+    p: 5,
+    borderRadius: 2,
+  },
   stack: {
     width: {
       // xs: "100%",
@@ -77,7 +84,10 @@ const customStyles = {
       md: 16,
     },
   },
-  formBox: { mb: 1, py: 1 },
+  formBox: {
+    mb: 1,
+    py: 1,
+  },
   selectStack: {
     flexDirection: {
       xs: "column",
@@ -92,6 +102,56 @@ const customStyles = {
       xs: 0,
       md: 2,
     },
+  },
+  step: {
+    "& .MuiStepLabel-iconContainer > .Mui-active": {
+      color: "#A879FF",
+    },
+
+    "& .MuiStepLabel-label": {
+      fontWeight: 600,
+    },
+  },
+  primaryButton: {
+    backgroundColor: "#A879FF",
+    color: "white",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 180,
+    border: "2px #A879FF solid",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
+    },
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
+    fontFamily: champBlackFontFamily,
+    fontWeight: 400,
+  },
+  secondaryButton: {
+    backgroundColor: "white",
+    color: "#A879FF",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 180,
+    border: "2px #A879FF solid",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
+    },
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontFamily: champBlackFontFamily,
   },
 };
 
@@ -453,7 +513,7 @@ const PostInterventionForm = () => {
         </Typography>
       </Box>
 
-      <Box sx={{ width: "100%" }}>
+      <Box sx={customStyles.mainBox}>
         <Stepper
           nonLinear
           activeStep={activeStep}
@@ -465,13 +525,19 @@ const PostInterventionForm = () => {
           }}
         >
           {steps.map((label, index) => (
-            <Step key={label} completed={completed[index]}>
+            <Step
+              key={label}
+              completed={completed[index]}
+              sx={customStyles.step}
+            >
               <StepButton color="inherit" onClick={handleStep(index)}>
                 {label}
               </StepButton>
             </Step>
           ))}
         </Stepper>
+
+        <Divider sx={{ py: 3, mb: 2 }} />
 
         {activeStep < 3 && (
           <Box
@@ -522,14 +588,25 @@ const PostInterventionForm = () => {
             </Typography>
 
             <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-              <Button
-                color="inherit"
-                variant="outlined"
-                onClick={handleBack}
-                sx={{ mr: 1 }}
-              >
-                Back
-              </Button>
+              {activeStep === 0 ? (
+                <Button
+                  color="inherit"
+                  variant="outlined"
+                  onClick={handleBack}
+                  sx={customStyles.secondaryButton}
+                >
+                  Cancel
+                </Button>
+              ) : (
+                <Button
+                  color="inherit"
+                  variant="outlined"
+                  onClick={handleBack}
+                  sx={customStyles.secondaryButton}
+                >
+                  Back
+                </Button>
+              )}
 
               <Box sx={{ flex: "1 1 auto" }} />
 
@@ -537,12 +614,16 @@ const PostInterventionForm = () => {
                 <Button
                   variant="outlined"
                   onClick={handleSubmit}
-                  sx={{ mr: 1 }}
+                  sx={customStyles.primaryButton}
                 >
-                  Submit
+                  Complete
                 </Button>
               ) : (
-                <Button variant="outlined" onClick={handleNext} sx={{ mr: 1 }}>
+                <Button
+                  variant="outlined"
+                  onClick={handleNext}
+                  sx={customStyles.primaryButton}
+                >
                   Next
                 </Button>
               )}
