@@ -52,7 +52,7 @@ import { DropDownOptions, Question } from "../../utils/types";
 
 const customStyles = {
   mainBox: {
-    width: "100%",
+    // width: "100%",
     border: "1px #E6E6E6 solid",
     p: 5,
     borderRadius: 2,
@@ -118,6 +118,10 @@ const customStyles = {
     "& .MuiStepLabel-iconContainer > .Mui-active": {
       color: "#A879FF",
     },
+    
+    "& .MuiStepLabel-iconContainer > .Mui-completed": {
+      color: "#A879FF",
+    },
 
     "& .MuiStepLabel-label": {
       fontWeight: 600,
@@ -145,6 +149,11 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
     fontWeight: 400,
+    "&:disabled": {
+      backgroundColor: "#E6E6E6",
+      color: "#98989A",
+      border: "2px #E6E6E6 solid",
+    },
   },
   secondaryButton: {
     backgroundColor: "white",
@@ -635,7 +644,6 @@ const PreInterventionForm = () => {
 
       <Box sx={customStyles.mainBox}>
         <Stepper
-          nonLinear
           activeStep={activeStep}
           sx={{
             display: {
