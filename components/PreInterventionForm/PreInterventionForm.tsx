@@ -118,7 +118,7 @@ const customStyles = {
     "& .MuiStepLabel-iconContainer > .Mui-active": {
       color: "#A879FF",
     },
-    
+
     "& .MuiStepLabel-iconContainer > .Mui-completed": {
       color: "#A879FF",
     },
@@ -205,6 +205,9 @@ const PreInterventionForm = () => {
     Array(questionListPartTwo.length).fill(0)
   );
 
+  const [allAnsweredPartOne, setAllAnsweredPartOne] = useState<boolean>(false);
+  const [allAnsweredPartTwo, setAllAnsweredPartTwo] = useState<boolean>(false);
+
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{
     [k: number]: boolean;
@@ -225,6 +228,48 @@ const PreInterventionForm = () => {
       return newAnswers;
     });
   };
+
+  useMemo(() => {
+    const partOneAllAnswered = () => {
+      if (answersPartOne.length !== questionListPartOne.length) {
+        return false;
+      }
+
+      for (let i = 0; i < answersPartOne.length; i++) {
+        if (
+          answersPartOne[i] === undefined ||
+          answersPartOne[i] === null ||
+          answersPartOne[i] === 0
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    setAllAnsweredPartOne(partOneAllAnswered());
+  }, [answersPartOne, questionListPartOne]);
+
+  useMemo(() => {
+    const partTwoAllAnswered = () => {
+      if (answersPartTwo.length !== questionListPartTwo.length) {
+        return false;
+      }
+
+      for (let i = 0; i < answersPartTwo.length; i++) {
+        if (
+          answersPartTwo[i] === undefined ||
+          answersPartTwo[i] === null ||
+          answersPartTwo[i] === 0
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    setAllAnsweredPartTwo(partTwoAllAnswered());
+  }, [answersPartTwo, questionListPartTwo]);
 
   useMemo(() => {
     const fetchData = async () => {
@@ -754,6 +799,7 @@ const PreInterventionForm = () => {
                     variant="outlined"
                     onClick={handleSubmit}
                     sx={customStyles.primaryButton}
+                    disabled={activeStep === 2 && !allAnsweredPartTwo}
                   >
                     Complete
                   </Button>
@@ -762,7 +808,10 @@ const PreInterventionForm = () => {
                     variant="outlined"
                     onClick={handleNext}
                     sx={customStyles.primaryButton}
-                    disabled={!(formik.isValid && formik.dirty)}
+                    // disabled={!(formik.isValid && formik.dirty)}
+                    disabled={
+                      activeStep === 0 ? !formik.isValid : !allAnsweredPartOne
+                    }
                   >
                     Next
                   </Button>
