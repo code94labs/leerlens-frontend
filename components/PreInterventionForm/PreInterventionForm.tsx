@@ -52,74 +52,74 @@ import {
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { DropDownOptions, Question } from "../../utils/types";
 
-const sampleResponse: Question[] = [
-  {
-    id: 1,
-    formType: 3,
-    questionText: "What school are you from",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "Royal Institute",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "Lyceum",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 2,
-    formType: 3,
-    questionText: "What's your age group",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "18",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "19",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 3,
-    formType: 3,
-    questionText: "What's your age group",
-    fieldType: 1,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 4,
-    formType: 3,
-    questionText: "What's your age group",
-    fieldType: 2,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [],
-    minValue: 1,
-    maxValue: 6,
-  },
-];
+// const sampleResponse: Question[] = [
+//   {
+//     id: 1,
+//     formType: 3,
+//     questionText: "What school are you from",
+//     fieldType: 0,
+//     sectionType: 0,
+//     positionOrderId: 1,
+//     dropdownOptions: [
+//       {
+//         id: 1,
+//         item: "Royal Institute",
+//         isDelete: false,
+//       },
+//       {
+//         id: 2,
+//         item: "Lyceum",
+//         isDelete: false,
+//       },
+//     ],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+//   {
+//     id: 2,
+//     formType: 3,
+//     questionText: "What's your age group",
+//     fieldType: 0,
+//     sectionType: 0,
+//     positionOrderId: 1,
+//     dropdownOptions: [
+//       {
+//         id: 1,
+//         item: "18",
+//         isDelete: false,
+//       },
+//       {
+//         id: 2,
+//         item: "19",
+//         isDelete: false,
+//       },
+//     ],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+//   {
+//     id: 3,
+//     formType: 3,
+//     questionText: "What's your age group",
+//     fieldType: 1,
+//     sectionType: 0,
+//     positionOrderId: 1,
+//     dropdownOptions: [],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+//   {
+//     id: 4,
+//     formType: 3,
+//     questionText: "What's your age group",
+//     fieldType: 2,
+//     sectionType: 0,
+//     positionOrderId: 1,
+//     dropdownOptions: [],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+// ];
 
 const customStyles = {
   mainBox: {
@@ -262,7 +262,7 @@ const TextareaElement = styled("textarea", {
   line-height: 1.5rem;
   padding: 8px 12px;
   border-radius: 4px;
-  color: rgba(0,0,0, 0.25);
+  color: rgba(0,0,0, 0.75);
   background-color: transparent;
   border: 1px solid rgba(0,0,0, 0.25);
 
@@ -403,9 +403,9 @@ const PreInterventionForm = () => {
   const validationSchema = yup
     .object()
     .shape(
-      sampleResponse.length > 0
+      studentFormInfo.length > 0
         ? Object.fromEntries(
-            sampleResponse.map((field) => [
+          studentFormInfo.map((field) => [
               field.id,
               yup.string().required(`Response is required`),
             ])
@@ -414,8 +414,8 @@ const PreInterventionForm = () => {
     );
 
   const formik = useFormik({
-    initialValues: sampleResponse
-      ? Object.fromEntries(sampleResponse.map((field) => [field.id, ""]))
+    initialValues: studentFormInfo
+      ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
       : {},
     validationSchema,
     onSubmit: () => {
@@ -529,8 +529,8 @@ const PreInterventionForm = () => {
 
   const personalDetailsForm = (
     <Grid container rowSpacing={1} columnSpacing={1}>
-      {sampleResponse &&
-        sampleResponse.map((question: Question) => (
+      {studentFormInfo &&
+        studentFormInfo.map((question: Question) => (
           <Grid item xs={12} md={6} key={question.id}>
             <FormControl fullWidth required>
               {(() => {
