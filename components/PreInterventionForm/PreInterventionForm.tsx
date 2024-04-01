@@ -14,10 +14,12 @@ import {
   Stack,
   Step,
   StepButton,
+  StepLabel,
   Stepper,
   TextField,
   Typography,
 } from "@mui/material";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { Input as BaseInput, InputProps } from "@mui/base/Input";
 import { styled } from "@mui/system";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -191,11 +193,17 @@ const customStyles = {
     },
 
     "& .MuiStepLabel-iconContainer > .Mui-completed": {
-      color: "#A879FF",
+      color: "#2E8B33",
     },
 
     "& .MuiStepLabel-label": {
       fontWeight: 600,
+    },
+  },
+  customArrow: {
+    color: "#98989A",
+    "& .MuiStepLabel-label.Mui-active": {
+      color: "#98989A",
     },
   },
   primaryButton: {
@@ -289,6 +297,14 @@ const Input = React.forwardRef(function CustomInput(
     />
   );
 });
+
+const ArrowIcon = () => {
+  return (
+    <StepLabel sx={customStyles.customArrow} icon={<span />}>
+      <ArrowForwardIosIcon fontSize="small" />
+    </StepLabel>
+  );
+};
 
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
@@ -405,7 +421,7 @@ const PreInterventionForm = () => {
     .shape(
       studentFormInfo.length > 0
         ? Object.fromEntries(
-          studentFormInfo.map((field) => [
+            studentFormInfo.map((field) => [
               field.id,
               yup.string().required(`Response is required`),
             ])
@@ -832,11 +848,14 @@ const PreInterventionForm = () => {
       <Box sx={customStyles.mainBox}>
         <Stepper
           activeStep={activeStep}
+          connector={<ArrowIcon />}
           sx={{
             display: {
               xs: "none",
               md: "flex",
             },
+            width: "100%",
+            justifyContent: "space-between",
           }}
         >
           {steps.map((label, index) => (
