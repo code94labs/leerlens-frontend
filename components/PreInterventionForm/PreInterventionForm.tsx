@@ -50,6 +50,53 @@ import {
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { DropDownOptions, Question } from "../../utils/types";
 
+const sampleResponse: Question[] = [
+  {
+    id: 1,
+    formType: 3,
+    questionText: "What school are you from",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "Royal Institute",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "Lyceum",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 2,
+    formType: 3,
+    questionText: "What's your age group",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "18",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "19",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+];
+
 const customStyles = {
   mainBox: {
     // width: "100%",
@@ -288,9 +335,9 @@ const PreInterventionForm = () => {
   const validationSchema = yup
     .object()
     .shape(
-      studentFormInfo.length > 0
+      sampleResponse.length > 0
         ? Object.fromEntries(
-            studentFormInfo.map((field) => [
+            sampleResponse.map((field) => [
               field.id,
               yup.string().required(`Response is required`),
             ])
@@ -299,8 +346,8 @@ const PreInterventionForm = () => {
     );
 
   const formik = useFormik({
-    initialValues: studentFormInfo
-      ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
+    initialValues: sampleResponse
+      ? Object.fromEntries(sampleResponse.map((field) => [field.id, ""]))
       : {},
     validationSchema,
     onSubmit: () => {
@@ -414,8 +461,8 @@ const PreInterventionForm = () => {
 
   const personalDetailsForm = (
     <Grid container rowSpacing={1} columnSpacing={1}>
-      {studentFormInfo &&
-        studentFormInfo.map((question: Question) => (
+      {sampleResponse &&
+        sampleResponse.map((question: Question) => (
           <Grid item xs={12} md={6} key={question.id}>
             <FormControl fullWidth required>
               {question.fieldType === FieldType.DropDown ? (
@@ -808,7 +855,6 @@ const PreInterventionForm = () => {
                     variant="outlined"
                     onClick={handleNext}
                     sx={customStyles.primaryButton}
-                    // disabled={!(formik.isValid && formik.dirty)}
                     disabled={
                       activeStep === 0
                         ? !(formik.isValid && formik.dirty)
