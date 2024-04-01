@@ -41,140 +41,140 @@ import {
 } from "../../services/questionnaire.service";
 import { useFormik } from "formik";
 
-const sampleResponse: Question[] = [
-  {
-    id: 1,
-    formType: 3,
-    questionText: "What school are you from",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "Royal Institute",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "Lyceum",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 2,
-    formType: 3,
-    questionText: "What's your age group",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "18",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "19",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 3,
-    formType: 3,
-    questionText: "What's your age group",
-    fieldType: 0,
-    sectionType: 1,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "18",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "19",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 4,
-    formType: 3,
-    questionText: "What's your age group",
-    fieldType: 0,
-    sectionType: 1,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "18",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "19",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 5,
-    formType: 3,
-    questionText: "What's your age group",
-    fieldType: 0,
-    sectionType: 2,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "18",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "19",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 6,
-    formType: 3,
-    questionText: "What's your age group",
-    fieldType: 0,
-    sectionType: 2,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "18",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "19",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-];
+// const sampleResponse: Question[] = [
+//   {
+//     id: 1,
+//     formType: 3,
+//     questionText: "What school are you from",
+//     fieldType: 0,
+//     sectionType: 0,
+//     positionOrderId: 1,
+//     dropdownOptions: [
+//       {
+//         id: 1,
+//         item: "Royal Institute",
+//         isDelete: false,
+//       },
+//       {
+//         id: 2,
+//         item: "Lyceum",
+//         isDelete: false,
+//       },
+//     ],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+//   {
+//     id: 2,
+//     formType: 3,
+//     questionText: "What's your age group",
+//     fieldType: 0,
+//     sectionType: 0,
+//     positionOrderId: 1,
+//     dropdownOptions: [
+//       {
+//         id: 1,
+//         item: "18",
+//         isDelete: false,
+//       },
+//       {
+//         id: 2,
+//         item: "19",
+//         isDelete: false,
+//       },
+//     ],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+//   {
+//     id: 3,
+//     formType: 3,
+//     questionText: "What's your age group",
+//     fieldType: 0,
+//     sectionType: 1,
+//     positionOrderId: 1,
+//     dropdownOptions: [
+//       {
+//         id: 1,
+//         item: "18",
+//         isDelete: false,
+//       },
+//       {
+//         id: 2,
+//         item: "19",
+//         isDelete: false,
+//       },
+//     ],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+//   {
+//     id: 4,
+//     formType: 3,
+//     questionText: "What's your age group",
+//     fieldType: 0,
+//     sectionType: 1,
+//     positionOrderId: 1,
+//     dropdownOptions: [
+//       {
+//         id: 1,
+//         item: "18",
+//         isDelete: false,
+//       },
+//       {
+//         id: 2,
+//         item: "19",
+//         isDelete: false,
+//       },
+//     ],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+//   {
+//     id: 5,
+//     formType: 3,
+//     questionText: "What's your age group",
+//     fieldType: 0,
+//     sectionType: 2,
+//     positionOrderId: 1,
+//     dropdownOptions: [
+//       {
+//         id: 1,
+//         item: "18",
+//         isDelete: false,
+//       },
+//       {
+//         id: 2,
+//         item: "19",
+//         isDelete: false,
+//       },
+//     ],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+//   {
+//     id: 6,
+//     formType: 3,
+//     questionText: "What's your age group",
+//     fieldType: 0,
+//     sectionType: 2,
+//     positionOrderId: 1,
+//     dropdownOptions: [
+//       {
+//         id: 1,
+//         item: "18",
+//         isDelete: false,
+//       },
+//       {
+//         id: 2,
+//         item: "19",
+//         isDelete: false,
+//       },
+//     ],
+//     minValue: 1,
+//     maxValue: 6,
+//   },
+// ];
 
 const customStyles = {
   mainBox: {
@@ -527,18 +527,18 @@ const RemindEvaluationForm = () => {
 
         // setStudentFormInfo(studentFormInfoQuestions);
         setPersonalDetailsQuestions(
-          sampleResponse.filter(
+          studentFormInfoQuestions.filter(
             (question) => question.sectionType === SectionType.PersonalDetails
           )
         );
         setProgramAndSupervisorsQuestions(
-          sampleResponse.filter(
+          studentFormInfoQuestions.filter(
             (question) =>
               question.sectionType === SectionType.ProgramAndSupervisor
           )
         );
         setFinalQuestions(
-          sampleResponse.filter(
+          studentFormInfoQuestions.filter(
             (question) => question.sectionType === SectionType.Final
           )
         );
