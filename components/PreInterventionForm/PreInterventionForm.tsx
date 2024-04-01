@@ -810,7 +810,9 @@ const PreInterventionForm = () => {
                     sx={customStyles.primaryButton}
                     // disabled={!(formik.isValid && formik.dirty)}
                     disabled={
-                      activeStep === 0 ? !formik.isValid : !allAnsweredPartOne
+                      activeStep === 0
+                        ? !(formik.isValid && formik.dirty)
+                        : !allAnsweredPartOne
                     }
                   >
                     Next
