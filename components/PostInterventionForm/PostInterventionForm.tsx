@@ -3,7 +3,11 @@ import {
   Button,
   Divider,
   FormControl,
+  FormHelperText,
+  Grid,
+  InputAdornment,
   InputLabel,
+  ListSubheader,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -14,34 +18,25 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
-import {
-  ageList,
-  completeSentenceList,
-  gradeList,
-  remindProgramList,
-  schoolList,
-  studyFieldList,
-} from "../../utils/constant";
 import { useRouter } from "next/router";
+import { Formik, useFormik } from "formik";
+import * as yup from "yup";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
-import { getAllPostInterventionQuestions } from "../../services/questionnaire.service";
+import {
+  getAllPostInterventionQuestions,
+  getStudentFormInfo,
+} from "../../services/questionnaire.service";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
-
-export type Question = {
-  id: number;
-  questionText: string;
-  positionOrderId: number;
-  minValue: number;
-  maxValue: number;
-  isDelete: boolean;
-};
+import { DropDownOptions, Question } from "../../utils/types";
+import { FieldType } from "../../utils/enum";
 
 const customStyles = {
   mainBox: {
-    width: "100%",
+    // width: "100%",
     border: "1px #E6E6E6 solid",
     p: 5,
     borderRadius: 2,
@@ -134,6 +129,11 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
     fontWeight: 400,
+    "&:disabled": {
+      backgroundColor: "#E6E6E6",
+      color: "#98989A",
+      border: "2px #E6E6E6 solid",
+    },
   },
   secondaryButton: {
     backgroundColor: "white",
@@ -168,6 +168,9 @@ const PostInterventionForm = () => {
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
 
+  const [searchTextSchool, setSearchTextSchool] = useState("");
+
+  const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
   const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
     []
   );
@@ -181,6 +184,9 @@ const PostInterventionForm = () => {
   const [answersPartTwo, setAnswersPartTwo] = useState<number[]>(
     Array(questionListPartTwo.length).fill(0)
   );
+
+  const [allAnsweredPartOne, setAllAnsweredPartOne] = useState<boolean>(false);
+  const [allAnsweredPartTwo, setAllAnsweredPartTwo] = useState<boolean>(false);
 
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{
@@ -203,33 +209,47 @@ const PostInterventionForm = () => {
     });
   };
 
-  const handleChangeSchool = (event: SelectChangeEvent) => {
-    setSchool(event.target.value as string);
-  };
+  useMemo(() => {
+    const partOneAllAnswered = () => {
+      if (answersPartOne.length !== questionListPartOne.length) {
+        return false;
+      }
 
-  const handleChangeClass = (event: ChangeEvent<HTMLInputElement>) => {
-    setClass(event.target.value as string);
-  };
+      for (let i = 0; i < answersPartOne.length; i++) {
+        if (
+          answersPartOne[i] === undefined ||
+          answersPartOne[i] === null ||
+          answersPartOne[i] === 0
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
 
-  const handleChangeRemindProgram = (event: SelectChangeEvent) => {
-    setRemindProgram(event.target.value as string);
-  };
+    setAllAnsweredPartOne(partOneAllAnswered());
+  }, [answersPartOne, questionListPartOne]);
 
-  const handleChangeStudyField = (event: SelectChangeEvent) => {
-    setStudyField(event.target.value as string);
-  };
+  useMemo(() => {
+    const partTwoAllAnswered = () => {
+      if (answersPartTwo.length !== questionListPartTwo.length) {
+        return false;
+      }
 
-  const handleChangeGrade = (event: SelectChangeEvent) => {
-    setGrade(event.target.value as string);
-  };
+      for (let i = 0; i < answersPartTwo.length; i++) {
+        if (
+          answersPartTwo[i] === undefined ||
+          answersPartTwo[i] === null ||
+          answersPartTwo[i] === 0
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
 
-  const handleChangeCompleteSentence = (event: SelectChangeEvent) => {
-    setCompleteSentence(event.target.value as string);
-  };
-
-  const handleChangeAge = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
-  };
+    setAllAnsweredPartTwo(partTwoAllAnswered());
+  }, [answersPartTwo, questionListPartTwo]);
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -282,127 +302,132 @@ const PostInterventionForm = () => {
   };
   // End of form step creation
 
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setStudentFormInfo(studentFormInfoQuestions);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const postInterventionQuestions =
+          await getAllPostInterventionQuestions();
+
+        const questionsWithAnswerValue = postInterventionQuestions.map(
+          (question: Question) => ({
+            ...question,
+            answerValue: 0,
+          })
+        );
+
+        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
+
+        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
+        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
+
+        setQuestionListPartOne(firstHalf);
+        setQuestionListPartTwo(secondHalf);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const validationSchema = yup
+    .object()
+    .shape(
+      studentFormInfo.length > 0
+        ? Object.fromEntries(
+            studentFormInfo.map((field) => [
+              field.id,
+              yup.string().required(`Response is required`),
+            ])
+          )
+        : {}
+    );
+
+  const formik = useFormik({
+    initialValues: studentFormInfo
+      ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
+      : {},
+    validationSchema,
+    onSubmit: () => {
+      // Handle form submission here
+      // You can access form values using formik.values
+    },
+  });
+
+  const handleChange = (event: any) => {
+    const { name, value } = event.target;
+    formik.setFieldValue(name, value);
+  };
+
   const personalDetailsForm = (
-    <>
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>What school are you at?</InputLabel>
-
-          <Select
-            value={school}
-            label="What school are you at?"
-            onChange={handleChangeSchool}
-          >
-            {schoolList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.schoolName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <InputLabel>What do you study?</InputLabel>
-
-          <Select
-            value={studyField}
-            label="What do you study?"
-            onChange={handleChangeStudyField}
-          >
-            {studyFieldList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.studyField}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>What grade are you in?</InputLabel>
-
-          <Select
-            value={grade}
-            label="What grade are you in?"
-            onChange={handleChangeGrade}
-          >
-            {gradeList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.grade}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <TextField
-            label="In which class are you?"
-            value={studentClass}
-            onChange={handleChangeClass}
-          />
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl fullWidth required>
-          <InputLabel>Complete the sentence: I am...</InputLabel>
-
-          <Select
-            value={completeSentence}
-            label="Complete the sentence: I am..."
-            onChange={handleChangeCompleteSentence}
-          >
-            {completeSentenceList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth required>
-          <InputLabel>How old are you?</InputLabel>
-
-          <Select
-            value={age}
-            label="How old are you?"
-            onChange={handleChangeAge}
-          >
-            {ageList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.age}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-
-      <Stack sx={customStyles.selectStack}>
-        <FormControl
-          sx={{
-            width: {
-              xs: "100%",
-              md: "49.5%",
-            },
-          }}
-        >
-          <InputLabel>Which Remind program are you following?</InputLabel>
-
-          <Select
-            value={remindProgram}
-            label="Which Remind program are you following?"
-            onChange={handleChangeRemindProgram}
-          >
-            {remindProgramList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-    </>
+    <Grid container rowSpacing={1} columnSpacing={1}>
+      {studentFormInfo &&
+        studentFormInfo.map((question: Question) => (
+          <Grid item xs={12} md={6} key={question.id}>
+            <FormControl fullWidth required>
+              {question.fieldType === FieldType.DropDown ? (
+                <>
+                  <InputLabel>{question.questionText}</InputLabel>
+                  <Select
+                    MenuProps={{ autoFocus: false }}
+                    labelId={`search-select-`}
+                    id={String(question.id)}
+                    name={String(question.id)}
+                    value={formik.values[question.id]}
+                    label={question.questionText}
+                    onChange={handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched[question.id] &&
+                      Boolean(formik.errors[question.id])
+                    }
+                  >
+                    {question.dropdownOptions
+                      .filter((item) => !item.isDelete)
+                      .map((item: DropDownOptions, index: number) => (
+                        <MenuItem value={item.item} key={index}>
+                          {item.item}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </>
+              ) : (
+                <TextField
+                  id="studentClass"
+                  name="studentClass"
+                  label={question.questionText}
+                  value={formik.values[question.id]}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched[question.id] &&
+                    Boolean(formik.errors[question.id])
+                  }
+                />
+              )}
+              {formik.touched[question.id] && (
+                <FormHelperText sx={{ color: "red" }}>
+                  {formik.errors[question.id]}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+        ))}
+    </Grid>
   );
 
   const questionPartOneForm = (
@@ -473,34 +498,6 @@ const PostInterventionForm = () => {
     }
   };
 
-  useMemo(() => {
-    const fetchData = async () => {
-      try {
-        const postInterventionQuestions =
-          await getAllPostInterventionQuestions();
-
-        const questionsWithAnswerValue = postInterventionQuestions.map(
-          (question: Question) => ({
-            ...question,
-            answerValue: 0,
-          })
-        );
-
-        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
-
-        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
-        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
-
-        setQuestionListPartOne(firstHalf);
-        setQuestionListPartTwo(secondHalf);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   return (
     <Stack sx={customStyles.stack}>
       <Box sx={customStyles.titleBox}>
@@ -515,7 +512,6 @@ const PostInterventionForm = () => {
 
       <Box sx={customStyles.mainBox}>
         <Stepper
-          nonLinear
           activeStep={activeStep}
           sx={{
             display: {
@@ -615,6 +611,7 @@ const PostInterventionForm = () => {
                   variant="outlined"
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
+                  disabled={activeStep === 2 && !allAnsweredPartTwo}
                 >
                   Complete
                 </Button>
@@ -623,6 +620,12 @@ const PostInterventionForm = () => {
                   variant="outlined"
                   onClick={handleNext}
                   sx={customStyles.primaryButton}
+                  disabled={
+                    activeStep === 0
+                      ? !(formik.isValid && formik.dirty)
+                      : // !formik.isValid
+                        !allAnsweredPartOne
+                  }
                 >
                   Next
                 </Button>
