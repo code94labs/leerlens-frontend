@@ -18,6 +18,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { Input as BaseInput, InputProps } from "@mui/base/Input";
+import { styled } from "@mui/system";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import React, {
   ChangeEvent,
@@ -92,6 +94,28 @@ const sampleResponse: Question[] = [
         isDelete: false,
       },
     ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 3,
+    formType: 3,
+    questionText: "What's your age group",
+    fieldType: 1,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 4,
+    formType: 3,
+    questionText: "What's your age group",
+    fieldType: 2,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [],
     minValue: 1,
     maxValue: 6,
   },
@@ -221,6 +245,50 @@ const customStyles = {
     fontFamily: champBlackFontFamily,
   },
 };
+
+const RootDiv = styled("div")`
+  display: flex;
+  max-width: 100%;
+`;
+
+const TextareaElement = styled("textarea", {
+  shouldForwardProp: (prop) =>
+    !["ownerState", "minRows", "maxRows"].includes(prop.toString()),
+})(
+  ({ theme }) => `
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: rgba(0,0,0, 0.25);
+  background-color: transparent;
+  border: 1px solid rgba(0,0,0, 0.25);
+
+  // firefox
+  &:focus-visible {
+    outline: 0;
+  }
+`
+);
+
+const Input = React.forwardRef(function CustomInput(
+  props: InputProps,
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
+  return (
+    <BaseInput
+      slots={{
+        root: RootDiv,
+        input: "input",
+        textarea: TextareaElement,
+      }}
+      {...props}
+      ref={ref}
+    />
+  );
+});
 
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
@@ -465,46 +533,73 @@ const PreInterventionForm = () => {
         sampleResponse.map((question: Question) => (
           <Grid item xs={12} md={6} key={question.id}>
             <FormControl fullWidth required>
-              {question.fieldType === FieldType.DropDown ? (
-                <>
-                  <InputLabel>{question.questionText}</InputLabel>
-                  <Select
-                    MenuProps={{ autoFocus: false }}
-                    labelId={`search-select-`}
-                    id={String(question.id)}
-                    name={String(question.id)}
-                    value={formik.values[question.id]}
-                    label={question.questionText}
-                    onChange={handleChange}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched[question.id] &&
-                      Boolean(formik.errors[question.id])
-                    }
-                  >
-                    {question.dropdownOptions
-                      .filter((item) => !item.isDelete)
-                      .map((item: DropDownOptions, index: number) => (
-                        <MenuItem value={item.item} key={index}>
-                          {item.item}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </>
-              ) : (
-                <TextField
-                  id={String(question.id)}
-                  name={String(question.id)}
-                  label={question.questionText}
-                  value={formik.values[question.id]}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched[question.id] &&
-                    Boolean(formik.errors[question.id])
-                  }
-                />
-              )}
+              {(() => {
+                switch (question.fieldType) {
+                  case FieldType.DropDown:
+                    return (
+                      <>
+                        <InputLabel>{question.questionText}</InputLabel>
+                        <Select
+                          MenuProps={{ autoFocus: false }}
+                          labelId={`search-select-`}
+                          id={String(question.id)}
+                          name={String(question.id)}
+                          value={formik.values[question.id]}
+                          label={question.questionText}
+                          onChange={handleChange}
+                          onBlur={formik.handleBlur}
+                          error={
+                            formik.touched[question.id] &&
+                            Boolean(formik.errors[question.id])
+                          }
+                        >
+                          {question.dropdownOptions
+                            .filter((item) => !item.isDelete)
+                            .map((item: DropDownOptions, index: number) => (
+                              <MenuItem value={item.item} key={index}>
+                                {item.item}
+                              </MenuItem>
+                            ))}
+                        </Select>
+                      </>
+                    );
+                  case FieldType.TextArea:
+                    return (
+                      <>
+                        {/* <InputLabel>{question.questionText}</InputLabel> */}
+                        <Input
+                          aria-label={question.questionText}
+                          multiline
+                          placeholder={question.questionText}
+                          id={String(question.id)}
+                          name={String(question.id)}
+                          value={formik.values[question.id]}
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          error={
+                            formik.touched[question.id] &&
+                            Boolean(formik.errors[question.id])
+                          }
+                        />
+                      </>
+                    );
+                  default:
+                    return (
+                      <TextField
+                        id={String(question.id)}
+                        name={String(question.id)}
+                        label={question.questionText}
+                        value={formik.values[question.id]}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={
+                          formik.touched[question.id] &&
+                          Boolean(formik.errors[question.id])
+                        }
+                      />
+                    );
+                }
+              })()}
               {formik.touched[question.id] && (
                 <FormHelperText sx={{ color: "red" }}>
                   {formik.errors[question.id]}
