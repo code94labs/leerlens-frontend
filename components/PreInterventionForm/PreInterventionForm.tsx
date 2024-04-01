@@ -446,8 +446,8 @@ const PreInterventionForm = () => {
                 </>
               ) : (
                 <TextField
-                  id="studentClass"
-                  name="studentClass"
+                  id={String(question.id)}
+                  name={String(question.id)}
                   label={question.questionText}
                   value={formik.values[question.id]}
                   onChange={formik.handleChange}

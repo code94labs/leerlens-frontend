@@ -36,7 +36,7 @@ import { FieldType } from "../../utils/enum";
 
 const customStyles = {
   mainBox: {
-    width: "100%",
+    // width: "100%",
     border: "1px #E6E6E6 solid",
     p: 5,
     borderRadius: 2,
@@ -129,6 +129,11 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
     fontWeight: 400,
+    "&:disabled": {
+      backgroundColor: "#E6E6E6",
+      color: "#98989A",
+      border: "2px #E6E6E6 solid",
+    },
   },
   secondaryButton: {
     backgroundColor: "white",
@@ -180,6 +185,9 @@ const PostInterventionForm = () => {
     Array(questionListPartTwo.length).fill(0)
   );
 
+  const [allAnsweredPartOne, setAllAnsweredPartOne] = useState<boolean>(false);
+  const [allAnsweredPartTwo, setAllAnsweredPartTwo] = useState<boolean>(false);
+
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{
     [k: number]: boolean;
@@ -200,6 +208,48 @@ const PostInterventionForm = () => {
       return newAnswers;
     });
   };
+
+  useMemo(() => {
+    const partOneAllAnswered = () => {
+      if (answersPartOne.length !== questionListPartOne.length) {
+        return false;
+      }
+
+      for (let i = 0; i < answersPartOne.length; i++) {
+        if (
+          answersPartOne[i] === undefined ||
+          answersPartOne[i] === null ||
+          answersPartOne[i] === 0
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    setAllAnsweredPartOne(partOneAllAnswered());
+  }, [answersPartOne, questionListPartOne]);
+
+  useMemo(() => {
+    const partTwoAllAnswered = () => {
+      if (answersPartTwo.length !== questionListPartTwo.length) {
+        return false;
+      }
+
+      for (let i = 0; i < answersPartTwo.length; i++) {
+        if (
+          answersPartTwo[i] === undefined ||
+          answersPartTwo[i] === null ||
+          answersPartTwo[i] === 0
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    setAllAnsweredPartTwo(partTwoAllAnswered());
+  }, [answersPartTwo, questionListPartTwo]);
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -562,6 +612,7 @@ const PostInterventionForm = () => {
                   variant="outlined"
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
+                  disabled={activeStep === 2 && !allAnsweredPartTwo}
                 >
                   Complete
                 </Button>
@@ -570,7 +621,12 @@ const PostInterventionForm = () => {
                   variant="outlined"
                   onClick={handleNext}
                   sx={customStyles.primaryButton}
-                  disabled={!(formik.isValid && formik.dirty)}
+                  disabled={
+                    activeStep === 0
+                      ? !(formik.isValid && formik.dirty)
+                      : // !formik.isValid
+                        !allAnsweredPartOne
+                  }
                 >
                   Next
                 </Button>
