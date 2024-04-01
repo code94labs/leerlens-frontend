@@ -12,14 +12,9 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
-  Step,
-  StepButton,
-  StepLabel,
-  Stepper,
   TextField,
   Typography,
 } from "@mui/material";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { Input as BaseInput, InputProps } from "@mui/base/Input";
 import { styled } from "@mui/system";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -39,7 +34,7 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
-import { Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 import * as yup from "yup";
 
 import { champBlackFontFamily } from "../../shared/typography";
@@ -53,75 +48,8 @@ import {
 
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { DropDownOptions, Question } from "../../utils/types";
+import { CustomStepper } from "../../shared/Stepper/Stepper";
 
-// const sampleResponse: Question[] = [
-//   {
-//     id: 1,
-//     formType: 3,
-//     questionText: "What school are you from",
-//     fieldType: 0,
-//     sectionType: 0,
-//     positionOrderId: 1,
-//     dropdownOptions: [
-//       {
-//         id: 1,
-//         item: "Royal Institute",
-//         isDelete: false,
-//       },
-//       {
-//         id: 2,
-//         item: "Lyceum",
-//         isDelete: false,
-//       },
-//     ],
-//     minValue: 1,
-//     maxValue: 6,
-//   },
-//   {
-//     id: 2,
-//     formType: 3,
-//     questionText: "What's your age group",
-//     fieldType: 0,
-//     sectionType: 0,
-//     positionOrderId: 1,
-//     dropdownOptions: [
-//       {
-//         id: 1,
-//         item: "18",
-//         isDelete: false,
-//       },
-//       {
-//         id: 2,
-//         item: "19",
-//         isDelete: false,
-//       },
-//     ],
-//     minValue: 1,
-//     maxValue: 6,
-//   },
-//   {
-//     id: 3,
-//     formType: 3,
-//     questionText: "What's your age group",
-//     fieldType: 1,
-//     sectionType: 0,
-//     positionOrderId: 1,
-//     dropdownOptions: [],
-//     minValue: 1,
-//     maxValue: 6,
-//   },
-//   {
-//     id: 4,
-//     formType: 3,
-//     questionText: "What's your age group",
-//     fieldType: 2,
-//     sectionType: 0,
-//     positionOrderId: 1,
-//     dropdownOptions: [],
-//     minValue: 1,
-//     maxValue: 6,
-//   },
-// ];
 
 const customStyles = {
   mainBox: {
@@ -185,25 +113,6 @@ const customStyles = {
     mt: {
       xs: 0,
       md: 2,
-    },
-  },
-  step: {
-    "& .MuiStepLabel-iconContainer > .Mui-active": {
-      color: "#A879FF",
-    },
-
-    "& .MuiStepLabel-iconContainer > .Mui-completed": {
-      color: "#2E8B33",
-    },
-
-    "& .MuiStepLabel-label": {
-      fontWeight: 600,
-    },
-  },
-  customArrow: {
-    color: "#98989A",
-    "& .MuiStepLabel-label.Mui-active": {
-      color: "#98989A",
     },
   },
   primaryButton: {
@@ -297,14 +206,6 @@ const Input = React.forwardRef(function CustomInput(
     />
   );
 });
-
-const ArrowIcon = () => {
-  return (
-    <StepLabel sx={customStyles.customArrow} icon={<span />}>
-      <ArrowForwardIosIcon fontSize="small" />
-    </StepLabel>
-  );
-};
 
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
@@ -846,30 +747,12 @@ const PreInterventionForm = () => {
       </Box>
 
       <Box sx={customStyles.mainBox}>
-        <Stepper
+        <CustomStepper
           activeStep={activeStep}
-          connector={<ArrowIcon />}
-          sx={{
-            display: {
-              xs: "none",
-              md: "flex",
-            },
-            width: "100%",
-            justifyContent: "space-between",
-          }}
-        >
-          {steps.map((label, index) => (
-            <Step
-              key={label}
-              completed={completed[index]}
-              sx={customStyles.step}
-            >
-              <StepButton color="inherit" onClick={handleStep(index)}>
-                {label}
-              </StepButton>
-            </Step>
-          ))}
-        </Stepper>
+          steps={steps}
+          completed={completed}
+          handleStep={handleStep}
+        />
 
         <Divider sx={{ py: 3, mb: 2 }} />
 
@@ -886,7 +769,10 @@ const PreInterventionForm = () => {
               gap: 2,
             }}
           >
-            <CircularProgressWithLabel activeStep={activeStep} totalSteps={3} />
+            <CircularProgressWithLabel
+              activeStep={activeStep}
+              totalSteps={steps.length}
+            />
             <Box
               sx={{
                 display: "flex",

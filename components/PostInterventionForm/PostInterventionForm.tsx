@@ -12,9 +12,6 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
-  Step,
-  StepButton,
-  Stepper,
   TextField,
   Typography,
 } from "@mui/material";
@@ -33,6 +30,7 @@ import {
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
 import { DropDownOptions, Question } from "../../utils/types";
 import { FieldType } from "../../utils/enum";
+import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 const customStyles = {
   mainBox: {
@@ -98,15 +96,6 @@ const customStyles = {
       md: 2,
     },
   },
-  step: {
-    "& .MuiStepLabel-iconContainer > .Mui-active": {
-      color: "#A879FF",
-    },
-
-    "& .MuiStepLabel-label": {
-      fontWeight: 600,
-    },
-  },
   primaryButton: {
     backgroundColor: "#A879FF",
     color: "white",
@@ -159,16 +148,6 @@ const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
 const PostInterventionForm = () => {
   const router = useRouter();
-
-  const [school, setSchool] = useState("");
-  const [studyField, setStudyField] = useState("");
-  const [grade, setGrade] = useState("");
-  const [studentClass, setClass] = useState("");
-  const [completeSentence, setCompleteSentence] = useState("");
-  const [age, setAge] = useState("");
-  const [remindProgram, setRemindProgram] = useState("");
-
-  const [searchTextSchool, setSearchTextSchool] = useState("");
 
   const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
   const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
@@ -511,27 +490,12 @@ const PostInterventionForm = () => {
       </Box>
 
       <Box sx={customStyles.mainBox}>
-        <Stepper
+        <CustomStepper
           activeStep={activeStep}
-          sx={{
-            display: {
-              xs: "none",
-              md: "flex",
-            },
-          }}
-        >
-          {steps.map((label, index) => (
-            <Step
-              key={label}
-              completed={completed[index]}
-              sx={customStyles.step}
-            >
-              <StepButton color="inherit" onClick={handleStep(index)}>
-                {label}
-              </StepButton>
-            </Step>
-          ))}
-        </Stepper>
+          steps={steps}
+          completed={completed}
+          handleStep={handleStep}
+        />
 
         <Divider sx={{ py: 3, mb: 2 }} />
 

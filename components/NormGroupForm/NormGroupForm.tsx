@@ -37,6 +37,7 @@ import {
 } from "../../services/questionnaire.service";
 import { champBlackFontFamily } from "../../shared/typography";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
+import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 const customStyles = {
   mainBox: {
@@ -100,15 +101,6 @@ const customStyles = {
     mt: {
       xs: 0,
       md: 2,
-    },
-  },
-  step: {
-    "& .MuiStepLabel-iconContainer > .Mui-active": {
-      color: "#A879FF",
-    },
-
-    "& .MuiStepLabel-label": {
-      fontWeight: 600,
     },
   },
   primaryButton: {
@@ -548,27 +540,12 @@ const NormGroupForm = () => {
       </Box>
 
       <Box sx={customStyles.mainBox}>
-        <Stepper
+        <CustomStepper
           activeStep={activeStep}
-          sx={{
-            display: {
-              xs: "none",
-              md: "flex",
-            },
-          }}
-        >
-          {steps.map((label, index) => (
-            <Step
-              key={label}
-              completed={completed[index]}
-              sx={customStyles.step}
-            >
-              <StepButton color="inherit" onClick={handleStep(index)}>
-                {label}
-              </StepButton>
-            </Step>
-          ))}
-        </Stepper>
+          steps={steps}
+          completed={completed}
+          handleStep={handleStep}
+        />
 
         <Divider sx={{ py: 3, mb: 2 }} />
 

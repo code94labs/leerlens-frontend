@@ -40,6 +40,7 @@ import {
   getStudentFormInfo,
 } from "../../services/questionnaire.service";
 import { useFormik } from "formik";
+import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 // const sampleResponse: Question[] = [
 //   {
@@ -318,7 +319,6 @@ const RemindEvaluationForm = () => {
   const [personalDetailsQuestions, setPersonalDetailsQuestions] = useState<
     Question[]
   >([]);
-
 
   const [programAndSupervisorsQuestions, setProgramAndSupervisorsQuestions] =
     useState<Question[]>([]);
@@ -926,27 +926,12 @@ const RemindEvaluationForm = () => {
       </Box>
 
       <Box sx={customStyles.mainBox}>
-        <Stepper
+        <CustomStepper
           activeStep={activeStep}
-          sx={{
-            display: {
-              xs: "none",
-              md: "flex",
-            },
-          }}
-        >
-          {steps.map((label, index) => (
-            <Step
-              key={label}
-              completed={completed[index]}
-              sx={customStyles.step}
-            >
-              <StepButton color="inherit" onClick={handleStep(index)}>
-                {label}
-              </StepButton>
-            </Step>
-          ))}
-        </Stepper>
+          steps={steps}
+          completed={completed}
+          handleStep={handleStep}
+        />
 
         {activeStep < 5 && (
           <Box
