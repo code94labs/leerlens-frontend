@@ -512,7 +512,6 @@ const PostInterventionForm = () => {
 
       <Box sx={customStyles.mainBox}>
         <Stepper
-          nonLinear
           activeStep={activeStep}
           sx={{
             display: {

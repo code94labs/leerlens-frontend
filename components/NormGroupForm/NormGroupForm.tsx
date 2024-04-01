@@ -3,6 +3,8 @@ import {
   Button,
   Divider,
   FormControl,
+  FormHelperText,
+  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -23,25 +25,82 @@ import {
   schoolList,
   studyFieldList,
 } from "../../utils/constant";
+import { Formik, useFormik } from "formik";
+import * as yup from "yup";
 import { useRouter } from "next/router";
 import CustomScale from "../../shared/CustomScale/CustomScale";
-import { Question } from "../PostInterventionForm/PostInterventionForm";
-import { FormEvaluation } from "../../utils/enum";
-import { getAllNormGroupQuestions } from "../../services/questionnaire.service";
+import { DropDownOptions, Question } from "../../utils/types";
+import { FieldType, FormEvaluation } from "../../utils/enum";
+import {
+  getAllNormGroupQuestions,
+  getStudentFormInfo,
+} from "../../services/questionnaire.service";
 import { champBlackFontFamily } from "../../shared/typography";
+import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
 
 const customStyles = {
   mainBox: {
-    width: "100%",
+    // width: "100%",
     border: "1px #E6E6E6 solid",
     p: 5,
     borderRadius: 2,
   },
   stack: {
-    width: "90%",
+    width: {
+      // xs: "100%",
+      md: "90%",
+    },
     maxWidth: 1200,
-    margin: "0 auto",
-    mb: 10,
+    mx: {
+      xs: 2,
+      md: "auto",
+    },
+    mb: {
+      xs: 0,
+      md: 20,
+    },
+  },
+  titleBox: {
+    py: {
+      xs: 2.5,
+      md: 4,
+    },
+  },
+  title: {
+    fontWeight: {
+      xs: 900,
+      md: 1000,
+    },
+    mb: 1,
+    textTransform: "uppercase",
+    fontFamily: champBlackFontFamily,
+    color: "#1A1A1A",
+  },
+  body: {
+    mb: 1,
+    fontsize: {
+      xs: 13,
+      md: 16,
+    },
+  },
+  formBox: {
+    mb: 1,
+    py: 1,
+  },
+  selectStack: {
+    flexDirection: {
+      xs: "column",
+      md: "row",
+    },
+    gap: 1,
+    mb: {
+      xs: 1,
+      md: 4,
+    },
+    mt: {
+      xs: 0,
+      md: 2,
+    },
   },
   step: {
     "& .MuiStepLabel-iconContainer > .Mui-active": {
@@ -74,6 +133,11 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
     fontWeight: 400,
+    "&:disabled": {
+      backgroundColor: "#E6E6E6",
+      color: "#98989A",
+      border: "2px #E6E6E6 solid",
+    },
   },
   secondaryButton: {
     backgroundColor: "white",
@@ -108,6 +172,7 @@ const NormGroupForm = () => {
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
 
+  const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
   const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
     []
   );
@@ -121,6 +186,9 @@ const NormGroupForm = () => {
   const [answersPartTwo, setAnswersPartTwo] = useState<number[]>(
     Array(questionListPartTwo.length).fill(0)
   );
+
+  const [allAnsweredPartOne, setAllAnsweredPartOne] = useState<boolean>(false);
+  const [allAnsweredPartTwo, setAllAnsweredPartTwo] = useState<boolean>(false);
 
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{
@@ -143,33 +211,47 @@ const NormGroupForm = () => {
     });
   };
 
-  const handleChangeSchool = (event: SelectChangeEvent) => {
-    setSchool(event.target.value as string);
-  };
+  useMemo(() => {
+    const partOneAllAnswered = () => {
+      if (answersPartOne.length !== questionListPartOne.length) {
+        return false;
+      }
 
-  const handleChangeClass = (event: ChangeEvent<HTMLInputElement>) => {
-    setClass(event.target.value as string);
-  };
+      for (let i = 0; i < answersPartOne.length; i++) {
+        if (
+          answersPartOne[i] === undefined ||
+          answersPartOne[i] === null ||
+          answersPartOne[i] === 0
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
 
-  const handleChangeRemindProgram = (event: SelectChangeEvent) => {
-    setRemindProgram(event.target.value as string);
-  };
+    setAllAnsweredPartOne(partOneAllAnswered());
+  }, [answersPartOne, questionListPartOne]);
 
-  const handleChangeStudyField = (event: SelectChangeEvent) => {
-    setStudyField(event.target.value as string);
-  };
+  useMemo(() => {
+    const partTwoAllAnswered = () => {
+      if (answersPartTwo.length !== questionListPartTwo.length) {
+        return false;
+      }
 
-  const handleChangeGrade = (event: SelectChangeEvent) => {
-    setGrade(event.target.value as string);
-  };
+      for (let i = 0; i < answersPartTwo.length; i++) {
+        if (
+          answersPartTwo[i] === undefined ||
+          answersPartTwo[i] === null ||
+          answersPartTwo[i] === 0
+        ) {
+          return false;
+        }
+      }
+      return true;
+    };
 
-  const handleChangeCompleteSentence = (event: SelectChangeEvent) => {
-    setCompleteSentence(event.target.value as string);
-  };
-
-  const handleChangeAge = (event: SelectChangeEvent) => {
-    setAge(event.target.value as string);
-  };
+    setAllAnsweredPartTwo(partTwoAllAnswered());
+  }, [answersPartTwo, questionListPartTwo]);
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -258,120 +340,104 @@ const NormGroupForm = () => {
   };
   // End of form step creation
 
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setStudentFormInfo(studentFormInfoQuestions);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const validationSchema = yup
+    .object()
+    .shape(
+      studentFormInfo.length > 0
+        ? Object.fromEntries(
+            studentFormInfo.map((field) => [
+              field.id,
+              yup.string().required(`Response is required`),
+            ])
+          )
+        : {}
+    );
+
+  const formik = useFormik({
+    initialValues: studentFormInfo
+      ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
+      : {},
+    validationSchema,
+    onSubmit: () => {
+      // Handle form submission here
+      // You can access form values using formik.values
+    },
+  });
+
+  const handleChange = (event: any) => {
+    const { name, value } = event.target;
+    formik.setFieldValue(name, value);
+  };
+
   const personalDetailsForm = (
-    <>
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
-          <InputLabel>What school are you at?</InputLabel>
-
-          <Select
-            value={school}
-            label="What school are you at?"
-            onChange={handleChangeSchool}
-          >
-            {schoolList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.schoolName}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth sx={{ ml: 1 }}>
-          <InputLabel>What do you study?</InputLabel>
-
-          <Select
-            value={studyField}
-            label="What do you study?"
-            onChange={handleChangeStudyField}
-          >
-            {studyFieldList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.studyField}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
-          <InputLabel>What grade are you in?</InputLabel>
-
-          <Select
-            value={grade}
-            label="What grade are you in?"
-            onChange={handleChangeGrade}
-          >
-            {gradeList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.grade}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth sx={{ ml: 1 }}>
-          <TextField
-            label="In which class are you?"
-            value={studentClass}
-            onChange={handleChangeClass}
-          />
-        </FormControl>
-      </Stack>
-
-      <Stack flexDirection="row" mb={4} mt={2}>
-        <FormControl fullWidth sx={{ mr: 1 }}>
-          <InputLabel>Complete the sentence: I am...</InputLabel>
-
-          <Select
-            value={completeSentence}
-            label="Complete the sentence: I am..."
-            onChange={handleChangeCompleteSentence}
-          >
-            {completeSentenceList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl fullWidth sx={{ ml: 1 }}>
-          <InputLabel>How old are you?</InputLabel>
-
-          <Select
-            value={age}
-            label="How old are you?"
-            onChange={handleChangeAge}
-          >
-            {ageList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.age}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-
-      <Stack flexDirection="row" mb={10} mt={2}>
-        <FormControl sx={{ width: "49.5%" }}>
-          <InputLabel>Which Remind program are you following?</InputLabel>
-
-          <Select
-            value={remindProgram}
-            label="Which Remind program are you following?"
-            onChange={handleChangeRemindProgram}
-          >
-            {remindProgramList.map((item, index) => (
-              <MenuItem key={index} value={item.id}>
-                {item.sentence}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Stack>
-    </>
+    <Grid container rowSpacing={1} columnSpacing={1}>
+      {studentFormInfo &&
+        studentFormInfo.map((question: Question) => (
+          <Grid item xs={12} md={6} key={question.id}>
+            <FormControl fullWidth required>
+              {question.fieldType === FieldType.DropDown ? (
+                <>
+                  <InputLabel>{question.questionText}</InputLabel>
+                  <Select
+                    MenuProps={{ autoFocus: false }}
+                    labelId={`search-select-`}
+                    id={String(question.id)}
+                    name={String(question.id)}
+                    value={formik.values[question.id]}
+                    label={question.questionText}
+                    onChange={handleChange}
+                    onBlur={formik.handleBlur}
+                    error={
+                      formik.touched[question.id] &&
+                      Boolean(formik.errors[question.id])
+                    }
+                  >
+                    {question.dropdownOptions
+                      .filter((item) => !item.isDelete)
+                      .map((item: DropDownOptions, index: number) => (
+                        <MenuItem value={item.item} key={index}>
+                          {item.item}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </>
+              ) : (
+                <TextField
+                  id="studentClass"
+                  name="studentClass"
+                  label={question.questionText}
+                  value={formik.values[question.id]}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched[question.id] &&
+                    Boolean(formik.errors[question.id])
+                  }
+                />
+              )}
+              {formik.touched[question.id] && (
+                <FormHelperText sx={{ color: "red" }}>
+                  {formik.errors[question.id]}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+        ))}
+    </Grid>
   );
 
   const questionPartOneForm = (
@@ -471,23 +537,26 @@ const NormGroupForm = () => {
 
   return (
     <Stack sx={customStyles.stack}>
-      <Box py={4}>
-        <Typography
-          variant="h5"
-          fontWeight={1000}
-          mb={1}
-          textTransform="uppercase"
-        >
-          Pre-Intervention Measurement
+      <Box sx={customStyles.titleBox}>
+        <Typography variant="h5" sx={customStyles.title}>
+          normgroup
         </Typography>
 
-        <Typography variant="body1" mb={1}>
+        <Typography variant="body1" sx={customStyles.body}>
           Here are some general questions about you?
         </Typography>
       </Box>
 
       <Box sx={customStyles.mainBox}>
-        <Stepper nonLinear activeStep={activeStep}>
+        <Stepper
+          activeStep={activeStep}
+          sx={{
+            display: {
+              xs: "none",
+              md: "flex",
+            },
+          }}
+        >
           {steps.map((label, index) => (
             <Step
               key={label}
@@ -502,6 +571,48 @@ const NormGroupForm = () => {
         </Stepper>
 
         <Divider sx={{ py: 3, mb: 2 }} />
+
+        {activeStep < 3 && (
+          <Box
+            sx={{
+              width: "100%",
+              display: {
+                xs: "flex",
+                md: "none",
+              },
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <CircularProgressWithLabel activeStep={activeStep} totalSteps={3} />
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ color: "#1A1A1A", fontSize: 13, fontWeight: 700 }}
+              >
+                {steps[activeStep]}
+              </Typography>
+              {activeStep < 2 && (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: "#98989A",
+                    fontSize: 13,
+                    fontWeight: 700,
+                  }}
+                >
+                  Next : {steps[activeStep + 1]}
+                </Typography>
+              )}
+            </Box>
+          </Box>
+        )}
 
         <Box>
           <Fragment>
@@ -537,6 +648,7 @@ const NormGroupForm = () => {
                   variant="outlined"
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
+                  disabled={activeStep === 2 && !allAnsweredPartTwo}
                 >
                   Complete
                 </Button>
@@ -545,6 +657,12 @@ const NormGroupForm = () => {
                   variant="outlined"
                   onClick={handleNext}
                   sx={customStyles.primaryButton}
+                  disabled={
+                    activeStep === 0
+                      ? // ? !(formik.isValid && formik.dirty)
+                        !formik.isValid
+                      : !allAnsweredPartOne
+                  }
                 >
                   Next
                 </Button>
