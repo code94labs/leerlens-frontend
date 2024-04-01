@@ -43,7 +43,7 @@ import { useFormik } from "formik";
 
 const customStyles = {
   mainBox: {
-    width: "100%",
+    // width: "100%",
     border: "1px #E6E6E6 solid",
     p: 5,
     borderRadius: 2,
@@ -407,8 +407,8 @@ const RemindEvaluationForm = () => {
                 </>
               ) : (
                 <TextField
-                  id="studentClass"
-                  name="studentClass"
+                  id={String(question.id)}
+                  name={String(question.id)}
                   label={question.questionText}
                   value={formik.values[question.id]}
                   onChange={formik.handleChange}
@@ -549,7 +549,6 @@ const RemindEvaluationForm = () => {
 
       <Box sx={customStyles.mainBox}>
         <Stepper
-          nonLinear
           activeStep={activeStep}
           sx={{
             display: {
