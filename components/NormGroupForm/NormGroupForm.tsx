@@ -5,7 +5,9 @@ import {
   FormControl,
   FormHelperText,
   Grid,
+  InputAdornment,
   InputLabel,
+  ListSubheader,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -16,6 +18,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
 import {
   ageList,
@@ -187,6 +190,10 @@ const NormGroupForm = () => {
     [k: number]: boolean;
   }>({});
 
+  const [searchStrings, setSearchStrings] = useState<{ [key: string]: string }>(
+    {}
+  );
+
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
       const newAnswers = [...prevAnswers];
@@ -244,6 +251,9 @@ const NormGroupForm = () => {
 
     setAllAnsweredPartTwo(partTwoAllAnswered());
   }, [answersPartTwo, questionListPartTwo]);
+
+  const containsText = (text: string, searchText: string) =>
+    text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -391,22 +401,60 @@ const NormGroupForm = () => {
                     name={String(question.id)}
                     value={formik.values[question.id]}
                     label={question.questionText}
-                    onChange={handleChange}
+                    onChange={formik.handleChange}
+                    onClose={() =>
+                      setSearchStrings({
+                        ...searchStrings,
+                        [question.id]: "",
+                      })
+                    }
+                    renderValue={() => formik.values[question.id]}
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched[question.id] &&
                       Boolean(formik.errors[question.id])
                     }
                   >
-                    <Box maxHeight={150}>
-                      {question.dropdownOptions
-                        .filter((item) => !item.isDelete)
-                        .map((item: DropDownOptions, index: number) => (
-                          <MenuItem value={item.item} key={index}>
-                            {item.item}
-                          </MenuItem>
-                        ))}
-                    </Box>
+                    <ListSubheader>
+                      <TextField
+                        size="small"
+                        autoFocus
+                        placeholder="Type to search..."
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        value={searchStrings[question.id] || ""}
+                        onChange={(e) =>
+                          setSearchStrings({
+                            ...searchStrings,
+                            [question.id]: e.target.value,
+                          })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") {
+                            e.stopPropagation();
+                          }
+                        }}
+                      />
+                    </ListSubheader>
+                    {question.dropdownOptions
+                      .filter((item) => !item.isDelete)
+                      .filter((option) =>
+                        containsText(
+                          option.item,
+                          searchStrings[question.id] || ""
+                        )
+                      )
+                      .map((item: DropDownOptions, index: number) => (
+                        <MenuItem value={item.item} key={index}>
+                          {item.item}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </>
               ) : (

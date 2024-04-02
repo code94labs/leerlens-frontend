@@ -6,7 +6,9 @@ import {
   FormControl,
   FormHelperText,
   Grid,
+  InputAdornment,
   InputLabel,
+  ListSubheader,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -17,6 +19,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useRouter } from "next/router";
 import * as yup from "yup";
 
@@ -347,6 +350,10 @@ const RemindEvaluationForm = () => {
     [k: number]: boolean;
   }>({});
 
+  const [searchStrings, setSearchStrings] = useState<{ [key: string]: string }>(
+    {}
+  );
+
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
       const newAnswers = [...prevAnswers];
@@ -432,6 +439,9 @@ const RemindEvaluationForm = () => {
   const handleChangeAge = (event: SelectChangeEvent) => {
     setAge(event.target.value as string);
   };
+
+  const containsText = (text: string, searchText: string) =>
+    text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -597,15 +607,57 @@ const RemindEvaluationForm = () => {
                     name={String(question.id)}
                     value={personalDetailsFormik.values[question.id]}
                     label={question.questionText}
-                    onChange={handleChangePersonalDetails}
+                    onChange={personalDetailsFormik.handleChange}
+                    onClose={() =>
+                      setSearchStrings({
+                        ...searchStrings,
+                        [question.id]: "",
+                      })
+                    }
+                    renderValue={() =>
+                      personalDetailsFormik.values[question.id]
+                    }
                     onBlur={personalDetailsFormik.handleBlur}
                     error={
                       personalDetailsFormik.touched[question.id] &&
                       Boolean(personalDetailsFormik.errors[question.id])
                     }
                   >
+                    <ListSubheader>
+                      <TextField
+                        size="small"
+                        autoFocus
+                        placeholder="Type to search..."
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        value={searchStrings[question.id] || ""}
+                        onChange={(e) =>
+                          setSearchStrings({
+                            ...searchStrings,
+                            [question.id]: e.target.value,
+                          })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") {
+                            e.stopPropagation();
+                          }
+                        }}
+                      />
+                    </ListSubheader>
                     {question.dropdownOptions
                       .filter((item) => !item.isDelete)
+                      .filter((option) =>
+                        containsText(
+                          option.item,
+                          searchStrings[question.id] || ""
+                        )
+                      )
                       .map((item: DropDownOptions, index: number) => (
                         <MenuItem value={item.item} key={index}>
                           {item.item}
@@ -737,15 +789,57 @@ const RemindEvaluationForm = () => {
                     name={String(question.id)}
                     value={programAndSupervisorsFormik.values[question.id]}
                     label={question.questionText}
-                    onChange={handleChangeProgramAndSupervisors}
+                    onChange={programAndSupervisorsFormik.handleChange}
+                    onClose={() =>
+                      setSearchStrings({
+                        ...searchStrings,
+                        [question.id]: "",
+                      })
+                    }
+                    renderValue={() =>
+                      programAndSupervisorsFormik.values[question.id]
+                    }
                     onBlur={programAndSupervisorsFormik.handleBlur}
                     error={
                       programAndSupervisorsFormik.touched[question.id] &&
                       Boolean(programAndSupervisorsFormik.errors[question.id])
                     }
                   >
+                    <ListSubheader>
+                      <TextField
+                        size="small"
+                        autoFocus
+                        placeholder="Type to search..."
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        value={searchStrings[question.id] || ""}
+                        onChange={(e) =>
+                          setSearchStrings({
+                            ...searchStrings,
+                            [question.id]: e.target.value,
+                          })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") {
+                            e.stopPropagation();
+                          }
+                        }}
+                      />
+                    </ListSubheader>
                     {question.dropdownOptions
                       .filter((item) => !item.isDelete)
+                      .filter((option) =>
+                        containsText(
+                          option.item,
+                          searchStrings[question.id] || ""
+                        )
+                      )
                       .map((item: DropDownOptions, index: number) => (
                         <MenuItem value={item.item} key={index}>
                           {item.item}
@@ -823,22 +917,60 @@ const RemindEvaluationForm = () => {
                     name={String(question.id)}
                     value={finalQuestionsFormik.values[question.id]}
                     label={question.questionText}
-                    onChange={handleChangeFinalQuestions}
+                    onChange={finalQuestionsFormik.handleChange}
+                    onClose={() =>
+                      setSearchStrings({
+                        ...searchStrings,
+                        [question.id]: "",
+                      })
+                    }
+                    renderValue={() => finalQuestionsFormik.values[question.id]}
                     onBlur={finalQuestionsFormik.handleBlur}
                     error={
                       finalQuestionsFormik.touched[question.id] &&
                       Boolean(finalQuestionsFormik.errors[question.id])
                     }
                   >
-                    <Box maxHeight={150}>
-                      {question.dropdownOptions
-                        .filter((item) => !item.isDelete)
-                        .map((item: DropDownOptions, index: number) => (
-                          <MenuItem value={item.item} key={index}>
-                            {item.item}
-                          </MenuItem>
-                        ))}
-                    </Box>
+                    <ListSubheader>
+                      <TextField
+                        size="small"
+                        autoFocus
+                        placeholder="Type to search..."
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        value={searchStrings[question.id] || ""}
+                        onChange={(e) =>
+                          setSearchStrings({
+                            ...searchStrings,
+                            [question.id]: e.target.value,
+                          })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") {
+                            e.stopPropagation();
+                          }
+                        }}
+                      />
+                    </ListSubheader>
+                    {question.dropdownOptions
+                      .filter((item) => !item.isDelete)
+                      .filter((option) =>
+                        containsText(
+                          option.item,
+                          searchStrings[question.id] || ""
+                        )
+                      )
+                      .map((item: DropDownOptions, index: number) => (
+                        <MenuItem value={item.item} key={index}>
+                          {item.item}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </>
               ) : (

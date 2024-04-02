@@ -351,8 +351,6 @@ const PreInterventionForm = () => {
     formik.setFieldValue(name, value);
   };
 
-  console.log(formik.values);
-
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
@@ -565,56 +563,6 @@ const PreInterventionForm = () => {
             </FormControl>
           </Grid>
         ))}
-      {/* <Select
-                    MenuProps={{ autoFocus: false }}
-                    labelId="search-select-school"
-                    id={String(question.id)}
-                    name={String(question.id)}
-                    value={formik.values[question.id]}
-                    label={question.questionText}
-                    onChange={(e) => {
-                      console.log(e);
-                      handleChange(e);
-                    }}
-                    onClose={() => setSearchTextSchool("")}
-                    renderValue={() => formik.values[question.id]}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched[question.id] &&
-                      Boolean(formik.errors[question.id])
-                    }
-                  >
-                    <ListSubheader>
-                      <TextField
-                        size="small"
-                        autoFocus
-                        placeholder="Type to search..."
-                        fullWidth
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchRoundedIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                        onChange={(e) => setSearchTextSchool(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key !== "Escape") {
-                            e.stopPropagation();
-                          }
-                        }}
-                      />
-                    </ListSubheader>
-                    <Box maxHeight={150}>
-                      {question.dropdownOptions
-                        .filter((item) => !item.isDelete)
-                        .map((item: DropDownOptions, index: number) => (
-                          <MenuItem value={item.id} key={index}>
-                            {item.item}
-                          </MenuItem>
-                        ))}
-                    </Box>
-                  </Select> */}
     </Grid>
   );
 
