@@ -360,7 +360,7 @@ const PostInterventionForm = () => {
   };
 
   const personalDetailsForm = (
-    <Grid container rowSpacing={1} columnSpacing={1}>
+    <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
         studentFormInfo.map((question: Question) => (
           <Grid item xs={12} md={6} key={question.id}>
@@ -446,7 +446,7 @@ const PostInterventionForm = () => {
                 />
               )}
               {formik.touched[question.id] && (
-                <FormHelperText sx={{ color: "red" }}>
+                <FormHelperText sx={{ color: "red", mb: -2.5 }}>
                   {formik.errors[question.id]}
                 </FormHelperText>
               )}

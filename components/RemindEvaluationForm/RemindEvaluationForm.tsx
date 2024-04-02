@@ -586,13 +586,13 @@ const RemindEvaluationForm = () => {
     },
   });
 
-  const handleChangePersonalDetails = (event: any) => {
-    const { name, value } = event.target;
-    personalDetailsFormik.setFieldValue(name, value);
-  };
+  // const handleChangePersonalDetails = (event: any) => {
+  //   const { name, value } = event.target;
+  //   personalDetailsFormik.setFieldValue(name, value);
+  // };
 
   const personalDetailsForm = (
-    <Grid container rowSpacing={1} columnSpacing={1}>
+    <Grid container rowSpacing={4} columnSpacing={4}>
       {personalDetailsQuestions &&
         personalDetailsQuestions.map((question: Question) => (
           <Grid item xs={12} md={6} key={question.id}>
@@ -680,7 +680,7 @@ const RemindEvaluationForm = () => {
                 />
               )}
               {personalDetailsFormik.touched[question.id] && (
-                <FormHelperText sx={{ color: "red" }}>
+                <FormHelperText sx={{ color: "red", mb: -2.5 }}>
                   {personalDetailsFormik.errors[question.id]}
                 </FormHelperText>
               )}
@@ -768,13 +768,13 @@ const RemindEvaluationForm = () => {
     },
   });
 
-  const handleChangeProgramAndSupervisors = (event: any) => {
-    const { name, value } = event.target;
-    programAndSupervisorsFormik.setFieldValue(name, value);
-  };
+  // const handleChangeProgramAndSupervisors = (event: any) => {
+  //   const { name, value } = event.target;
+  //   programAndSupervisorsFormik.setFieldValue(name, value);
+  // };
 
   const programAndSupervisorForm = (
-    <Grid container rowSpacing={1} columnSpacing={1}>
+    <Grid container rowSpacing={4} columnSpacing={4}>
       {programAndSupervisorsQuestions &&
         programAndSupervisorsQuestions.map((question: Question) => (
           <Grid item xs={12} md={6} key={question.id}>
@@ -862,7 +862,7 @@ const RemindEvaluationForm = () => {
                 />
               )}
               {programAndSupervisorsFormik.touched[question.id] && (
-                <FormHelperText sx={{ color: "red" }}>
+                <FormHelperText sx={{ color: "red", mb: -2.5 }}>
                   {programAndSupervisorsFormik.errors[question.id]}
                 </FormHelperText>
               )}
@@ -896,13 +896,13 @@ const RemindEvaluationForm = () => {
     },
   });
 
-  const handleChangeFinalQuestions = (event: any) => {
-    const { name, value } = event.target;
-    finalQuestionsFormik.setFieldValue(name, value);
-  };
+  // const handleChangeFinalQuestions = (event: any) => {
+  //   const { name, value } = event.target;
+  //   finalQuestionsFormik.setFieldValue(name, value);
+  // };
 
   const finalContentForm = (
-    <Grid container rowSpacing={1} columnSpacing={1}>
+    <Grid container rowSpacing={4} columnSpacing={4}>
       {finalQuestions &&
         finalQuestions.map((question: Question) => (
           <Grid item xs={12} md={6} key={question.id}>
@@ -988,7 +988,7 @@ const RemindEvaluationForm = () => {
                 />
               )}
               {finalQuestionsFormik.touched[question.id] && (
-                <FormHelperText sx={{ color: "red" }}>
+                <FormHelperText sx={{ color: "red", mb: -2.5 }}>
                   {finalQuestionsFormik.errors[question.id]}
                 </FormHelperText>
               )}

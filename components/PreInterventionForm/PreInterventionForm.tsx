@@ -345,11 +345,11 @@ const PreInterventionForm = () => {
     },
   });
 
-  const handleChange = (event: any) => {
-    console.log(event.target);
-    const { name, value } = event.target;
-    formik.setFieldValue(name, value);
-  };
+  // const handleChange = (event: any) => {
+  //   console.log(event.target);
+  //   const { name, value } = event.target;
+  //   formik.setFieldValue(name, value);
+  // };
 
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
@@ -442,7 +442,7 @@ const PreInterventionForm = () => {
   // End of form step creation
 
   const personalDetailsForm = (
-    <Grid container rowSpacing={1} columnSpacing={1}>
+    <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
         studentFormInfo.map((question: Question) => (
           <Grid item xs={12} md={6} key={question.id}>
@@ -556,7 +556,7 @@ const PreInterventionForm = () => {
                 }
               })()}
               {formik.touched[question.id] && (
-                <FormHelperText sx={{ color: "red" }}>
+                <FormHelperText sx={{ color: "red", mb: -2.5 }}>
                   {formik.errors[question.id]}
                 </FormHelperText>
               )}
