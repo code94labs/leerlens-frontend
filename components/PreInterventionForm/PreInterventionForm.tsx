@@ -449,7 +449,6 @@ const PreInterventionForm = () => {
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
         studentFormInfo
-          // .filter((item) => item.sectionType === SectionType.PersonalDetails)
           .map((question: Question) => (
             <Grid item xs={12} md={6} key={question.id}>
               <FormControl fullWidth required>

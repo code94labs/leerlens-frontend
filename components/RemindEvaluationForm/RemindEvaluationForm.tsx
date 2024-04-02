@@ -581,8 +581,6 @@ const RemindEvaluationForm = () => {
       try {
         const studentFormInfoQuestions: Question[] = await getStudentFormInfo();
 
-        // console.log(studentFormInfoQuestions);
-
         // setStudentFormInfo(studentFormInfoQuestions);
         setPersonalDetailsQuestions(
           studentFormInfoQuestions.filter(
@@ -832,97 +830,149 @@ const RemindEvaluationForm = () => {
     <Grid container rowSpacing={4} columnSpacing={4}>
       {programAndSupervisorsQuestions &&
         programAndSupervisorsQuestions.map((question: Question) => (
-          <Grid item xs={12} md={6} key={question.id}>
+          <Grid
+            item
+            xs={12}
+            md={question.fieldType === FieldType.Scale ? 12 : 6}
+            key={question.id}
+          >
             <FormControl fullWidth required>
-              {question.fieldType === FieldType.DropDown ? (
-                <>
-                  <InputLabel>{question.questionText}</InputLabel>
-                  <Select
-                    MenuProps={{
-                      autoFocus: false,
-                      PaperProps: {
-                        style: {
-                          maxHeight: 200,
-                        },
-                      },
-                    }}
-                    labelId={`search-select-`}
-                    id={String(question.id)}
-                    name={String(question.id)}
-                    value={programAndSupervisorsFormik.values[question.id]}
-                    label={question.questionText}
-                    onChange={programAndSupervisorsFormik.handleChange}
-                    onClose={() =>
-                      setSearchStrings({
-                        ...searchStrings,
-                        [question.id]: "",
-                      })
-                    }
-                    renderValue={() =>
-                      programAndSupervisorsFormik.values[question.id]
-                    }
-                    onBlur={programAndSupervisorsFormik.handleBlur}
-                    error={
-                      programAndSupervisorsFormik.touched[question.id] &&
-                      Boolean(programAndSupervisorsFormik.errors[question.id])
-                    }
-                  >
-                    <ListSubheader>
-                      <TextField
-                        size="small"
-                        autoFocus
-                        placeholder="Type to search..."
-                        fullWidth
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchRoundedIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                        value={searchStrings[question.id] || ""}
-                        onChange={(e) =>
-                          setSearchStrings({
-                            ...searchStrings,
-                            [question.id]: e.target.value,
-                          })
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key !== "Escape") {
-                            e.stopPropagation();
+              {(() => {
+                switch (question.fieldType) {
+                  case FieldType.DropDown:
+                    return (
+                      <>
+                        <InputLabel>{question.questionText}</InputLabel>
+                        <Select
+                          MenuProps={{
+                            autoFocus: false,
+                            PaperProps: {
+                              style: {
+                                maxHeight: 200,
+                              },
+                            },
+                          }}
+                          labelId={`search-select-`}
+                          id={String(question.id)}
+                          name={String(question.id)}
+                          value={
+                            programAndSupervisorsFormik.values[question.id]
                           }
+                          label={question.questionText}
+                          onChange={programAndSupervisorsFormik.handleChange}
+                          onClose={() =>
+                            setSearchStrings({
+                              ...searchStrings,
+                              [question.id]: "",
+                            })
+                          }
+                          renderValue={() =>
+                            programAndSupervisorsFormik.values[question.id]
+                          }
+                          onBlur={programAndSupervisorsFormik.handleBlur}
+                          error={
+                            programAndSupervisorsFormik.touched[question.id] &&
+                            Boolean(
+                              programAndSupervisorsFormik.errors[question.id]
+                            )
+                          }
+                        >
+                          <ListSubheader>
+                            <TextField
+                              size="small"
+                              autoFocus
+                              placeholder="Type to search..."
+                              fullWidth
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <SearchRoundedIcon />
+                                  </InputAdornment>
+                                ),
+                              }}
+                              value={searchStrings[question.id] || ""}
+                              onChange={(e) =>
+                                setSearchStrings({
+                                  ...searchStrings,
+                                  [question.id]: e.target.value,
+                                })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key !== "Escape") {
+                                  e.stopPropagation();
+                                }
+                              }}
+                            />
+                          </ListSubheader>
+                          {question.dropdownOptions
+                            .filter((item) => !item.isDelete)
+                            .filter((option) =>
+                              containsText(
+                                option.item,
+                                searchStrings[question.id] || ""
+                              )
+                            )
+                            .map((item: DropDownOptions, index: number) => (
+                              <MenuItem value={item.item} key={index}>
+                                {item.item}
+                              </MenuItem>
+                            ))}
+                        </Select>
+                      </>
+                    );
+                  case FieldType.TextArea:
+                    return (
+                      <Input
+                        aria-label={question.questionText}
+                        multiline
+                        placeholder={question.questionText}
+                        id={String(question.id)}
+                        name={String(question.id)}
+                        value={programAndSupervisorsFormik.values[question.id]}
+                        onChange={programAndSupervisorsFormik.handleChange}
+                        onBlur={programAndSupervisorsFormik.handleBlur}
+                        error={
+                          programAndSupervisorsFormik.touched[question.id] &&
+                          Boolean(
+                            programAndSupervisorsFormik.errors[question.id]
+                          )
+                        }
+                      />
+                    );
+                  case FieldType.Scale:
+                    return (
+                      <CustomScale
+                        {...question}
+                        // updateAnswer={function (answer: number): void {
+                        //   throw new Error("Function not implemented.");
+                        // }}
+                        updateAnswer={(answer: number) => {
+                          programAndSupervisorsFormik.setFieldValue(
+                            String(question.id),
+                            answer
+                          );
                         }}
                       />
-                    </ListSubheader>
-                    {question.dropdownOptions
-                      .filter((item) => !item.isDelete)
-                      .filter((option) =>
-                        containsText(
-                          option.item,
-                          searchStrings[question.id] || ""
-                        )
-                      )
-                      .map((item: DropDownOptions, index: number) => (
-                        <MenuItem value={item.item} key={index}>
-                          {item.item}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </>
-              ) : (
-                <TextField
-                  id={String(question.id)}
-                  name={String(question.id)}
-                  label={question.questionText}
-                  value={programAndSupervisorsFormik.values[question.id]}
-                  onChange={programAndSupervisorsFormik.handleChange}
-                  onBlur={programAndSupervisorsFormik.handleBlur}
-                  error={
-                    programAndSupervisorsFormik.touched[question.id] &&
-                    Boolean(programAndSupervisorsFormik.errors[question.id])
-                  }
-                />
-              )}
+                    );
+                  default:
+                    return (
+                      <TextField
+                        id={String(question.id)}
+                        name={String(question.id)}
+                        label={question.questionText}
+                        value={programAndSupervisorsFormik.values[question.id]}
+                        onChange={programAndSupervisorsFormik.handleChange}
+                        onBlur={programAndSupervisorsFormik.handleBlur}
+                        error={
+                          programAndSupervisorsFormik.touched[question.id] &&
+                          Boolean(
+                            programAndSupervisorsFormik.errors[question.id]
+                          )
+                        }
+                      />
+                    );
+                }
+              })()}
               {programAndSupervisorsFormik.touched[question.id] && (
                 <FormHelperText sx={{ color: "red", mb: -2.5 }}>
                   {programAndSupervisorsFormik.errors[question.id]}
@@ -1048,18 +1098,6 @@ const RemindEvaluationForm = () => {
                   </Select>
                 </>
               ) : (
-                // <TextField
-                //   id={String(question.id)}
-                //   name={String(question.id)}
-                //   label={question.questionText}
-                //   value={finalQuestionsFormik.values[question.id]}
-                //   onChange={finalQuestionsFormik.handleChange}
-                //   onBlur={finalQuestionsFormik.handleBlur}
-                //   error={
-                //     finalQuestionsFormik.touched[question.id] &&
-                //     Boolean(finalQuestionsFormik.errors[question.id])
-                //   }
-                // />
                 <Input
                   aria-label={question.questionText}
                   multiline
