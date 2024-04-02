@@ -29,7 +29,7 @@ import {
 } from "../../services/questionnaire.service";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
 import { DropDownOptions, Question } from "../../utils/types";
-import { FieldType } from "../../utils/enum";
+import { FieldType, SectionType } from "../../utils/enum";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 const customStyles = {
@@ -293,7 +293,11 @@ const PostInterventionForm = () => {
       try {
         const studentFormInfoQuestions = await getStudentFormInfo();
 
-        setStudentFormInfo(studentFormInfoQuestions);
+        setStudentFormInfo(
+          studentFormInfoQuestions.filter(
+            (item: Question) => item.sectionType === SectionType.PersonalDetails
+          )
+        );
       } catch (error) {
         console.log(error);
       }
@@ -354,10 +358,10 @@ const PostInterventionForm = () => {
     },
   });
 
-  const handleChange = (event: any) => {
-    const { name, value } = event.target;
-    formik.setFieldValue(name, value);
-  };
+  // const handleChange = (event: any) => {
+  //   const { name, value } = event.target;
+  //   formik.setFieldValue(name, value);
+  // };
 
   const personalDetailsForm = (
     <Grid container rowSpacing={4} columnSpacing={4}>
@@ -440,8 +444,8 @@ const PostInterventionForm = () => {
                 </>
               ) : (
                 <TextField
-                  id="studentClass"
-                  name="studentClass"
+                  id={String(question.id)}
+                  name={String(question.id)}
                   label={question.questionText}
                   value={formik.values[question.id]}
                   onChange={formik.handleChange}
@@ -641,8 +645,7 @@ const PostInterventionForm = () => {
                   disabled={
                     activeStep === 0
                       ? !(formik.isValid && formik.dirty)
-                      : // !formik.isValid
-                        !allAnsweredPartOne
+                      : !allAnsweredPartOne
                   }
                 >
                   Next
