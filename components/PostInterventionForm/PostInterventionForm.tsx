@@ -369,7 +369,14 @@ const PostInterventionForm = () => {
                 <>
                   <InputLabel>{question.questionText}</InputLabel>
                   <Select
-                    MenuProps={{ autoFocus: false }}
+                    MenuProps={{
+                      autoFocus: false,
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200,
+                        },
+                      },
+                    }}
                     labelId={`search-select-`}
                     id={String(question.id)}
                     name={String(question.id)}
