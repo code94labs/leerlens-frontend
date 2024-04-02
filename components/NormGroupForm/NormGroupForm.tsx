@@ -398,13 +398,15 @@ const NormGroupForm = () => {
                       Boolean(formik.errors[question.id])
                     }
                   >
-                    {question.dropdownOptions
-                      .filter((item) => !item.isDelete)
-                      .map((item: DropDownOptions, index: number) => (
-                        <MenuItem value={item.item} key={index}>
-                          {item.item}
-                        </MenuItem>
-                      ))}
+                    <Box maxHeight={150}>
+                      {question.dropdownOptions
+                        .filter((item) => !item.isDelete)
+                        .map((item: DropDownOptions, index: number) => (
+                          <MenuItem value={item.item} key={index}>
+                            {item.item}
+                          </MenuItem>
+                        ))}
+                    </Box>
                   </Select>
                 </>
               ) : (
