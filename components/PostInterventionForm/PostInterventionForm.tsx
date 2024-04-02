@@ -12,9 +12,6 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
-  Step,
-  StepButton,
-  Stepper,
   TextField,
   Typography,
 } from "@mui/material";
@@ -33,6 +30,7 @@ import {
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
 import { DropDownOptions, Question } from "../../utils/types";
 import { FieldType } from "../../utils/enum";
+import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 const customStyles = {
   mainBox: {
@@ -98,15 +96,6 @@ const customStyles = {
       md: 2,
     },
   },
-  step: {
-    "& .MuiStepLabel-iconContainer > .Mui-active": {
-      color: "#A879FF",
-    },
-
-    "& .MuiStepLabel-label": {
-      fontWeight: 600,
-    },
-  },
   primaryButton: {
     backgroundColor: "#A879FF",
     color: "white",
@@ -160,16 +149,6 @@ const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 const PostInterventionForm = () => {
   const router = useRouter();
 
-  const [school, setSchool] = useState("");
-  const [studyField, setStudyField] = useState("");
-  const [grade, setGrade] = useState("");
-  const [studentClass, setClass] = useState("");
-  const [completeSentence, setCompleteSentence] = useState("");
-  const [age, setAge] = useState("");
-  const [remindProgram, setRemindProgram] = useState("");
-
-  const [searchTextSchool, setSearchTextSchool] = useState("");
-
   const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
   const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
     []
@@ -192,6 +171,10 @@ const PostInterventionForm = () => {
   const [completed, setCompleted] = useState<{
     [k: number]: boolean;
   }>({});
+
+  const [searchStrings, setSearchStrings] = useState<{ [key: string]: string }>(
+    {}
+  );
 
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
@@ -250,6 +233,9 @@ const PostInterventionForm = () => {
 
     setAllAnsweredPartTwo(partTwoAllAnswered());
   }, [answersPartTwo, questionListPartTwo]);
+
+  const containsText = (text: string, searchText: string) =>
+    text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -389,15 +375,55 @@ const PostInterventionForm = () => {
                     name={String(question.id)}
                     value={formik.values[question.id]}
                     label={question.questionText}
-                    onChange={handleChange}
+                    onChange={formik.handleChange}
+                    onClose={() =>
+                      setSearchStrings({
+                        ...searchStrings,
+                        [question.id]: "",
+                      })
+                    }
+                    renderValue={() => formik.values[question.id]}
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched[question.id] &&
                       Boolean(formik.errors[question.id])
                     }
                   >
+                    <ListSubheader>
+                      <TextField
+                        size="small"
+                        autoFocus
+                        placeholder="Type to search..."
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        value={searchStrings[question.id] || ""}
+                        onChange={(e) =>
+                          setSearchStrings({
+                            ...searchStrings,
+                            [question.id]: e.target.value,
+                          })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") {
+                            e.stopPropagation();
+                          }
+                        }}
+                      />
+                    </ListSubheader>
                     {question.dropdownOptions
                       .filter((item) => !item.isDelete)
+                      .filter((option) =>
+                        containsText(
+                          option.item,
+                          searchStrings[question.id] || ""
+                        )
+                      )
                       .map((item: DropDownOptions, index: number) => (
                         <MenuItem value={item.item} key={index}>
                           {item.item}
@@ -511,27 +537,12 @@ const PostInterventionForm = () => {
       </Box>
 
       <Box sx={customStyles.mainBox}>
-        <Stepper
+        <CustomStepper
           activeStep={activeStep}
-          sx={{
-            display: {
-              xs: "none",
-              md: "flex",
-            },
-          }}
-        >
-          {steps.map((label, index) => (
-            <Step
-              key={label}
-              completed={completed[index]}
-              sx={customStyles.step}
-            >
-              <StepButton color="inherit" onClick={handleStep(index)}>
-                {label}
-              </StepButton>
-            </Step>
-          ))}
-        </Stepper>
+          steps={steps}
+          completed={completed}
+          handleStep={handleStep}
+        />
 
         <Divider sx={{ py: 3, mb: 2 }} />
 

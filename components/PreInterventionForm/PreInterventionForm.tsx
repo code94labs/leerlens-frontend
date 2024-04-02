@@ -1,4 +1,5 @@
 import {
+  Autocomplete,
   Box,
   Button,
   Divider,
@@ -12,9 +13,6 @@ import {
   Select,
   SelectChangeEvent,
   Stack,
-  Step,
-  StepButton,
-  Stepper,
   TextField,
   Typography,
 } from "@mui/material";
@@ -37,7 +35,7 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { useRouter } from "next/router";
-import { Formik, useFormik } from "formik";
+import { useFormik } from "formik";
 import * as yup from "yup";
 
 import { champBlackFontFamily } from "../../shared/typography";
@@ -51,75 +49,7 @@ import {
 
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { DropDownOptions, Question } from "../../utils/types";
-
-// const sampleResponse: Question[] = [
-//   {
-//     id: 1,
-//     formType: 3,
-//     questionText: "What school are you from",
-//     fieldType: 0,
-//     sectionType: 0,
-//     positionOrderId: 1,
-//     dropdownOptions: [
-//       {
-//         id: 1,
-//         item: "Royal Institute",
-//         isDelete: false,
-//       },
-//       {
-//         id: 2,
-//         item: "Lyceum",
-//         isDelete: false,
-//       },
-//     ],
-//     minValue: 1,
-//     maxValue: 6,
-//   },
-//   {
-//     id: 2,
-//     formType: 3,
-//     questionText: "What's your age group",
-//     fieldType: 0,
-//     sectionType: 0,
-//     positionOrderId: 1,
-//     dropdownOptions: [
-//       {
-//         id: 1,
-//         item: "18",
-//         isDelete: false,
-//       },
-//       {
-//         id: 2,
-//         item: "19",
-//         isDelete: false,
-//       },
-//     ],
-//     minValue: 1,
-//     maxValue: 6,
-//   },
-//   {
-//     id: 3,
-//     formType: 3,
-//     questionText: "What's your age group",
-//     fieldType: 1,
-//     sectionType: 0,
-//     positionOrderId: 1,
-//     dropdownOptions: [],
-//     minValue: 1,
-//     maxValue: 6,
-//   },
-//   {
-//     id: 4,
-//     formType: 3,
-//     questionText: "What's your age group",
-//     fieldType: 2,
-//     sectionType: 0,
-//     positionOrderId: 1,
-//     dropdownOptions: [],
-//     minValue: 1,
-//     maxValue: 6,
-//   },
-// ];
+import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 const customStyles = {
   mainBox: {
@@ -183,19 +113,6 @@ const customStyles = {
     mt: {
       xs: 0,
       md: 2,
-    },
-  },
-  step: {
-    "& .MuiStepLabel-iconContainer > .Mui-active": {
-      color: "#A879FF",
-    },
-
-    "& .MuiStepLabel-iconContainer > .Mui-completed": {
-      color: "#A879FF",
-    },
-
-    "& .MuiStepLabel-label": {
-      fontWeight: 600,
     },
   },
   primaryButton: {
@@ -328,6 +245,10 @@ const PreInterventionForm = () => {
     [k: number]: boolean;
   }>({});
 
+  const [searchStrings, setSearchStrings] = useState<{ [key: string]: string }>(
+    {}
+  );
+
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
       const newAnswers = [...prevAnswers];
@@ -405,7 +326,7 @@ const PreInterventionForm = () => {
     .shape(
       studentFormInfo.length > 0
         ? Object.fromEntries(
-          studentFormInfo.map((field) => [
+            studentFormInfo.map((field) => [
               field.id,
               yup.string().required(`Response is required`),
             ])
@@ -425,20 +346,13 @@ const PreInterventionForm = () => {
   });
 
   const handleChange = (event: any) => {
+    console.log(event.target);
     const { name, value } = event.target;
     formik.setFieldValue(name, value);
   };
 
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
-
-  const displayedSchoolOptions = useMemo(
-    () =>
-      schoolList.filter((option) =>
-        containsText(option.schoolName, searchTextSchool)
-      ),
-    [searchTextSchool]
-  );
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -546,15 +460,55 @@ const PreInterventionForm = () => {
                           name={String(question.id)}
                           value={formik.values[question.id]}
                           label={question.questionText}
-                          onChange={handleChange}
+                          onChange={formik.handleChange}
+                          onClose={() =>
+                            setSearchStrings({
+                              ...searchStrings,
+                              [question.id]: "",
+                            })
+                          }
+                          renderValue={() => formik.values[question.id]}
                           onBlur={formik.handleBlur}
                           error={
                             formik.touched[question.id] &&
                             Boolean(formik.errors[question.id])
                           }
                         >
+                          <ListSubheader>
+                            <TextField
+                              size="small"
+                              autoFocus
+                              placeholder="Type to search..."
+                              fullWidth
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <SearchRoundedIcon />
+                                  </InputAdornment>
+                                ),
+                              }}
+                              value={searchStrings[question.id] || ""}
+                              onChange={(e) =>
+                                setSearchStrings({
+                                  ...searchStrings,
+                                  [question.id]: e.target.value,
+                                })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key !== "Escape") {
+                                  e.stopPropagation();
+                                }
+                              }}
+                            />
+                          </ListSubheader>
                           {question.dropdownOptions
                             .filter((item) => !item.isDelete)
+                            .filter((option) =>
+                              containsText(
+                                option.item,
+                                searchStrings[question.id] || ""
+                              )
+                            )
                             .map((item: DropDownOptions, index: number) => (
                               <MenuItem value={item.item} key={index}>
                                 {item.item}
@@ -590,6 +544,7 @@ const PreInterventionForm = () => {
                         name={String(question.id)}
                         label={question.questionText}
                         value={formik.values[question.id]}
+                        // placeholder="Placeholder"
                         onChange={formik.handleChange}
                         onBlur={formik.handleBlur}
                         error={
@@ -608,56 +563,6 @@ const PreInterventionForm = () => {
             </FormControl>
           </Grid>
         ))}
-      {/* <Select
-                    MenuProps={{ autoFocus: false }}
-                    labelId="search-select-school"
-                    id={String(question.id)}
-                    name={String(question.id)}
-                    value={formik.values[question.id]}
-                    label={question.questionText}
-                    onChange={(e) => {
-                      console.log(e);
-                      handleChange(e);
-                    }}
-                    onClose={() => setSearchTextSchool("")}
-                    renderValue={() => formik.values[question.id]}
-                    onBlur={formik.handleBlur}
-                    error={
-                      formik.touched[question.id] &&
-                      Boolean(formik.errors[question.id])
-                    }
-                  >
-                    <ListSubheader>
-                      <TextField
-                        size="small"
-                        autoFocus
-                        placeholder="Type to search..."
-                        fullWidth
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchRoundedIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                        onChange={(e) => setSearchTextSchool(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key !== "Escape") {
-                            e.stopPropagation();
-                          }
-                        }}
-                      />
-                    </ListSubheader>
-                    <Box maxHeight={150}>
-                      {question.dropdownOptions
-                        .filter((item) => !item.isDelete)
-                        .map((item: DropDownOptions, index: number) => (
-                          <MenuItem value={item.id} key={index}>
-                            {item.item}
-                          </MenuItem>
-                        ))}
-                    </Box>
-                  </Select> */}
     </Grid>
   );
 
@@ -830,27 +735,12 @@ const PreInterventionForm = () => {
       </Box>
 
       <Box sx={customStyles.mainBox}>
-        <Stepper
+        <CustomStepper
           activeStep={activeStep}
-          sx={{
-            display: {
-              xs: "none",
-              md: "flex",
-            },
-          }}
-        >
-          {steps.map((label, index) => (
-            <Step
-              key={label}
-              completed={completed[index]}
-              sx={customStyles.step}
-            >
-              <StepButton color="inherit" onClick={handleStep(index)}>
-                {label}
-              </StepButton>
-            </Step>
-          ))}
-        </Stepper>
+          steps={steps}
+          completed={completed}
+          handleStep={handleStep}
+        />
 
         <Divider sx={{ py: 3, mb: 2 }} />
 
@@ -867,7 +757,10 @@ const PreInterventionForm = () => {
               gap: 2,
             }}
           >
-            <CircularProgressWithLabel activeStep={activeStep} totalSteps={3} />
+            <CircularProgressWithLabel
+              activeStep={activeStep}
+              totalSteps={steps.length}
+            />
             <Box
               sx={{
                 display: "flex",

@@ -5,7 +5,9 @@ import {
   FormControl,
   FormHelperText,
   Grid,
+  InputAdornment,
   InputLabel,
+  ListSubheader,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -16,6 +18,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
 import {
   ageList,
@@ -37,6 +40,7 @@ import {
 } from "../../services/questionnaire.service";
 import { champBlackFontFamily } from "../../shared/typography";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
+import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 const customStyles = {
   mainBox: {
@@ -100,15 +104,6 @@ const customStyles = {
     mt: {
       xs: 0,
       md: 2,
-    },
-  },
-  step: {
-    "& .MuiStepLabel-iconContainer > .Mui-active": {
-      color: "#A879FF",
-    },
-
-    "& .MuiStepLabel-label": {
-      fontWeight: 600,
     },
   },
   primaryButton: {
@@ -195,6 +190,10 @@ const NormGroupForm = () => {
     [k: number]: boolean;
   }>({});
 
+  const [searchStrings, setSearchStrings] = useState<{ [key: string]: string }>(
+    {}
+  );
+
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
       const newAnswers = [...prevAnswers];
@@ -252,6 +251,9 @@ const NormGroupForm = () => {
 
     setAllAnsweredPartTwo(partTwoAllAnswered());
   }, [answersPartTwo, questionListPartTwo]);
+
+  const containsText = (text: string, searchText: string) =>
+    text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
   // These functions are used to handle the form step changes
   const totalSteps = () => {
@@ -399,15 +401,55 @@ const NormGroupForm = () => {
                     name={String(question.id)}
                     value={formik.values[question.id]}
                     label={question.questionText}
-                    onChange={handleChange}
+                    onChange={formik.handleChange}
+                    onClose={() =>
+                      setSearchStrings({
+                        ...searchStrings,
+                        [question.id]: "",
+                      })
+                    }
+                    renderValue={() => formik.values[question.id]}
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched[question.id] &&
                       Boolean(formik.errors[question.id])
                     }
                   >
+                    <ListSubheader>
+                      <TextField
+                        size="small"
+                        autoFocus
+                        placeholder="Type to search..."
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        value={searchStrings[question.id] || ""}
+                        onChange={(e) =>
+                          setSearchStrings({
+                            ...searchStrings,
+                            [question.id]: e.target.value,
+                          })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") {
+                            e.stopPropagation();
+                          }
+                        }}
+                      />
+                    </ListSubheader>
                     {question.dropdownOptions
                       .filter((item) => !item.isDelete)
+                      .filter((option) =>
+                        containsText(
+                          option.item,
+                          searchStrings[question.id] || ""
+                        )
+                      )
                       .map((item: DropDownOptions, index: number) => (
                         <MenuItem value={item.item} key={index}>
                           {item.item}
@@ -548,27 +590,12 @@ const NormGroupForm = () => {
       </Box>
 
       <Box sx={customStyles.mainBox}>
-        <Stepper
+        <CustomStepper
           activeStep={activeStep}
-          sx={{
-            display: {
-              xs: "none",
-              md: "flex",
-            },
-          }}
-        >
-          {steps.map((label, index) => (
-            <Step
-              key={label}
-              completed={completed[index]}
-              sx={customStyles.step}
-            >
-              <StepButton color="inherit" onClick={handleStep(index)}>
-                {label}
-              </StepButton>
-            </Step>
-          ))}
-        </Stepper>
+          steps={steps}
+          completed={completed}
+          handleStep={handleStep}
+        />
 
         <Divider sx={{ py: 3, mb: 2 }} />
 
