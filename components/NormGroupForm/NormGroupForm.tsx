@@ -33,7 +33,7 @@ import * as yup from "yup";
 import { useRouter } from "next/router";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import { DropDownOptions, Question } from "../../utils/types";
-import { FieldType, FormEvaluation } from "../../utils/enum";
+import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import {
   getAllNormGroupQuestions,
   getStudentFormInfo,
@@ -347,7 +347,11 @@ const NormGroupForm = () => {
       try {
         const studentFormInfoQuestions = await getStudentFormInfo();
 
-        setStudentFormInfo(studentFormInfoQuestions);
+        setStudentFormInfo(
+          studentFormInfoQuestions.filter(
+            (item: Question) => item.sectionType === SectionType.PersonalDetails
+          )
+        );
       } catch (error) {
         console.log(error);
       }
@@ -388,104 +392,106 @@ const NormGroupForm = () => {
   const personalDetailsForm = (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
-        studentFormInfo.map((question: Question) => (
-          <Grid item xs={12} md={6} key={question.id}>
-            <FormControl fullWidth required>
-              {question.fieldType === FieldType.DropDown ? (
-                <>
-                  <InputLabel>{question.questionText}</InputLabel>
-                  <Select
-                    MenuProps={{
-                      autoFocus: false,
-                      PaperProps: {
-                        style: {
-                          maxHeight: 200, // Set the maximum height here
+        studentFormInfo
+          // .filter((item) => item.sectionType === SectionType.PersonalDetails)
+          .map((question: Question) => (
+            <Grid item xs={12} md={6} key={question.id}>
+              <FormControl fullWidth required>
+                {question.fieldType === FieldType.DropDown ? (
+                  <>
+                    <InputLabel>{question.questionText}</InputLabel>
+                    <Select
+                      MenuProps={{
+                        autoFocus: false,
+                        PaperProps: {
+                          style: {
+                            maxHeight: 200, // Set the maximum height here
+                          },
                         },
-                      },
-                    }}
-                    labelId={`search-select-`}
+                      }}
+                      labelId={`search-select-`}
+                      id={String(question.id)}
+                      name={String(question.id)}
+                      value={formik.values[question.id]}
+                      label={question.questionText}
+                      onChange={formik.handleChange}
+                      onClose={() =>
+                        setSearchStrings({
+                          ...searchStrings,
+                          [question.id]: "",
+                        })
+                      }
+                      renderValue={() => formik.values[question.id]}
+                      onBlur={formik.handleBlur}
+                      error={
+                        formik.touched[question.id] &&
+                        Boolean(formik.errors[question.id])
+                      }
+                    >
+                      <ListSubheader>
+                        <TextField
+                          size="small"
+                          autoFocus
+                          placeholder="Type to search..."
+                          fullWidth
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <SearchRoundedIcon />
+                              </InputAdornment>
+                            ),
+                          }}
+                          value={searchStrings[question.id] || ""}
+                          onChange={(e) =>
+                            setSearchStrings({
+                              ...searchStrings,
+                              [question.id]: e.target.value,
+                            })
+                          }
+                          onKeyDown={(e) => {
+                            if (e.key !== "Escape") {
+                              e.stopPropagation();
+                            }
+                          }}
+                        />
+                      </ListSubheader>
+                      {question.dropdownOptions
+                        .filter((item) => !item.isDelete)
+                        .filter((option) =>
+                          containsText(
+                            option.item,
+                            searchStrings[question.id] || ""
+                          )
+                        )
+                        .map((item: DropDownOptions, index: number) => (
+                          <MenuItem value={item.item} key={index}>
+                            {item.item}
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </>
+                ) : (
+                  <TextField
                     id={String(question.id)}
                     name={String(question.id)}
-                    value={formik.values[question.id]}
                     label={question.questionText}
+                    value={formik.values[question.id]}
                     onChange={formik.handleChange}
-                    onClose={() =>
-                      setSearchStrings({
-                        ...searchStrings,
-                        [question.id]: "",
-                      })
-                    }
-                    renderValue={() => formik.values[question.id]}
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched[question.id] &&
                       Boolean(formik.errors[question.id])
                     }
-                  >
-                    <ListSubheader>
-                      <TextField
-                        size="small"
-                        autoFocus
-                        placeholder="Type to search..."
-                        fullWidth
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchRoundedIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                        value={searchStrings[question.id] || ""}
-                        onChange={(e) =>
-                          setSearchStrings({
-                            ...searchStrings,
-                            [question.id]: e.target.value,
-                          })
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key !== "Escape") {
-                            e.stopPropagation();
-                          }
-                        }}
-                      />
-                    </ListSubheader>
-                    {question.dropdownOptions
-                      .filter((item) => !item.isDelete)
-                      .filter((option) =>
-                        containsText(
-                          option.item,
-                          searchStrings[question.id] || ""
-                        )
-                      )
-                      .map((item: DropDownOptions, index: number) => (
-                        <MenuItem value={item.item} key={index}>
-                          {item.item}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </>
-              ) : (
-                <TextField
-                  id="studentClass"
-                  name="studentClass"
-                  label={question.questionText}
-                  value={formik.values[question.id]}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  error={
-                    formik.touched[question.id] &&
-                    Boolean(formik.errors[question.id])
-                  }
-                />
-              )}
-              {formik.touched[question.id] && (
-                <FormHelperText sx={{ color: "red", mb: -2.5 }}>
-                  {formik.errors[question.id]}
-                </FormHelperText>
-              )}
-            </FormControl>
-          </Grid>
-        ))}
+                  />
+                )}
+                {formik.touched[question.id] && (
+                  <FormHelperText sx={{ color: "red", mb: -2.5 }}>
+                    {formik.errors[question.id]}
+                  </FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+          ))}
     </Grid>
   );
 
