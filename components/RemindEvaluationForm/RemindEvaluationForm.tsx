@@ -18,7 +18,9 @@ import {
   Stepper,
   TextField,
   Typography,
+  styled,
 } from "@mui/material";
+import { Input as BaseInput, InputProps } from "@mui/base/Input";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useRouter } from "next/router";
 import * as yup from "yup";
@@ -298,6 +300,50 @@ const customStyles = {
   },
 };
 
+const RootDiv = styled("div")`
+  display: flex;
+  max-width: 100%;
+`;
+
+const TextareaElement = styled("textarea", {
+  shouldForwardProp: (prop) =>
+    !["ownerState", "minRows", "maxRows"].includes(prop.toString()),
+})(
+  ({ theme }) => `
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: rgba(0,0,0, 0.75);
+  background-color: transparent;
+  border: 1px solid rgba(0,0,0, 0.25);
+
+  // firefox
+  &:focus-visible {
+    outline: 0;
+  }
+`
+);
+
+const Input = React.forwardRef(function CustomInput(
+  props: InputProps,
+  ref: React.ForwardedRef<HTMLDivElement>
+) {
+  return (
+    <BaseInput
+      slots={{
+        root: RootDiv,
+        input: "input",
+        textarea: TextareaElement,
+      }}
+      {...props}
+      ref={ref}
+    />
+  );
+});
+
 const steps = [
   "Personal Details",
   "Part 01 Questions",
@@ -534,6 +580,8 @@ const RemindEvaluationForm = () => {
     const fetchData = async () => {
       try {
         const studentFormInfoQuestions: Question[] = await getStudentFormInfo();
+
+        // console.log(studentFormInfoQuestions);
 
         // setStudentFormInfo(studentFormInfoQuestions);
         setPersonalDetailsQuestions(
@@ -905,7 +953,12 @@ const RemindEvaluationForm = () => {
     <Grid container rowSpacing={4} columnSpacing={4}>
       {finalQuestions &&
         finalQuestions.map((question: Question) => (
-          <Grid item xs={12} md={6} key={question.id}>
+          <Grid
+            item
+            xs={12}
+            md={question.fieldType === FieldType.TextArea ? 12 : 6}
+            key={question.id}
+          >
             <FormControl fullWidth required>
               {question.fieldType === FieldType.DropDown ? (
                 <>
@@ -974,10 +1027,24 @@ const RemindEvaluationForm = () => {
                   </Select>
                 </>
               ) : (
-                <TextField
+                // <TextField
+                //   id={String(question.id)}
+                //   name={String(question.id)}
+                //   label={question.questionText}
+                //   value={finalQuestionsFormik.values[question.id]}
+                //   onChange={finalQuestionsFormik.handleChange}
+                //   onBlur={finalQuestionsFormik.handleBlur}
+                //   error={
+                //     finalQuestionsFormik.touched[question.id] &&
+                //     Boolean(finalQuestionsFormik.errors[question.id])
+                //   }
+                // />
+                <Input
+                  aria-label={question.questionText}
+                  multiline
+                  placeholder={question.questionText}
                   id={String(question.id)}
                   name={String(question.id)}
-                  label={question.questionText}
                   value={finalQuestionsFormik.values[question.id]}
                   onChange={finalQuestionsFormik.handleChange}
                   onBlur={finalQuestionsFormik.handleBlur}
