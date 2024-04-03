@@ -12,6 +12,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
+import AlertNotification from "../../../components/LoginPage/AlertNotification/AlertNotification";
 
 const customStyles = {
   background: {
@@ -37,15 +38,14 @@ const customStyles = {
     fontFamily: champBlackFontFamily,
   },
   textField: {
-    width: 350,
+    width: 400,
     mb: 2,
     "& .MuiFormLabel-asterisk": {
       color: "red",
     },
-    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-      {
-        borderColor: "grey !important",
-      },
+    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "grey !important",
+    },
     "& .MuiInputLabel-root.Mui-focused": {
       color: "grey",
     },
@@ -66,10 +66,7 @@ const customStyles = {
       md: "max-content",
     },
     display: "flex",
-    alignItems: {
-      xs: "center",
-      md: "center",
-    },
+    alignItems: "center",
     justifyContent: "center",
     maxWidth: 420,
     backgroundColor: "#FFFFFF",
@@ -89,6 +86,8 @@ const LoginPage = () => {
   };
 
   const handleSignIn = () => {};
+
+  const handleForgetPassword = () => {};
 
   return (
     <Box sx={customStyles.background}>
@@ -143,6 +142,12 @@ const LoginPage = () => {
                 Remember Me
               </Typography>
             </Stack>
+
+            <AlertNotification
+              message="Invalid username or Passoword"
+              linkText="Forget Password"
+              onClick={handleForgetPassword}
+            />
 
             <Stack flexDirection="row" justifyContent="center" mt={3}>
               <Button
