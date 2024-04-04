@@ -12,7 +12,6 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
-import AlertNotification from "../../../components/LoginPage/AlertNotification/AlertNotification";
 import { useRouter } from "next/router";
 
 const customStyles = {
@@ -74,9 +73,10 @@ const customStyles = {
   },
 };
 
-const LoginPage = () => {
+const ResetPasswordPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
 
   const handleRememberMeChange = () => {
@@ -85,6 +85,10 @@ const LoginPage = () => {
 
   const handlePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleConfirmPasswordVisibility = () => {
+    setShowPassword(!showConfirmPassword);
   };
 
   const handleSignIn = () => {};
@@ -105,23 +109,14 @@ const LoginPage = () => {
             fontFamily={champBlackFontFamily}
             textTransform="uppercase"
           >
-            Log In
+            Reset Password
           </Typography>
-          <Typography mb={3}>Welcome let’s get started.</Typography>
+          <Typography mb={3}>Please enter your new password.</Typography>
 
           <Stack flexDirection="column" alignItems="">
             <TextField
               variant="outlined"
-              label="Enter email address"
-              required
-              type="email"
-              placeholder="abc@gmail.com"
-              sx={customStyles.textField}
-            />
-
-            <TextField
-              variant="outlined"
-              label="Enter password"
+              label="Password"
               required
               type={showPassword ? "text" : "password"}
               sx={customStyles.textField}
@@ -140,22 +135,25 @@ const LoginPage = () => {
               }}
             />
 
-            <Stack flexDirection="row" alignItems="center" ml={-1}>
-              <Checkbox
-                checked={rememberMe}
-                onChange={handleRememberMeChange}
-                color="primary"
-                inputProps={{ "aria-label": "Remember Me checkbox" }}
-              />
-              <Typography variant="body2" color="grey">
-                Remember Me
-              </Typography>
-            </Stack>
-
-            <AlertNotification
-              message="Invalid username or Passoword"
-              linkText="Forget Password"
-              onClick={handleForgetPassword}
+            <TextField
+              variant="outlined"
+              label="Confirm password"
+              required
+              type={showConfirmPassword ? "text" : "password"}
+              sx={customStyles.textField}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleConfirmPasswordVisibility}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
 
             <Stack flexDirection="row" justifyContent="center" mt={3}>
@@ -166,7 +164,7 @@ const LoginPage = () => {
                 onClick={handleSignIn}
                 disableElevation
               >
-                Sign In
+                Reset Password
               </Button>
             </Stack>
           </Stack>
@@ -176,4 +174,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ResetPasswordPage;

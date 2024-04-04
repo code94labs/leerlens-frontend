@@ -4,7 +4,7 @@ import React from "react";
 
 type Props = {
   message: string;
-  linkText: string;
+  linkText?: string;
   onClick?: () => void;
 };
 
@@ -38,11 +38,11 @@ const AlertNotification = (props: Props) => {
     >
       <Typography variant="subtitle2">{message}</Typography>
 
-      <Link href="#" passHref style={customStyles.link}>
+      {linkText && <Link href="#" passHref style={customStyles.link}>
         <Typography variant="subtitle2" onClick={handleClick} color="#DF332B">
           {linkText}
         </Typography>
-      </Link>
+      </Link>}
     </Stack>
   );
 };
