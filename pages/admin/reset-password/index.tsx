@@ -2,19 +2,28 @@ import React, { useState } from "react";
 import {
   Box,
   Button,
-  Checkbox,
   Stack,
   TextField,
   Typography,
   IconButton,
   InputAdornment,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
 import { useRouter } from "next/router";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; // Importing the success icon
 
 const customStyles = {
+  snackbarAlert: {
+    width: "100%",
+    bgcolor: "white",
+    fontWeight: 600,
+    borderRadius: 2,
+    border: "none",
+  },
   background: {
     backgroundColor: "#C4B0EB",
     width: "100%",
@@ -75,8 +84,12 @@ const customStyles = {
 
 const ResetPasswordPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(true);
+
   const router = useRouter();
 
   const handleRememberMeChange = () => {
@@ -170,6 +183,25 @@ const ResetPasswordPage = () => {
           </Stack>
         </Stack>
       </Box>
+
+      <Snackbar
+        open={displaySnackbarMsg}
+        autoHideDuration={6000}
+        onClose={() => setDisplaySnackbarMsg(false)}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+      >
+        <Alert
+          onClose={() => setDisplaySnackbarMsg(false)}
+          severity="success"
+          variant="outlined"
+          sx={customStyles.snackbarAlert}
+        >
+          Link copied Successfully!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
