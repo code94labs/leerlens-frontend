@@ -28,3 +28,10 @@ export enum RemindProgramQuestionSetID {
   QuestionSetOne = 0,
   QuestionSetTwo = 1,
 }
+
+export const fieldTypeTitles = {
+  [FieldType.DropDown]: "Drop down",
+  [FieldType.TextField]: "Text",
+  [FieldType.TextArea]: "Text area",
+  [FieldType.Scale]: "Scale",
+};
