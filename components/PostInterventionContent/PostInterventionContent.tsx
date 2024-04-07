@@ -1,6 +1,8 @@
 import { Button, Stack, Tab, Tabs, Typography } from "@mui/material";
 import React, { SyntheticEvent, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
+import QuestionSet from "../../shared/QuestionSet/QuestionSet";
+import { FieldType } from "../../utils/enum";
 
 const customStyles = {
   primaryButton: {
@@ -42,7 +44,7 @@ const customStyles = {
     "& .MuiButtonBase-root": {
       textTransform: "initial",
       p: 1,
-      mr: 5
+      mr: 5,
     },
     borderBottom: "5px solid #E6E6E6",
   },
@@ -80,7 +82,33 @@ const PostInterventionContent = () => {
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
       case 0:
-        return <></>;
+        return (
+          <>
+            <QuestionSet
+              number={1}
+              question="What school are you at?"
+              answerType={FieldType.DropDown}
+            />
+
+            <QuestionSet
+              number={2}
+              question="What do you study?"
+              answerType={FieldType.DropDown}
+            />
+
+            <QuestionSet
+              number={3}
+              question="What grade are you in?"
+              answerType={FieldType.DropDown}
+            />
+
+            <QuestionSet
+              number={4}
+              question="In Which class are you?"
+              answerType={FieldType.TextField}
+            />
+          </>
+        );
       case 1:
         return <></>;
       case 3:
@@ -91,12 +119,14 @@ const PostInterventionContent = () => {
   };
 
   const questionViewTabs = (
-    <Stack p={1}>
+    <Stack px={1}>
       <Tabs value={value} onChange={handleChange} sx={customStyles.tabs}>
         <Tab value={0} label="Personal Details" />
         <Tab value={1} label="Questions | Part 01" />
         <Tab value={2} label="Questions | Part 02" />
       </Tabs>
+
+      <QuestionSet isHeading />
 
       <Stack flexDirection="row" flexWrap="wrap" justifyContent="space-between">
         {renderTabContent(value)}
