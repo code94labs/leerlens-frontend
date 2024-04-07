@@ -14,6 +14,7 @@ import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
 import AlertNotification from "../../../components/LoginPage/AlertNotification/AlertNotification";
 import { useRouter } from "next/router";
+import { postLogin } from "../../../services/authentication.service";
 
 const customStyles = {
   background: {
@@ -77,7 +78,20 @@ const customStyles = {
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const router = useRouter();
+
+  const handleSignIn = async () => {
+    try {
+      const response = await postLogin({ email, password });
+
+      // Handle successful login response
+      console.log(response);
+    } catch (error) {
+      console.log((error as Error).message);
+    }
+  };
 
   const handleRememberMeChange = () => {
     setRememberMe(!rememberMe);
@@ -86,8 +100,6 @@ const LoginPage = () => {
   const handlePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
-  const handleSignIn = () => {};
 
   const handleForgetPassword = () => {
     router.push("/admin/forget-password");
@@ -116,6 +128,10 @@ const LoginPage = () => {
               required
               type="email"
               placeholder="abc@gmail.com"
+              value={email}
+              onChange={(
+                e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+              ) => setEmail(e.target.value)}
               sx={customStyles.textField}
             />
 
@@ -124,6 +140,10 @@ const LoginPage = () => {
               label="Enter password"
               required
               type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(
+                e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+              ) => setPassword(e.target.value)}
               sx={customStyles.textField}
               InputProps={{
                 endAdornment: (

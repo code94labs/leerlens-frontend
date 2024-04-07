@@ -6,4 +6,6 @@ export const leerLensApi = {
   postIntervention: `${baseUrl}/questionnaire/post-intervention`,
   evaluation: `${baseUrl}/questionnaire/evaluation`,
   normgroup: `${baseUrl}/questionnaire/normgroup`,
+
+  login: `${baseUrl}/auth/login`,
 };
