@@ -13,6 +13,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
 import AlertNotification from "../../../components/LoginPage/AlertNotification/AlertNotification";
+import { postForgotPassword } from "../../../services/authentication.service";
 
 const customStyles = {
   background: {
@@ -74,11 +75,26 @@ const customStyles = {
 };
 
 const ForgetPasswordPage = () => {
-  const [isSubmitted, setIsSubmitted] = useState(true);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [email, setEmail] = useState<string>("");
+  const [error, setError] = useState<boolean>(false);
 
-  const handleSubmit = () => {
-    setIsSubmitted(isSubmitted => !isSubmitted)
-  }
+  const handleResetPasswordButtonClick = async () => {
+    setError(false);
+    try {
+      const response = await postForgotPassword({ email });
+
+      // Handle successful login response
+      setIsSubmitted(true);
+    } catch (error) {
+      console.log((error as Error).message);
+      setError(true);
+    }
+  };
+
+  const handleOpenMailButtonClick = () => {
+    setIsSubmitted((isSubmitted) => !isSubmitted);
+  };
 
   const resetPasswordContent = (
     <>
@@ -101,18 +117,22 @@ const ForgetPasswordPage = () => {
           label="Enter email address"
           required
           type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="abc@gmail.com"
           sx={customStyles.textField}
         />
 
-        <AlertNotification message="Invalid Email" onClick={() => {}} />
+        {error && (
+          <AlertNotification message="Invalid Email" onClick={() => {}} />
+        )}
 
         <Stack flexDirection="row" justifyContent="center" mt={3}>
           <Button
             variant="contained"
             sx={customStyles.primaryBtn}
             fullWidth
-            onClick={handleSubmit}
+            onClick={handleResetPasswordButtonClick}
             disableElevation
           >
             Reset Password
@@ -133,8 +153,7 @@ const ForgetPasswordPage = () => {
         Check your email
       </Typography>
       <Typography mb={3} mt={1} textAlign="center">
-        We have sent password reset instructions to your email
-        “Lucy0111@swarmio.com”
+        We have sent password reset instructions to your email “{email}”
       </Typography>
 
       <Stack flexDirection="row" justifyContent="center" mt={2}>
@@ -142,7 +161,7 @@ const ForgetPasswordPage = () => {
           variant="contained"
           sx={customStyles.primaryBtn}
           fullWidth
-          onClick={handleSubmit}
+          onClick={handleOpenMailButtonClick}
           disableElevation
         >
           Open Mail
@@ -157,7 +176,7 @@ const ForgetPasswordPage = () => {
         <Stack justifyContent="center" alignItems="center">
           <Image src="/Logo.png" height={60} width={200} alt="logo" />
 
-          {isSubmitted ? resetPasswordContent : successMessageContent}
+          {isSubmitted ? successMessageContent : resetPasswordContent}
         </Stack>
       </Box>
     </Box>

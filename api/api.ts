@@ -8,4 +8,5 @@ export const leerLensApi = {
   normgroup: `${baseUrl}/questionnaire/normgroup`,
 
   login: `${baseUrl}/auth/login`,
+  forgotPassword: `${baseUrl}/auth/forgot-password`,
 };
