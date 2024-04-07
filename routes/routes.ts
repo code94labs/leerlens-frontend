@@ -49,3 +49,14 @@ export const pages: RoutePath[] = [
     iconPath: "/images/admin-icons/settings.png",
   },
 ];
+
+
+export const breadcrumbMap: { [key: string]: string } = {
+  "/admin/dashboard": "Learning Scan Report",
+  "/admin/responses": "Responses",
+  "/admin/question-set/pre-intervention": "Pre-Intervention",
+  "/admin/question-set/post-intervention": "Post-Intervention",
+  "/admin/question-set/evaluation": "Evaluation",
+  "/admin/question-set/norm-group": "NormGroup",
+  "/admin/settings": "Settings",
+};

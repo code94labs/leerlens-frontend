@@ -1,6 +1,7 @@
-import { Stack, Typography } from '@mui/material'
-import React from 'react'
-import Sidebar from '../../../../shared/Sidebar/Sidebar'
+import { Stack } from "@mui/material";
+import React from "react";
+import Sidebar from "../../../../shared/Sidebar/Sidebar";
+import AdminHeader from "../../../../shared/Header/AdminHeader";
 
 const PostInterventionPage = () => {
   return (
@@ -8,12 +9,10 @@ const PostInterventionPage = () => {
       <Sidebar />
 
       <Stack width={"100%"}>
-        {/* <AdminHeader /> */}
-
-        <Typography variant="h3">Post intervention content page</Typography>
+        <AdminHeader title="Post-Intervention" />
       </Stack>
     </Stack>
-  )
-}
+  );
+};
 
-export default PostInterventionPage
+export default PostInterventionPage;

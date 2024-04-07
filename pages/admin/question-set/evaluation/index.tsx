@@ -1,6 +1,7 @@
-import { Stack, Typography } from '@mui/material'
-import React from 'react'
-import Sidebar from '../../../../shared/Sidebar/Sidebar'
+import { Stack } from "@mui/material";
+import React from "react";
+import Sidebar from "../../../../shared/Sidebar/Sidebar";
+import AdminHeader from "../../../../shared/Header/AdminHeader";
 
 const EvaluationPage = () => {
   return (
@@ -8,12 +9,10 @@ const EvaluationPage = () => {
       <Sidebar />
 
       <Stack width={"100%"}>
-        {/* <AdminHeader /> */}
-
-        <Typography variant="h3">Evaluation content page</Typography>
+        <AdminHeader title="Evaluation" />
       </Stack>
     </Stack>
-  )
-}
+  );
+};
 
-export default EvaluationPage
+export default EvaluationPage;
