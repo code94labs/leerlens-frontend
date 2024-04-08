@@ -1,9 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { UserRole } from "../../utils/enum";
 
 type UserState = {
   user: {
     email: string;
-    password: string;
+    token: string;
+    profileImage: null | string;
+    firstname: string;
+    lastname: string;
+    role: UserRole
   };
 };
 

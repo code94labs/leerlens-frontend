@@ -8,6 +8,8 @@ import {
   Typography,
   IconButton,
   InputAdornment,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
@@ -15,8 +17,17 @@ import { champBlackFontFamily } from "../../../shared/typography";
 import AlertNotification from "../../../components/LoginPage/AlertNotification/AlertNotification";
 import { useRouter } from "next/router";
 import { postLogin } from "../../../services/authentication.service";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../../redux/slices/userSlice";
 
 const customStyles = {
+  snackbarAlert: {
+    width: "100%",
+    bgcolor: "white",
+    fontWeight: 600,
+    borderRadius: 2,
+    border: "none",
+  },
   background: {
     backgroundColor: "#C4B0EB",
     width: "100%",
@@ -77,19 +88,53 @@ const customStyles = {
 
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
+
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+
   const router = useRouter();
 
   const handleSignIn = async () => {
     try {
+      setIsLoading(true);
+      setIsError(false);
+
       const response = await postLogin({ email, password });
 
-      // Handle successful login response
-      console.log(response);
+      dispatch(
+        setUser({
+          email: response.email,
+          token: response.token,
+          profileImage: response.profileImage,
+          firstname: response.firstname,
+          lastname: response.lastname,
+          role: response.role,
+        })
+      );
+
+      setNotificationMsg("Successfully logged in...");
+      setDisplaySnackbarMsg(true);
+
+      router.push("/admin/dashboard");
     } catch (error) {
       console.log((error as Error).message);
+
+      setIsError(true);
+
+      setNotificationMsg("Something went wrong when resetting password");
+      setDisplaySnackbarMsg(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -128,6 +173,7 @@ const LoginPage = () => {
               required
               type="email"
               placeholder="abc@gmail.com"
+              disabled={isLoading}
               value={email}
               onChange={(
                 e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -140,6 +186,7 @@ const LoginPage = () => {
               label="Enter password"
               required
               type={showPassword ? "text" : "password"}
+              disabled={isLoading}
               value={password}
               onChange={(
                 e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -166,17 +213,20 @@ const LoginPage = () => {
                 onChange={handleRememberMeChange}
                 color="primary"
                 inputProps={{ "aria-label": "Remember Me checkbox" }}
+                disabled={isLoading}
               />
               <Typography variant="body2" color="grey">
                 Remember Me
               </Typography>
             </Stack>
 
-            <AlertNotification
-              message="Invalid username or Passoword"
-              linkText="Forget Password"
-              onClick={handleForgetPassword}
-            />
+            {isError && (
+              <AlertNotification
+                message="Invalid username or Passoword"
+                linkText="Forget Password"
+                onClick={handleForgetPassword}
+              />
+            )}
 
             <Stack flexDirection="row" justifyContent="center" mt={3}>
               <Button
@@ -185,13 +235,33 @@ const LoginPage = () => {
                 fullWidth
                 onClick={handleSignIn}
                 disableElevation
+                disabled={isLoading}
               >
-                Sign In
+                {isLoading ? "Logging in..." : "Sign In"}
               </Button>
             </Stack>
           </Stack>
         </Stack>
       </Box>
+
+      <Snackbar
+        open={displaySnackbarMsg}
+        autoHideDuration={6000}
+        onClose={() => setDisplaySnackbarMsg(false)}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+      >
+        <Alert
+          onClose={() => setDisplaySnackbarMsg(false)}
+          severity={isError ? "error" : "success"}
+          variant="outlined"
+          sx={customStyles.snackbarAlert}
+        >
+          {notificationMsg}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

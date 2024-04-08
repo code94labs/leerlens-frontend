@@ -2,6 +2,8 @@ import { Avatar, Box, IconButton, Stack, Typography } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import React from "react";
 import Breadcrumb from "./Breadcrumb";
+import { selectUser } from "../../redux/slices/userSlice";
+import { useSelector } from "react-redux";
 
 const customStyles = {
   container: {
@@ -34,10 +36,9 @@ type Props = {
   title: string;
 };
 
-const username = "Nazhim Kalam";
-
 const AdminHeader = (props: Props) => {
   const { title } = props;
+  const user = useSelector(selectUser);
 
   return (
     <>
@@ -48,10 +49,10 @@ const AdminHeader = (props: Props) => {
           </Typography>
 
           <Stack direction="row" alignItems="center">
-            <Avatar alt={username} src="/avatar.jpg" sx={customStyles.avatar} />
+            <Avatar alt={user.firstname} src="/avatar.jpg" sx={customStyles.avatar} />
 
             <Typography variant="body1" sx={customStyles.profileText} pl={1}>
-              {username}
+              {user.firstname}
             </Typography>
 
             <IconButton>

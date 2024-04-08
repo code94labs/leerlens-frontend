@@ -85,13 +85,13 @@ const customStyles = {
 const ResetPasswordPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
 
-  const [token, setToken] = useState<string>("");
+  const [token, setToken] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
 
-  const [newPassword, setNewPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
