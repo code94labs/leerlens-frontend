@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -15,6 +15,7 @@ import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
 import { useRouter } from "next/router";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; // Importing the success icon
+import { postResetPassword } from "../../../services/authentication.service";
 
 const customStyles = {
   snackbarAlert: {
@@ -85,26 +86,48 @@ const customStyles = {
 const ResetPasswordPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
 
-  const [showPassword, setShowPassword] = useState(false);
+  const [token, setToken] = useState<string>("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [newPassword, setNewPassword] = useState<string>("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(true);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const { token } = router.query;
+
+    if (Array.isArray(token)) {
+      setToken(token[0]);
+    } else if (token) {
+      setToken(token);
+    }
+  }, [router.query.token]);
+
+  const handleResetPassword = async () => {
+    try {
+      const response = await postResetPassword({ token, newPassword });
+
+      // Handle successful login response
+      console.log(response);
+    } catch (error) {
+      console.log((error as Error).message);
+    }
+  };
 
   const handleRememberMeChange = () => {
     setRememberMe(!rememberMe);
   };
 
   const handlePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+    setShowNewPassword(!showNewPassword);
   };
 
   const handleConfirmPasswordVisibility = () => {
-    setShowPassword(!showConfirmPassword);
+    setShowConfirmPassword(!showConfirmPassword);
   };
-
-  const handleSignIn = () => {};
 
   const handleForgetPassword = () => {
     router.push("/admin/forget-password");
@@ -129,10 +152,12 @@ const ResetPasswordPage = () => {
           <Stack flexDirection="column" alignItems="">
             <TextField
               variant="outlined"
-              label="Password"
+              label="New password"
               required
-              type={showPassword ? "text" : "password"}
+              type={showNewPassword ? "text" : "password"}
               sx={customStyles.textField}
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -141,7 +166,7 @@ const ResetPasswordPage = () => {
                       onClick={handlePasswordVisibility}
                       edge="end"
                     >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                      {showNewPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -154,6 +179,8 @@ const ResetPasswordPage = () => {
               required
               type={showConfirmPassword ? "text" : "password"}
               sx={customStyles.textField}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -174,7 +201,7 @@ const ResetPasswordPage = () => {
                 variant="contained"
                 sx={customStyles.primaryBtn}
                 fullWidth
-                onClick={handleSignIn}
+                onClick={handleResetPassword}
                 disableElevation
               >
                 Reset Password
