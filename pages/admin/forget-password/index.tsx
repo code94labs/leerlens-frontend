@@ -1,15 +1,5 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Checkbox,
-  Stack,
-  TextField,
-  Typography,
-  IconButton,
-  InputAdornment,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Box, Button, Stack, TextField, Typography } from "@mui/material";
 import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
 import AlertNotification from "../../../components/LoginPage/AlertNotification/AlertNotification";
@@ -77,23 +67,29 @@ const customStyles = {
 const ForgetPasswordPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [email, setEmail] = useState<string>("");
+
   const [error, setError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleResetPasswordButtonClick = async () => {
-    setError(false);
     try {
-      const response = await postForgotPassword({ email });
+      setIsLoading(true);
+      setError(false);
 
-      // Handle successful login response
+      await postForgotPassword({ email });
+
       setIsSubmitted(true);
     } catch (error) {
       console.log((error as Error).message);
+
       setError(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleOpenMailButtonClick = () => {
-    setIsSubmitted((isSubmitted) => !isSubmitted);
+    window.open("https://mail.google.com", "_blank");
   };
 
   const resetPasswordContent = (
@@ -117,6 +113,7 @@ const ForgetPasswordPage = () => {
           label="Enter email address"
           required
           type="email"
+          disabled={isLoading}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="abc@gmail.com"
@@ -134,8 +131,9 @@ const ForgetPasswordPage = () => {
             fullWidth
             onClick={handleResetPasswordButtonClick}
             disableElevation
+            disabled={isLoading}
           >
-            Reset Password
+            {isLoading ? "Sending reset mail" : "Reset Password"}
           </Button>
         </Stack>
       </Stack>
