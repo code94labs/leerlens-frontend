@@ -14,7 +14,6 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
 import { useRouter } from "next/router";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"; // Importing the success icon
 import { postResetPassword } from "../../../services/authentication.service";
 
 const customStyles = {
@@ -88,32 +87,68 @@ const ResetPasswordPage = () => {
 
   const [token, setToken] = useState<string>("");
   const [showNewPassword, setShowNewPassword] = useState(false);
+
   const [newPassword, setNewPassword] = useState<string>("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [confirmPassword, setConfirmPassword] = useState<string>("");
 
-  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(true);
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
-  useEffect(() => {
+  const extractTokenFromQuery = () => {
     const { token } = router.query;
 
     if (Array.isArray(token)) {
-      setToken(token[0]);
-    } else if (token) {
-      setToken(token);
+      return token[0];
+    } else {
+      return token;
     }
+  };
+
+  useEffect(() => {
+    const updateToken = () => {
+      const extractedToken = extractTokenFromQuery();
+
+      if (extractedToken) {
+        setToken(extractedToken);
+      }
+    };
+
+    updateToken();
   }, [router.query.token]);
 
   const handleResetPassword = async () => {
     try {
-      const response = await postResetPassword({ token, newPassword });
+      if (newPassword !== confirmPassword) {
+        setIsError(true);
 
-      // Handle successful login response
-      console.log(response);
+        setNotificationMsg("The passwords don't match!");
+        setDisplaySnackbarMsg(true);
+
+        return;
+      }
+      setIsLoading(true);
+      await postResetPassword({ token, newPassword });
+
+      setIsError(false);
+
+      setNotificationMsg("Successfully completed password reset");
+      setDisplaySnackbarMsg(true);
     } catch (error) {
       console.log((error as Error).message);
+
+      setIsError(true);
+
+      setNotificationMsg("Something went wrong when resetting password");
+      setDisplaySnackbarMsg(true);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -157,7 +192,8 @@ const ResetPasswordPage = () => {
               type={showNewPassword ? "text" : "password"}
               sx={customStyles.textField}
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              disabled={!token || isLoading}
+              onChange={(event) => setNewPassword(event.target.value)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -180,7 +216,8 @@ const ResetPasswordPage = () => {
               type={showConfirmPassword ? "text" : "password"}
               sx={customStyles.textField}
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={!token || isLoading}
+              onChange={(event) => setConfirmPassword(event.target.value)}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -203,8 +240,9 @@ const ResetPasswordPage = () => {
                 fullWidth
                 onClick={handleResetPassword}
                 disableElevation
+                disabled={!token || isLoading}
               >
-                Reset Password
+                {isLoading ? "Resetting..." : "Reset Password"}
               </Button>
             </Stack>
           </Stack>
@@ -222,11 +260,11 @@ const ResetPasswordPage = () => {
       >
         <Alert
           onClose={() => setDisplaySnackbarMsg(false)}
-          severity="success"
+          severity={isError ? "error" : "success"}
           variant="outlined"
           sx={customStyles.snackbarAlert}
         >
-          Link copied Successfully!
+          {notificationMsg}
         </Alert>
       </Snackbar>
     </Box>
