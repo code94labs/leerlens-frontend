@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -17,8 +17,8 @@ import { champBlackFontFamily } from "../../../shared/typography";
 import AlertNotification from "../../../components/LoginPage/AlertNotification/AlertNotification";
 import { useRouter } from "next/router";
 import { postLogin } from "../../../services/authentication.service";
-import { useDispatch } from "react-redux";
-import { setUser } from "../../../redux/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { selectUser, setUser } from "../../../redux/slices/userSlice";
 
 const customStyles = {
   snackbarAlert: {
@@ -101,6 +101,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
 
   const router = useRouter();
 
@@ -149,6 +150,12 @@ const LoginPage = () => {
   const handleForgetPassword = () => {
     router.push("/admin/forget-password");
   };
+
+  useEffect(() => {
+    if (user) {
+      router.push("/admin/dashboard");
+    }
+  }, [user]);
 
   return (
     <Box sx={customStyles.background}>

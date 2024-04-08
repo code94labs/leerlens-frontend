@@ -1,9 +1,20 @@
-import { Avatar, Box, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  IconButton,
+  Menu,
+  MenuItem,
+  Stack,
+  Typography,
+} from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import React from "react";
 import Breadcrumb from "./Breadcrumb";
-import { selectUser } from "../../redux/slices/userSlice";
-import { useSelector } from "react-redux";
+import { clearUser, selectUser } from "../../redux/slices/userSlice";
+import { useDispatch, useSelector } from "react-redux";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
+import { useRouter } from "next/router";
 
 const customStyles = {
   container: {
@@ -30,6 +41,21 @@ const customStyles = {
   avatar: {
     backgroundColor: "#A879FF",
   },
+  menuItem: {
+    py: 2,
+
+    "> .MuiSvgIcon-root": {
+      pr: 1,
+    },
+
+    ":hover": {
+      backgroundColor: "rgba(168, 121, 255, 0.2)",
+
+      "> .MuiSvgIcon-root": {
+        color: "#A879FF",
+      },
+    },
+  },
 };
 
 type Props = {
@@ -38,7 +64,29 @@ type Props = {
 
 const AdminHeader = (props: Props) => {
   const { title } = props;
+
   const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    dispatch(clearUser());
+
+    router.replace('/admin/login')
+
+    handleClose();
+  }
 
   return (
     <>
@@ -49,15 +97,53 @@ const AdminHeader = (props: Props) => {
           </Typography>
 
           <Stack direction="row" alignItems="center">
-            <Avatar alt={user.firstname} src="/avatar.jpg" sx={customStyles.avatar} />
+            <Avatar
+              alt={user?.firstname}
+              src="/avatar.jpg"
+              sx={customStyles.avatar}
+            />
 
             <Typography variant="body1" sx={customStyles.profileText} pl={1}>
-              {user.firstname}
+              {user?.firstname}
             </Typography>
 
-            <IconButton>
+            <IconButton onClick={handleClick}>
               <ExpandMoreIcon />
             </IconButton>
+
+            <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+              <MenuItem onClick={handleClose}>
+                <Stack flexDirection="row">
+                  <Box pr={5}>
+                    <Typography variant="h6" fontWeight={800} color="#A879FF">
+                      {user?.firstname}
+                    </Typography>
+
+                    <Typography variant="subtitle2">{user?.email}</Typography>
+                  </Box>
+
+                  <Box>
+                    <Avatar
+                      alt={user?.firstname}
+                      src="/avatar.jpg"
+                      sx={customStyles.avatar}
+                    />
+                  </Box>
+                </Stack>
+              </MenuItem>
+
+              <MenuItem onClick={handleClose} sx={customStyles.menuItem}>
+                <PersonOutlineOutlinedIcon />
+
+                <Typography variant="subtitle2">My Profile</Typography>
+              </MenuItem>
+
+              <MenuItem onClick={handleLogout} sx={customStyles.menuItem}>
+                <LogoutOutlinedIcon />
+
+                <Typography variant="subtitle2">Logout</Typography>
+              </MenuItem>
+            </Menu>
           </Stack>
         </Box>
       </Stack>

@@ -1,7 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { UserRole } from "../../utils/enum";
 
-type UserState = {
+export type UserState = {
   user: {
     email: string;
     token: string;
