@@ -9,4 +9,5 @@ export const leerLensApi = {
 
   login: `${baseUrl}/auth/login`,
   forgotPassword: `${baseUrl}/auth/forgot-password`,
+  resetPassword: `${baseUrl}/auth/reset-password`,
 };

@@ -34,6 +34,21 @@ export const postForgotPassword = async (forgotPasswordInfo: { email: string }) 
   }
 };
 
+export const postResetPassword = async (resetPasswordInfo: { token: string, newPassword: string }) => {
+  try {
+    const response = await postRequest(leerLensApi.resetPassword, resetPasswordInfo);
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error("Try again");
+    }
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 // export const getAllPreInterventionQuestions = async () => {
 //   try {
 //     const response = await getRequest(leerLensApi.preIntervention);
