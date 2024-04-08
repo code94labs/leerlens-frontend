@@ -4,6 +4,7 @@ import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
 import AlertNotification from "../../../components/LoginPage/AlertNotification/AlertNotification";
 import { postForgotPassword } from "../../../services/authentication.service";
+import { gmailAddress } from "../../../utils/constant";
 
 const customStyles = {
   background: {
@@ -64,6 +65,7 @@ const customStyles = {
   },
 };
 
+
 const ForgetPasswordPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [email, setEmail] = useState<string>("");
@@ -89,7 +91,7 @@ const ForgetPasswordPage = () => {
   };
 
   const handleOpenMailButtonClick = () => {
-    window.open("https://mail.google.com", "_blank");
+    window.open(gmailAddress, "_blank");
   };
 
   const resetPasswordContent = (

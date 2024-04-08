@@ -198,3 +198,5 @@ export const completeSentenceList = [
 ];
 
 export const classList = [];
+
+export const gmailAddress = "https://mail.google.com";
