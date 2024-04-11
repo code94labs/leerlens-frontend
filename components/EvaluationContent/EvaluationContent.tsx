@@ -18,7 +18,7 @@ import {
   QuestionnaireSet,
 } from "../../utils/enum";
 import {
-  getAllPreInterventionQuestions,
+  getAllEvaluationQuestions,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
 
@@ -75,7 +75,7 @@ const customStyles = {
   },
 };
 
-const formType = FormEvaluation.PostInterventions;
+const formType = FormEvaluation.Evaluation;
 
 type StudentInfo = {
   id: number;
@@ -97,7 +97,7 @@ type Questionnaire = {
   questionSection: QuestionnaireSection;
 };
 
-const PreInterventionContent = () => {
+const EvaluationContent = () => {
   const [value, setValue] = useState(0);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
@@ -106,7 +106,7 @@ const PreInterventionContent = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [preQuestionnaireList, setPreQuestionnaireList] = useState<
+  const [evalQuestionnaireList, setEvalQuestionnaireList] = useState<
     Questionnaire[]
   >([]);
   const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
@@ -176,7 +176,7 @@ const PreInterventionContent = () => {
   };
 
   const getQuestionList = (section: QuestionnaireSection) => {
-    return preQuestionnaireList.filter(
+    return evalQuestionnaireList.filter(
       (question) => question.questionSection === section
     );
   };
@@ -202,9 +202,9 @@ const PreInterventionContent = () => {
   };
 
   const fetchingQuestionnaire = async () => {
-    await getAllPreInterventionQuestions()
+    await getAllEvaluationQuestions()
       .then((res) => {
-        setPreQuestionnaireList(res);
+        setEvalQuestionnaireList(res);
 
         console.log(res);
       })
@@ -213,7 +213,7 @@ const PreInterventionContent = () => {
 
         setIsError(true);
 
-        setNotificationMsg("Error when fetching pre questionnaire data...");
+        setNotificationMsg("Error when fetching evaluation questionnaire data...");
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
@@ -302,4 +302,4 @@ const PreInterventionContent = () => {
   );
 };
 
-export default PreInterventionContent;
+export default EvaluationContent;

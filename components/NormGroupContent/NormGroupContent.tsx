@@ -18,7 +18,7 @@ import {
   QuestionnaireSet,
 } from "../../utils/enum";
 import {
-  getAllPreInterventionQuestions,
+  getAllNormGroupQuestions,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
 
@@ -75,7 +75,7 @@ const customStyles = {
   },
 };
 
-const formType = FormEvaluation.PostInterventions;
+const formType = FormEvaluation.Normgroup;
 
 type StudentInfo = {
   id: number;
@@ -97,7 +97,7 @@ type Questionnaire = {
   questionSection: QuestionnaireSection;
 };
 
-const PreInterventionContent = () => {
+const NormGroupContent = () => {
   const [value, setValue] = useState(0);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
@@ -106,7 +106,7 @@ const PreInterventionContent = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [preQuestionnaireList, setPreQuestionnaireList] = useState<
+  const [normGroupQuestionnaireList, setNormGroupQuestionnaireList] = useState<
     Questionnaire[]
   >([]);
   const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
@@ -176,7 +176,7 @@ const PreInterventionContent = () => {
   };
 
   const getQuestionList = (section: QuestionnaireSection) => {
-    return preQuestionnaireList.filter(
+    return normGroupQuestionnaireList.filter(
       (question) => question.questionSection === section
     );
   };
@@ -202,9 +202,9 @@ const PreInterventionContent = () => {
   };
 
   const fetchingQuestionnaire = async () => {
-    await getAllPreInterventionQuestions()
+    await getAllNormGroupQuestions()
       .then((res) => {
-        setPreQuestionnaireList(res);
+        setNormGroupQuestionnaireList(res);
 
         console.log(res);
       })
@@ -213,7 +213,7 @@ const PreInterventionContent = () => {
 
         setIsError(true);
 
-        setNotificationMsg("Error when fetching pre questionnaire data...");
+        setNotificationMsg("Error when fetching normgroup questionnaire data...");
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
@@ -302,4 +302,4 @@ const PreInterventionContent = () => {
   );
 };
 
-export default PreInterventionContent;
+export default NormGroupContent;
