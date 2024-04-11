@@ -73,6 +73,13 @@ const customStyles = {
     },
     borderBottom: "5px solid #E6E6E6",
   },
+  scrollableList: {
+    overflowY: "auto", 
+    maxHeight: "60vh", 
+    "&::-webkit-scrollbar": {
+      width: "0", 
+    },
+  },
 };
 
 const formType = FormEvaluation.Normgroup;
@@ -261,6 +268,7 @@ const NormGroupContent = () => {
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="space-between"
+          sx={customStyles.scrollableList}
         >
           {renderTabContent(value)}
         </Stack>
