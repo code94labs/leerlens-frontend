@@ -16,6 +16,21 @@ export const getStudentFormInfo = async () => {
   }
 };
 
+export const getStudentFormInfoByFormType = async (formType: number) => {
+  try {
+    const response = await getRequest(`${leerLensApi.studentFormInfo}/formType/${formType}`);
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error("Failed to fetch student info questions");
+    }
+  } catch (error) {
+    console.error("Error fetching student info questions:", error);
+    throw error;
+  }
+};
+
 export const getAllPreInterventionQuestions = async () => {
   try {
     const response = await getRequest(leerLensApi.preIntervention);

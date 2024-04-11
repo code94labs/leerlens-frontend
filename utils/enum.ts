@@ -23,6 +23,16 @@ export enum UserRole {
   Admin = 1,
 }
 
+export enum QuestionnaireSection {
+  QuestionPartOne = 0,
+  QuestionPartTwo = 1,
+}
+
+export enum QuestionnaireSet {
+  QuestionSetOne = 0,
+  QuestionSetTwo = 1,
+}
+
 /* We will be using this to differentiate the 2 sets of questions */
 export enum RemindProgramQuestionSetID {
   QuestionSetOne = 0,

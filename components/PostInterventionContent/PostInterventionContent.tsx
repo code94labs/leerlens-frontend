@@ -1,10 +1,34 @@
-import { Button, Stack, Tab, Tabs, Typography } from "@mui/material";
-import React, { SyntheticEvent, useState } from "react";
+import {
+  Alert,
+  Button,
+  Snackbar,
+  Stack,
+  Tab,
+  Tabs,
+  Typography,
+} from "@mui/material";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionSet from "../../shared/QuestionSet/QuestionSet";
-import { FieldType } from "../../utils/enum";
+import {
+  FieldType,
+  FormEvaluation,
+  QuestionnaireSection,
+  QuestionnaireSet,
+} from "../../utils/enum";
+import {
+  getAllPostInterventionQuestions,
+  getStudentFormInfoByFormType,
+} from "../../services/questionnaire.service";
 
 const customStyles = {
+  snackbarAlert: {
+    width: "100%",
+    bgcolor: "white",
+    fontWeight: 600,
+    borderRadius: 2,
+    border: "none",
+  },
   primaryButton: {
     backgroundColor: "#A879FF",
     color: "white",
@@ -50,8 +74,41 @@ const customStyles = {
   },
 };
 
+const formType = FormEvaluation.PostInterventions;
+
+type StudentInfo = {
+  id: number;
+  formType: FormEvaluation;
+  questionText: string;
+  fieldType: FieldType;
+  sectionType: number;
+  positionOrderId: number;
+};
+
+type Questionnaire = {
+  id: number;
+  questionText: string;
+  positionOrderId: number;
+  minvalue: number;
+  maxValue: number;
+  isDelete: boolean;
+  questionSetId: QuestionnaireSet;
+  questionSection: QuestionnaireSection;
+};
+
 const PostInterventionContent = () => {
   const [value, setValue] = useState(0);
+
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [postQuestionnaireList, setPostQuestionnaireList] = useState<
+    Questionnaire[]
+  >([]);
+  const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -82,41 +139,98 @@ const PostInterventionContent = () => {
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
       case 0:
-        return (
-          <>
-            <QuestionSet
-              number={1}
-              question="What school are you at?"
-              answerType={FieldType.DropDown}
-            />
-
-            <QuestionSet
-              number={2}
-              question="What do you study?"
-              answerType={FieldType.DropDown}
-            />
-
-            <QuestionSet
-              number={3}
-              question="What grade are you in?"
-              answerType={FieldType.DropDown}
-            />
-
-            <QuestionSet
-              number={4}
-              question="In Which class are you?"
-              answerType={FieldType.TextField}
-            />
-          </>
-        );
+        return personalDetails.map((item, index) => (
+          <QuestionSet
+            key={item.id}
+            number={++index}
+            question={item.questionText}
+            answerType={item.fieldType}
+          />
+        ));
       case 1:
-        return <></>;
-      case 3:
-        return <></>;
+        return getQuestionList(QuestionnaireSection.QuestionPartOne).map(
+          (item) => (
+            <QuestionSet
+              key={item.id}
+              number={item.id}
+              question={item.questionText}
+              answerType={FieldType.Scale}
+            />
+          )
+        );
+      case 2:
+        return getQuestionList(QuestionnaireSection.QuestionPartTwo).map(
+          (item) => (
+            <QuestionSet
+              key={item.id}
+              number={item.id}
+              question={item.questionText}
+              answerType={FieldType.Scale}
+            />
+          )
+        );
       default:
         return null;
     }
   };
+
+  const getQuestionList = (section: QuestionnaireSection) => {
+    return postQuestionnaireList.filter(
+      (question) => question.questionSection === section
+    );
+  };
+
+  const fetchingStudentInfo = async () => {
+    await getStudentFormInfoByFormType(formType)
+      .then((res) => {
+        setPersonalDetails(res);
+
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching personal details data...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const fetchingQuestionnaire = async () => {
+    await getAllPostInterventionQuestions()
+      .then((res) => {
+        setPostQuestionnaireList(res);
+
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching post questionnaire data...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setIsError(false);
+
+      await fetchingStudentInfo();
+      await fetchingQuestionnaire();
+    };
+
+    fetchData();
+  }, []);
 
   const questionViewTabs = (
     <Stack px={1}>
@@ -134,12 +248,37 @@ const PostInterventionContent = () => {
     </Stack>
   );
 
-  return (
-    <Stack>
-      {titleButtonSection}
+  const snackbar = (
+    <Snackbar
+      open={displaySnackbarMsg}
+      autoHideDuration={6000}
+      onClose={() => setDisplaySnackbarMsg(false)}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "right",
+      }}
+    >
+      <Alert
+        onClose={() => setDisplaySnackbarMsg(false)}
+        severity={isError ? "error" : "success"}
+        variant="outlined"
+        sx={customStyles.snackbarAlert}
+      >
+        {notificationMsg}
+      </Alert>
+    </Snackbar>
+  );
 
-      {questionViewTabs}
-    </Stack>
+  return (
+    <>
+      <Stack>
+        {titleButtonSection}
+
+        {questionViewTabs}
+      </Stack>
+
+      {snackbar}
+    </>
   );
 };
 
