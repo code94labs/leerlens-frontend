@@ -56,7 +56,7 @@ const customStyles = {
   primaryButton: {
     backgroundColor: "#A879FF",
     color: "white",
-    borderRadius: 3,
+    borderRadius: 2,
     textTransform: "initial",
     border: "2px #A879FF solid",
     p: 1.5,
@@ -75,6 +75,41 @@ const customStyles = {
       fontWeight: 400,
       fontFamily: champBlackFontFamily,
     },
+  },
+  updateButton: {
+    backgroundColor: "#A879FF",
+    color: "white",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 180,
+    padding: 1.3,
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+    },
+    fontSize: 16,
+    fontFamily: champBlackFontFamily,
+    fontWeight: 400,
+    "&:disabled": {
+      backgroundColor: "#E6E6E6",
+      color: "#98989A",
+    },
+  },
+  cancelButton: {
+    backgroundColor: "white",
+    color: "#A879FF",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 180,
+    border: "2px #A879FF solid",
+    p: 1.3,
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontFamily: champBlackFontFamily,
+    mr: 2,
   },
 };
 
@@ -148,6 +183,24 @@ const EditPreInterventionForm = () => {
     </Stack>
   );
 
+  const updateButtonGroup = (
+    <Stack
+      flexDirection="row"
+      alignItems="center"
+      my={5}
+      mx={3}
+      justifyContent="flex-end"
+    >
+      <Button onClick={() => {}} sx={customStyles.cancelButton}>
+        Cancel
+      </Button>
+
+      <Button onClick={() => {}} sx={customStyles.updateButton} disabled>
+        Update
+      </Button>
+    </Stack>
+  );
+
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
       case 0:
@@ -188,6 +241,8 @@ const EditPreInterventionForm = () => {
             />
 
             {addQuestionButton}
+
+            {updateButtonGroup}
           </>
         );
       case 1:
