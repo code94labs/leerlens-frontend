@@ -53,6 +53,12 @@ const customStyles = {
     lineHeight: "16.8px",
     color: "#A879FF",
   },
+  option: {
+    // color: "red",
+    "& .MuiInputBase-root .Mui-disabled": {
+      // color: "red", // (default alpha is 0.38)
+    },
+  },
 };
 
 type Props = {};
@@ -64,6 +70,7 @@ const index = (props: Props) => {
       item: string;
       isDelete: boolean;
       newlyAdded: boolean;
+      editable: boolean;
     }[]
   >([
     {
@@ -71,10 +78,29 @@ const index = (props: Props) => {
       item: "Aeres Hogeschool Dronten",
       isDelete: false,
       newlyAdded: false,
+      editable: false,
     },
-    { id: 2, item: "Aeres MBO Almere", isDelete: false, newlyAdded: false },
-    { id: 3, item: "Aeres MBO Ede", isDelete: false, newlyAdded: false },
-    { id: 4, item: "Aeres MBO Velp", isDelete: false, newlyAdded: false },
+    {
+      id: 2,
+      item: "Aeres MBO Almere",
+      isDelete: false,
+      newlyAdded: false,
+      editable: false,
+    },
+    {
+      id: 3,
+      item: "Aeres MBO Ede",
+      isDelete: false,
+      newlyAdded: false,
+      editable: false,
+    },
+    {
+      id: 4,
+      item: "Aeres MBO Velp",
+      isDelete: false,
+      newlyAdded: false,
+      editable: false,
+    },
   ]);
   const [AddNewOptionData, setAddNewOptionData] = useState<string | undefined>(
     undefined
@@ -91,6 +117,45 @@ const index = (props: Props) => {
     setOptions(newOptionsArr);
   };
 
+  const handleEditOption = (id: number) => {
+    const updatedOptions = options.map((option) => {
+      if (option.id === id) {
+        return {
+          ...option,
+          editable: true,
+        };
+      }
+      return option;
+    });
+    setOptions(updatedOptions);
+  };
+
+  const handleUpdateNewOption = (id: number) => {
+    const updatedOptions = options.map((option) => {
+      if (option.id === id) {
+        return {
+          ...option,
+          editable: false,
+        };
+      }
+      return option;
+    });
+    setOptions(updatedOptions);
+  };
+
+  const handleOptionChangeById = (id: number, value: string) => {
+    const updatedOptions = options.map((option) => {
+      if (option.id === id) {
+        return {
+          ...option,
+          item: value,
+        };
+      }
+      return option;
+    });
+    setOptions(updatedOptions);
+  };
+
   const handleAddNewOption = () => {
     const maxId = Math.max(...options.map((option) => option.id));
     const newOptionsArr = [...options];
@@ -100,6 +165,7 @@ const index = (props: Props) => {
         item: AddNewOptionData,
         isDelete: false,
         newlyAdded: true,
+        editable: false,
       });
       setOptions(newOptionsArr);
       setAddNewOptionData(undefined);
@@ -161,46 +227,63 @@ const index = (props: Props) => {
               height="35px"
               marginTop={1}
             >
-              {item.newlyAdded ? (
+              {item.newlyAdded && item.editable ? (
                 <Input
                   id="outlined-basic"
                   value={item.item}
-                  // onChange={(e) => setAddNewOptionData(e.target.value)}
-                  disabled
+                  onChange={(e) =>
+                    handleOptionChangeById(item.id, e.target.value)
+                  }
+                  // disabled={!item.editable}
                   size="small"
                   fullWidth
+                  sx={customStyles.option}
+                  // disableUnderline={!item.editable}
                 />
               ) : (
                 <Typography>{item.item}</Typography>
               )}
               {item.newlyAdded && (
                 <Stack direction="row" alignItems="center" gap={1}>
-                  <IconButton aria-label="edit">
-                    <SvgIcon>
-                      <svg
-                        width="24"
-                        height="25"
-                        viewBox="0 0 24 25"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M16.475 5.90783L18.592 8.02483M17.836 4.04283L12.109 9.76983C11.8131 10.0653 11.6113 10.4418 11.529 10.8518L11 13.4998L13.648 12.9698C14.058 12.8878 14.434 12.6868 14.73 12.3908L20.457 6.66383C20.6291 6.49173 20.7656 6.28742 20.8588 6.06256C20.9519 5.83771 20.9998 5.59671 20.9998 5.35333C20.9998 5.10994 20.9519 4.86895 20.8588 4.64409C20.7656 4.41923 20.6291 4.21492 20.457 4.04283C20.2849 3.87073 20.0806 3.73421 19.8557 3.64108C19.6309 3.54794 19.3899 3.5 19.1465 3.5C18.9031 3.5 18.6621 3.54794 18.4373 3.64108C18.2124 3.73421 18.0081 3.87073 17.836 4.04283Z"
-                          stroke="#1A1A1A"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M19 15.5V18.5C19 19.0304 18.7893 19.5391 18.4142 19.9142C18.0391 20.2893 17.5304 20.5 17 20.5H6C5.46957 20.5 4.96086 20.2893 4.58579 19.9142C4.21071 19.5391 4 19.0304 4 18.5V7.5C4 6.96957 4.21071 6.46086 4.58579 6.08579C4.96086 5.71071 5.46957 5.5 6 5.5H9"
-                          stroke="#1A1A1A"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </SvgIcon>
-                  </IconButton>
+                  {item.editable ? (
+                    <Button
+                      variant="outlined"
+                      sx={customStyles.addButton}
+                      onClick={() => handleUpdateNewOption(item.id)}
+                    >
+                      <Typography sx={customStyles.buttonText}>Add</Typography>
+                    </Button>
+                  ) : (
+                    <IconButton
+                      aria-label="edit"
+                      onClick={() => handleEditOption(item.id)}
+                    >
+                      <SvgIcon>
+                        <svg
+                          width="24"
+                          height="25"
+                          viewBox="0 0 24 25"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M16.475 5.90783L18.592 8.02483M17.836 4.04283L12.109 9.76983C11.8131 10.0653 11.6113 10.4418 11.529 10.8518L11 13.4998L13.648 12.9698C14.058 12.8878 14.434 12.6868 14.73 12.3908L20.457 6.66383C20.6291 6.49173 20.7656 6.28742 20.8588 6.06256C20.9519 5.83771 20.9998 5.59671 20.9998 5.35333C20.9998 5.10994 20.9519 4.86895 20.8588 4.64409C20.7656 4.41923 20.6291 4.21492 20.457 4.04283C20.2849 3.87073 20.0806 3.73421 19.8557 3.64108C19.6309 3.54794 19.3899 3.5 19.1465 3.5C18.9031 3.5 18.6621 3.54794 18.4373 3.64108C18.2124 3.73421 18.0081 3.87073 17.836 4.04283Z"
+                            stroke="#1A1A1A"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            d="M19 15.5V18.5C19 19.0304 18.7893 19.5391 18.4142 19.9142C18.0391 20.2893 17.5304 20.5 17 20.5H6C5.46957 20.5 4.96086 20.2893 4.58579 19.9142C4.21071 19.5391 4 19.0304 4 18.5V7.5C4 6.96957 4.21071 6.46086 4.58579 6.08579C4.96086 5.71071 5.46957 5.5 6 5.5H9"
+                            stroke="#1A1A1A"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </SvgIcon>
+                    </IconButton>
+                  )}
                   <IconButton
                     aria-label="delete"
                     onClick={() => handleDeleteOption(item.id)}
