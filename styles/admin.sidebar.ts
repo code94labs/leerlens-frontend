@@ -1,6 +1,7 @@
 export const customStyles = {
   stack: {
     minWidth: 250,
+    height: "100vh",
     backgroundColor: "#333333",
     position: "sticky",
     top: 0,
