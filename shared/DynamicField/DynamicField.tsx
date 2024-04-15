@@ -126,7 +126,7 @@ const DynamicField = (props: Props) => {
   const deleteButton = (
     <Stack flex="row" alignItems="flex-end" my={2}>
       <Button onClick={() => {}} sx={customStyles.deleteButton}>
-        Cancel
+        Delete
       </Button>
     </Stack>
   );
