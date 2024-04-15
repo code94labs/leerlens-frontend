@@ -1,12 +1,10 @@
 export const customStyles = {
   stack: {
     minWidth: 250,
-    height: "100vh",
     backgroundColor: "#333333",
     position: "sticky",
     top: 0,
     m: 0,
-    overflowY: "auto",
   },
   logo: {
     backgroundColor: "#333333",
@@ -56,8 +54,6 @@ export const customStyles = {
     },
   },
   accordionDetails: {
-    // "& .MuiStack-root  .MuiAccordionDetails-root": {
-    // },
     backgroundColor: "#333333",
   },
   activeMenuItem: {

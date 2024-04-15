@@ -2,6 +2,7 @@ import {
   Alert,
   Button,
   CircularProgress,
+  Divider,
   Snackbar,
   Stack,
   Tab,
@@ -23,7 +24,7 @@ const customStyles = {
   },
   menuNavigation: {
     backgroundColor: "#F2EEFB",
-    height: "80vh",
+    height: "82vh",
   },
   tabs: {
     "& .Mui-selected": {
@@ -36,14 +37,20 @@ const customStyles = {
       textTransform: "initial",
       mx: 2,
       my: 0.5,
+      color: "black !important",
       borderBottom: "1px solid #98989A",
       alignItems: "flex-start",
       pl: 0,
       pb: 2.5,
     },
+    "& .MuiTabs-indicator": {
+      display: "none",
+    },
   },
   formContent: {
     backgroundColor: "#F8F8F8",
+    overflowY: "auto",
+    height: "80vh",
   },
 };
 
@@ -117,7 +124,7 @@ const EditPreInterventionForm = () => {
               label="Question heading"
               fieldType={FieldType.TextField}
             />
-            {/* <DynamicField
+            <DynamicField
               title="Description"
               label="Question heading description"
               fieldType={FieldType.TextArea}
@@ -126,13 +133,27 @@ const EditPreInterventionForm = () => {
               title="Sub heading"
               label="Question heading"
               fieldType={FieldType.TextField}
-            /> */}
+            />
             <DynamicField
               title="Question : 1"
               label="Type Question"
-              fieldType={FieldType.TextField}
+              fieldType={FieldType.Scale1to6}
               isQuestionnaireType={true}
             />
+            <DynamicField
+              title="Question : 2"
+              label="Type Question"
+              fieldType={FieldType.Scale1to6}
+              isQuestionnaireType={true}
+            />
+            <DynamicField
+              title="Question : 3"
+              label="Type Question"
+              fieldType={FieldType.Scale1to6}
+              isQuestionnaireType={true}
+            />
+
+            <Divider sx={{ m: 5 }} />
           </>
         );
       case 1:

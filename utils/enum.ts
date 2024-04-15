@@ -9,7 +9,8 @@ export enum FieldType {
   DropDown = 0,
   TextField = 1,
   TextArea = 2,
-  Scale = 3,
+  Scale1to6 = 3,
+  Scale1to10 = 4,
 }
 
 export enum SectionType {
@@ -43,5 +44,6 @@ export const fieldTypeTitles = {
   [FieldType.DropDown]: "Drop down",
   [FieldType.TextField]: "Text",
   [FieldType.TextArea]: "Text area",
-  [FieldType.Scale]: "Scale",
+  [FieldType.Scale1to6]: "Scale 1 to 6",
+  [FieldType.Scale1to10]: "Scale 1 to 10",
 };

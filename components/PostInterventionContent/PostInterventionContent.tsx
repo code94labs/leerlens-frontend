@@ -162,7 +162,7 @@ const PostInterventionContent = () => {
               key={item.id}
               number={item.id}
               question={item.questionText}
-              answerType={FieldType.Scale}
+              answerType={FieldType.Scale1to6}
             />
           )
         );
@@ -173,7 +173,7 @@ const PostInterventionContent = () => {
               key={item.id}
               number={item.id}
               question={item.questionText}
-              answerType={FieldType.Scale}
+              answerType={FieldType.Scale1to6}
             />
           )
         );
