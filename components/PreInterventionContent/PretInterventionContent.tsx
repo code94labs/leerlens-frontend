@@ -18,7 +18,7 @@ import {
   QuestionnaireSet,
 } from "../../utils/enum";
 import {
-  getAllPostInterventionQuestions,
+  getAllPreInterventionQuestions,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
 
@@ -104,7 +104,7 @@ type Questionnaire = {
   questionSection: QuestionnaireSection;
 };
 
-const PostInterventionContent = () => {
+const PreInterventionContent = () => {
   const [value, setValue] = useState(0);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
@@ -113,7 +113,7 @@ const PostInterventionContent = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [postQuestionnaireList, setPostQuestionnaireList] = useState<
+  const [preQuestionnaireList, setPreQuestionnaireList] = useState<
     Questionnaire[]
   >([]);
   const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
@@ -183,7 +183,7 @@ const PostInterventionContent = () => {
   };
 
   const getQuestionList = (section: QuestionnaireSection) => {
-    return postQuestionnaireList.filter(
+    return preQuestionnaireList.filter(
       (question) => question.questionSection === section
     );
   };
@@ -209,9 +209,9 @@ const PostInterventionContent = () => {
   };
 
   const fetchingQuestionnaire = async () => {
-    await getAllPostInterventionQuestions()
+    await getAllPreInterventionQuestions()
       .then((res) => {
-        setPostQuestionnaireList(res);
+        setPreQuestionnaireList(res);
 
         console.log(res);
       })
@@ -220,7 +220,7 @@ const PostInterventionContent = () => {
 
         setIsError(true);
 
-        setNotificationMsg("Error when fetching post questionnaire data...");
+        setNotificationMsg("Error when fetching pre questionnaire data...");
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
@@ -310,4 +310,4 @@ const PostInterventionContent = () => {
   );
 };
 
-export default PostInterventionContent;
+export default PreInterventionContent;
