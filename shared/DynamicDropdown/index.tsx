@@ -70,7 +70,6 @@ const index = (props: Props) => {
       item: string;
       isDelete: boolean;
       newlyAdded: boolean;
-      editable: boolean;
     }[]
   >([
     {
@@ -78,30 +77,27 @@ const index = (props: Props) => {
       item: "Aeres Hogeschool Dronten",
       isDelete: false,
       newlyAdded: false,
-      editable: false,
     },
     {
       id: 2,
       item: "Aeres MBO Almere",
       isDelete: false,
       newlyAdded: false,
-      editable: false,
     },
     {
       id: 3,
       item: "Aeres MBO Ede",
       isDelete: false,
       newlyAdded: false,
-      editable: false,
     },
     {
       id: 4,
       item: "Aeres MBO Velp",
       isDelete: false,
       newlyAdded: false,
-      editable: false,
     },
   ]);
+  const [editableOptions, setEditableOptions] = useState<number[]>([]);
   const [AddNewOptionData, setAddNewOptionData] = useState<string | undefined>(
     undefined
   );
@@ -118,29 +114,12 @@ const index = (props: Props) => {
   };
 
   const handleEditOption = (id: number) => {
-    const updatedOptions = options.map((option) => {
-      if (option.id === id) {
-        return {
-          ...option,
-          editable: true,
-        };
-      }
-      return option;
-    });
-    setOptions(updatedOptions);
+    setEditableOptions([...editableOptions, id])
   };
 
   const handleUpdateNewOption = (id: number) => {
-    const updatedOptions = options.map((option) => {
-      if (option.id === id) {
-        return {
-          ...option,
-          editable: false,
-        };
-      }
-      return option;
-    });
-    setOptions(updatedOptions);
+    const newEditableOptionsArr = editableOptions.filter((option) => !(option === id));
+    setEditableOptions(newEditableOptionsArr);
   };
 
   const handleOptionChangeById = (id: number, value: string) => {
@@ -165,7 +144,6 @@ const index = (props: Props) => {
         item: AddNewOptionData,
         isDelete: false,
         newlyAdded: true,
-        editable: false,
       });
       setOptions(newOptionsArr);
       setAddNewOptionData(undefined);
@@ -227,7 +205,7 @@ const index = (props: Props) => {
               height="35px"
               marginTop={1}
             >
-              {item.newlyAdded && item.editable ? (
+              {item.newlyAdded && editableOptions.includes(item.id) ? (
                 <Input
                   id="outlined-basic"
                   value={item.item}
@@ -245,7 +223,7 @@ const index = (props: Props) => {
               )}
               {item.newlyAdded && (
                 <Stack direction="row" alignItems="center" gap={1}>
-                  {item.editable ? (
+                  {editableOptions.includes(item.id) ? (
                     <Button
                       variant="outlined"
                       sx={customStyles.addButton}
