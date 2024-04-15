@@ -10,9 +10,10 @@ import {
   Typography,
 } from "@mui/material";
 import React, { SyntheticEvent, useState } from "react";
-import CustomMenuButton from "./CustomMenuButton";
 import DynamicField from "../../shared/DynamicField/DynamicField";
 import { FieldType } from "../../utils/enum";
+import { champBlackFontFamily } from "../../shared/typography";
+import AddIcon from "@mui/icons-material/Add";
 
 const customStyles = {
   snackbarAlert: {
@@ -51,6 +52,29 @@ const customStyles = {
     backgroundColor: "#F8F8F8",
     overflowY: "auto",
     height: "80vh",
+  },
+  primaryButton: {
+    backgroundColor: "#A879FF",
+    color: "white",
+    borderRadius: 3,
+    textTransform: "initial",
+    border: "2px #A879FF solid",
+    p: 1.5,
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontSize: 16,
+    "&:disabled": {
+      backgroundColor: "#E6E6E6",
+      color: "#98989A",
+      border: "2px #E6E6E6 solid",
+    },
+    "> *": {
+      fontWeight: 400,
+      fontFamily: champBlackFontFamily,
+    },
   },
 };
 
@@ -114,6 +138,16 @@ const EditPreInterventionForm = () => {
     </Stack>
   );
 
+  const addQuestionButton = (
+    <Stack flexDirection="row" alignItems="center" my={5} mx={3}>
+      <Button onClick={() => {}} sx={customStyles.primaryButton}>
+        <AddIcon />
+
+        <Typography>Add Question</Typography>
+      </Button>
+    </Stack>
+  );
+
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
       case 0:
@@ -153,13 +187,41 @@ const EditPreInterventionForm = () => {
               isQuestionnaireType={true}
             />
 
-            <Divider sx={{ m: 5 }} />
+            {addQuestionButton}
           </>
         );
       case 1:
-        return <Typography>Item 02</Typography>;
+        return (
+          <>
+            <DynamicField
+              title="Question : 1"
+              label="Type Question"
+              fieldType={FieldType.Scale1to6}
+              isQuestionnaireType={true}
+            />
+            <DynamicField
+              title="Question : 1"
+              label="Type Question"
+              fieldType={FieldType.Scale1to6}
+              isQuestionnaireType={true}
+            />
+
+            {addQuestionButton}
+          </>
+        );
       case 2:
-        return <Typography>Item 03</Typography>;
+        return (
+          <>
+            <DynamicField
+              title="Question : 1"
+              label="Type Question"
+              fieldType={FieldType.Scale1to6}
+              isQuestionnaireType={true}
+            />
+
+            {addQuestionButton}
+          </>
+        );
       default:
         return null;
     }
@@ -185,12 +247,7 @@ const EditPreInterventionForm = () => {
       {isLoading ? (
         loading
       ) : (
-        <Stack
-          flexDirection="row"
-          flexWrap="wrap"
-          justifyContent="space-between"
-          sx={customStyles.formContent}
-        >
+        <Stack flexDirection="column" sx={customStyles.formContent}>
           {renderTabContent(value)}
         </Stack>
       )}

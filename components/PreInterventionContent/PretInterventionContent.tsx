@@ -38,19 +38,13 @@ const customStyles = {
     textTransform: "initial",
     width: 180,
     border: "2px #A879FF solid",
-    padding: {
-      xs: 0.5,
-      md: 1.3,
-    },
+    padding: 1.3,
     "&:hover": {
       backgroundColor: "#C4B0EB",
       color: "white",
       border: "2px #C4B0EB solid",
     },
-    fontSize: {
-      xs: 14,
-      md: 16,
-    },
+    fontSize: 16,
     fontFamily: champBlackFontFamily,
     fontWeight: 400,
     "&:disabled": {

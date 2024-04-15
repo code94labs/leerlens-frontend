@@ -49,13 +49,13 @@ const customStyles = {
   stack: {
     backgroundColor: "white",
     borderRadius: 4,
-    width: "100%",
+    height: 'min-content'
   },
   dragDropButton: {
     backgroundColor: "#A879FF",
     color: "white",
-    p: .5,
-    ml: .5
+    p: 0.5,
+    ml: 0.5,
   },
 };
 
@@ -106,7 +106,11 @@ const DynamicField = (props: Props) => {
 
   const questionnaireField = (
     <>
-      <Stack flexDirection="row" justifyContent="space-between" alignItems="center">
+      <Stack
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
         <Typography
           my={1}
           fontSize={20}
@@ -118,11 +122,11 @@ const DynamicField = (props: Props) => {
 
         <Box>
           <IconButton sx={customStyles.dragDropButton}>
-            <KeyboardArrowDownIcon fontSize="small"/>
+            <KeyboardArrowDownIcon fontSize="small" />
           </IconButton>
 
           <IconButton sx={customStyles.dragDropButton}>
-            <KeyboardArrowUpIcon fontSize="small"/>
+            <KeyboardArrowUpIcon fontSize="small" />
           </IconButton>
         </Box>
       </Stack>
