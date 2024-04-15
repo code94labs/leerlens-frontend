@@ -21,6 +21,7 @@ import {
   getAllPreInterventionQuestions,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
+import { useRouter } from "next/router";
 
 const customStyles = {
   snackbarAlert: {
@@ -74,10 +75,10 @@ const customStyles = {
     borderBottom: "5px solid #E6E6E6",
   },
   scrollableList: {
-    overflowY: "auto", 
-    maxHeight: "60vh", 
+    overflowY: "auto",
+    maxHeight: "60vh",
     "&::-webkit-scrollbar": {
-      width: "0", 
+      width: "0",
     },
   },
 };
@@ -105,6 +106,7 @@ type Questionnaire = {
 };
 
 const PreInterventionContent = () => {
+  const router = useRouter();
   const [value, setValue] = useState(0);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
@@ -136,7 +138,7 @@ const PreInterventionContent = () => {
 
       <Button
         variant="outlined"
-        onClick={() => {}}
+        onClick={() => router.push("/admin/question-set/pre-intervention/edit")}
         sx={customStyles.primaryButton}
       >
         Edit Question
