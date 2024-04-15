@@ -10,6 +10,8 @@ import {
 } from "@mui/material";
 import React, { SyntheticEvent, useState } from "react";
 import CustomMenuButton from "./CustomMenuButton";
+import DynamicField from "../../shared/DynamicField/DynamicField";
+import { FieldType } from "../../utils/enum";
 
 const customStyles = {
   snackbarAlert: {
@@ -29,17 +31,19 @@ const customStyles = {
       fontWeight: "bold",
       fontSize: 15,
       borderBottom: "5px solid #A879FF",
-      zIndex: 999,
     },
     "& .MuiButtonBase-root": {
       textTransform: "initial",
       mx: 2,
       my: 0.5,
       borderBottom: "1px solid #98989A",
-      alignItems: 'flex-start',
+      alignItems: "flex-start",
       pl: 0,
-      pb: 2.5
+      pb: 2.5,
     },
+  },
+  formContent: {
+    backgroundColor: "#F8F8F8",
   },
 };
 
@@ -106,7 +110,31 @@ const EditPreInterventionForm = () => {
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
       case 0:
-        return <Typography>Item 01</Typography>;
+        return (
+          <>
+            <DynamicField
+              title="Personal Details"
+              label="Question heading"
+              fieldType={FieldType.TextField}
+            />
+            {/* <DynamicField
+              title="Description"
+              label="Question heading description"
+              fieldType={FieldType.TextArea}
+            />
+            <DynamicField
+              title="Sub heading"
+              label="Question heading"
+              fieldType={FieldType.TextField}
+            /> */}
+            <DynamicField
+              title="Question : 1"
+              label="Type Question"
+              fieldType={FieldType.TextField}
+              isQuestionnaireType={true}
+            />
+          </>
+        );
       case 1:
         return <Typography>Item 02</Typography>;
       case 2:
@@ -140,7 +168,7 @@ const EditPreInterventionForm = () => {
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="space-between"
-          // sx={customStyles.scrollableList}
+          sx={customStyles.formContent}
         >
           {renderTabContent(value)}
         </Stack>
