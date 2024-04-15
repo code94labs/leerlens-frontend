@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   FormControl,
   IconButton,
   InputLabel,
@@ -49,13 +50,29 @@ const customStyles = {
   stack: {
     backgroundColor: "white",
     borderRadius: 4,
-    height: 'min-content'
+    height: "min-content",
   },
   dragDropButton: {
     backgroundColor: "#A879FF",
     color: "white",
     p: 0.5,
     ml: 0.5,
+  },
+  deleteButton: {
+    backgroundColor: "white",
+    color: "#E55C55",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 180,
+    border: "2px #E55C55 solid",
+    p: 1.3,
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontFamily: champBlackFontFamily,
+    mr: 2,
   },
 };
 
@@ -64,10 +81,12 @@ type Props = {
   label: string;
   fieldType: FieldType;
   isQuestionnaireType?: boolean;
+  isNewQuestionType?: boolean;
 };
 
 const DynamicField = (props: Props) => {
-  const { title, label, fieldType, isQuestionnaireType } = props;
+  const { title, label, fieldType, isQuestionnaireType, isNewQuestionType } =
+    props;
 
   const [questionType, setQuestionType] = useState(FieldType.TextField);
 
@@ -102,6 +121,14 @@ const DynamicField = (props: Props) => {
         sx={customStyles.textField}
       />
     </>
+  );
+
+  const deleteButton = (
+    <Stack flex="row" alignItems="flex-end" my={2}>
+      <Button onClick={() => {}} sx={customStyles.deleteButton}>
+        Cancel
+      </Button>
+    </Stack>
   );
 
   const questionnaireField = (
@@ -171,6 +198,8 @@ const DynamicField = (props: Props) => {
           sx={{ ...customStyles.textField, flex: 0.75 }}
         />
       </Stack>
+
+      {isNewQuestionType && deleteButton}
     </>
   );
 

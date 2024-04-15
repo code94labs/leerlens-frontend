@@ -137,6 +137,8 @@ const EditPreInterventionForm = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
+
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -175,7 +177,12 @@ const EditPreInterventionForm = () => {
 
   const addQuestionButton = (
     <Stack flexDirection="row" alignItems="center" my={5} mx={3}>
-      <Button onClick={() => {}} sx={customStyles.primaryButton}>
+      <Button
+        onClick={() =>
+          setDisplayNewQuestion((displayNewQuestion) => !displayNewQuestion)
+        }
+        sx={customStyles.primaryButton}
+      >
         <AddIcon />
 
         <Typography>Add Question</Typography>
@@ -239,6 +246,16 @@ const EditPreInterventionForm = () => {
               fieldType={FieldType.Scale1to6}
               isQuestionnaireType={true}
             />
+
+            {displayNewQuestion && (
+              <DynamicField
+                title="Question : 4"
+                label="Type Question"
+                fieldType={FieldType.Scale1to6}
+                isQuestionnaireType={true}
+                isNewQuestionType={true}
+              />
+            )}
 
             {addQuestionButton}
 
