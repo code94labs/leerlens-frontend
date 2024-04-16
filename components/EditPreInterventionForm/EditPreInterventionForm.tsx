@@ -113,6 +113,347 @@ const customStyles = {
   },
 };
 
+const sampleResponse = [
+  {
+    id: 2,
+    formType: 1,
+    questionText: "What school are you at?",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "Aeres Hogeschool Dronten",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "Aeres MBO Almere",
+        isDelete: false,
+      },
+      {
+        id: 3,
+        item: "Aeres MBO Ede",
+        isDelete: false,
+      },
+      {
+        id: 4,
+        item: "Aeres MBO Velp",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 3,
+    formType: 1,
+    questionText: "What do you study?",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "Havo",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "VWO",
+        isDelete: false,
+      },
+      {
+        id: 3,
+        item: "Vmbo TL",
+        isDelete: false,
+      },
+      {
+        id: 4,
+        item: "Vmbo Kader",
+        isDelete: false,
+      },
+      {
+        id: 5,
+        item: "Vmbo Basis",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 4,
+    formType: 1,
+    questionText: "What grade are you in?",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "1",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "2",
+        isDelete: false,
+      },
+      {
+        id: 3,
+        item: "3",
+        isDelete: false,
+      },
+      {
+        id: 4,
+        item: "4",
+        isDelete: false,
+      },
+      {
+        id: 5,
+        item: "5",
+        isDelete: false,
+      },
+      {
+        id: 6,
+        item: "6",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 5,
+    formType: 1,
+    questionText: "Which remind program are you following?",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "Leerlingentraining",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "Mentorlessen over slim jezelf zijn",
+        isDelete: false,
+      },
+      {
+        id: 3,
+        item: "Startdag",
+        isDelete: false,
+      },
+      {
+        id: 4,
+        item: "Doorstroomprogramma vmbo-mbo of mavo-havo",
+        isDelete: false,
+      },
+      {
+        id: 5,
+        item: "Examentraining",
+        isDelete: false,
+      },
+      {
+        id: 6,
+        item: "Zomerschool, herfstschool of lenteschool",
+        isDelete: false,
+      },
+      {
+        id: 7,
+        item: "Remind in de middag / Ondersteuningsprogramma",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 6,
+    formType: 1,
+    questionText: "In which class are you?",
+    fieldType: 1,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 10,
+    formType: 2,
+    questionText: "What school are you at?",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "Aeres Hogeschool Dronten",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "Aeres MBO Almere",
+        isDelete: false,
+      },
+      {
+        id: 3,
+        item: "Aeres MBO Ede",
+        isDelete: false,
+      },
+      {
+        id: 4,
+        item: "Aeres MBO Velp",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 11,
+    formType: 2,
+    questionText: "What do you study?",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "Havo",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "VWO",
+        isDelete: false,
+      },
+      {
+        id: 3,
+        item: "Vmbo TL",
+        isDelete: false,
+      },
+      {
+        id: 4,
+        item: "Vmbo Kader",
+        isDelete: false,
+      },
+      {
+        id: 5,
+        item: "Vmbo Basis",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 12,
+    formType: 2,
+    questionText: "What grade are you in?",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "1",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "2",
+        isDelete: false,
+      },
+      {
+        id: 3,
+        item: "3",
+        isDelete: false,
+      },
+      {
+        id: 4,
+        item: "4",
+        isDelete: false,
+      },
+      {
+        id: 5,
+        item: "5",
+        isDelete: false,
+      },
+      {
+        id: 6,
+        item: "6",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 13,
+    formType: 2,
+    questionText: "Which remind program are you following?",
+    fieldType: 0,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [
+      {
+        id: 1,
+        item: "Leerlingentraining",
+        isDelete: false,
+      },
+      {
+        id: 2,
+        item: "Mentorlessen over slim jezelf zijn",
+        isDelete: false,
+      },
+      {
+        id: 3,
+        item: "Startdag",
+        isDelete: false,
+      },
+      {
+        id: 4,
+        item: "Doorstroomprogramma vmbo-mbo of mavo-havo",
+        isDelete: false,
+      },
+      {
+        id: 5,
+        item: "Examentraining",
+        isDelete: false,
+      },
+      {
+        id: 6,
+        item: "Zomerschool, herfstschool of lenteschool",
+        isDelete: false,
+      },
+      {
+        id: 7,
+        item: "Remind in de middag / Ondersteuningsprogramma",
+        isDelete: false,
+      },
+    ],
+    minValue: 1,
+    maxValue: 6,
+  },
+  {
+    id: 14,
+    formType: 2,
+    questionText: "In which class are you?",
+    fieldType: 1,
+    sectionType: 0,
+    positionOrderId: 1,
+    dropdownOptions: [],
+    minValue: 1,
+    maxValue: 6,
+  },
+];
+
 const menuItems = [
   {
     id: 0,
@@ -138,6 +479,8 @@ const EditPreInterventionForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
+
+  const [questions, setQuestions] = useState(sampleResponse);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -228,13 +571,18 @@ const EditPreInterventionForm = () => {
               label="Question heading"
               fieldType={FieldType.TextField}
             />
-            <DynamicField
-              title="Question : 1"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
-            <DynamicField
+            {questions.map((question) => (
+              <DynamicField
+                title={`Question : ${question.id}`}
+                label="Type Question"
+                fieldType={question.fieldType as FieldType}
+                isQuestionnaireType={true}
+                questionText={question.questionText}
+                dropdownOptions={question.dropdownOptions}
+                key={question.id}
+              />
+            ))}
+            {/* <DynamicField
               title="Question : 2"
               label="Type Question"
               fieldType={FieldType.Scale1to6}
@@ -245,7 +593,7 @@ const EditPreInterventionForm = () => {
               label="Type Question"
               fieldType={FieldType.Scale1to6}
               isQuestionnaireType={true}
-            />
+            /> */}
 
             {displayNewQuestion && (
               <DynamicField

@@ -16,6 +16,7 @@ import { champBlackFontFamily } from "../typography";
 import { FieldType } from "../../utils/enum";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import TestDynamicDropdown from "../TestDynamicDropdown";
 
 const customStyles = {
   textField: {
@@ -80,15 +81,30 @@ type Props = {
   title: string;
   label: string;
   fieldType: FieldType;
+  questionText?: string;
+  dropdownOptions?: {
+    id: number;
+    item: string;
+    isDelete: boolean;
+  }[];
   isQuestionnaireType?: boolean;
   isNewQuestionType?: boolean;
 };
 
 const DynamicField = (props: Props) => {
-  const { title, label, fieldType, isQuestionnaireType, isNewQuestionType } =
-    props;
+  const {
+    title,
+    label,
+    fieldType,
+    questionText,
+    dropdownOptions,
+    isQuestionnaireType,
+    isNewQuestionType,
+  } = props;
 
-  const [questionType, setQuestionType] = useState(FieldType.TextField);
+  const [questionType, setQuestionType] = useState(fieldType);
+
+  const [qText, setQText] = useState<string | undefined>(questionText);
 
   const handleChangeQuestionType = (event: SelectChangeEvent) => {
     setQuestionType(parseInt(event.target.value));
@@ -114,10 +130,10 @@ const DynamicField = (props: Props) => {
         rows={4}
         // placeholder="abc@gmail.com"
         // disabled={isLoading}
-        // value={email}
+        // value={qText}
         // onChange={(
         //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-        // ) => setEmail(e.target.value)}
+        // ) => setQText(e.target.value)}
         sx={customStyles.textField}
       />
     </>
@@ -191,13 +207,17 @@ const DynamicField = (props: Props) => {
           type="text"
           // placeholder="abc@gmail.com"
           // disabled={isLoading}
-          // value={email}
-          // onChange={(
-          //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-          // ) => setEmail(e.target.value)}
+          value={qText}
+          onChange={(
+            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+          ) => setQText(e.target.value)}
           sx={{ ...customStyles.textField, flex: 0.75 }}
         />
       </Stack>
+
+      {questionType === FieldType.DropDown && dropdownOptions && (
+        <TestDynamicDropdown dropDownOptions={dropdownOptions} />
+      )}
 
       {isNewQuestionType && deleteButton}
     </>
