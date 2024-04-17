@@ -16,7 +16,8 @@ import { champBlackFontFamily } from "../typography";
 import { FieldType } from "../../utils/enum";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import TestDynamicDropdown from "../TestDynamicDropdown";
+import DynamicDropdown from "../DynamicDropdown";
+import { DropDownOptions } from "../../utils/types";
 
 const customStyles = {
   textField: {
@@ -73,7 +74,21 @@ const customStyles = {
       border: "2px #C4B0EB solid",
     },
     fontFamily: champBlackFontFamily,
-    mr: 2,
+  },
+  saveButton: {
+    backgroundColor: "white",
+    color: "#A879FF",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 180,
+    border: "2px #A879FF solid",
+    p: 1.3,
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontFamily: champBlackFontFamily,
   },
 };
 
@@ -82,13 +97,15 @@ type Props = {
   label: string;
   fieldType: FieldType;
   questionText?: string;
-  dropdownOptions?: {
-    id: number;
-    item: string;
-    isDelete: boolean;
-  }[];
+  dropdownOptions?: DropDownOptions[];
   isQuestionnaireType?: boolean;
   isNewQuestionType?: boolean;
+  handleNewQuestionDelete?: () => void;
+  handleNewQuestionSave?: (props: {
+    fieldType: FieldType;
+    questionText: string;
+    dropdownOptions: DropDownOptions[];
+  }) => void;
 };
 
 const DynamicField = (props: Props) => {
@@ -100,6 +117,8 @@ const DynamicField = (props: Props) => {
     dropdownOptions,
     isQuestionnaireType,
     isNewQuestionType,
+    handleNewQuestionDelete,
+    handleNewQuestionSave,
   } = props;
 
   const [questionType, setQuestionType] = useState(fieldType);
@@ -139,9 +158,22 @@ const DynamicField = (props: Props) => {
     </>
   );
 
-  const deleteButton = (
-    <Stack flex="row" alignItems="flex-end" my={2}>
-      <Button onClick={() => {}} sx={customStyles.deleteButton}>
+  const buttons = (
+    <Stack direction="row" justifyContent="end" my={2} gap={2}>
+      <Button
+        onClick={() =>
+          handleNewQuestionSave &&
+          handleNewQuestionSave({
+            fieldType: questionType,
+            questionText: qText ? qText : "",
+            dropdownOptions: [],
+          })
+        }
+        sx={customStyles.saveButton}
+      >
+        Save
+      </Button>
+      <Button onClick={handleNewQuestionDelete} sx={customStyles.deleteButton}>
         Delete
       </Button>
     </Stack>
@@ -216,10 +248,10 @@ const DynamicField = (props: Props) => {
       </Stack>
 
       {questionType === FieldType.DropDown && dropdownOptions && (
-        <TestDynamicDropdown dropDownOptions={dropdownOptions} />
+        <DynamicDropdown dropDownOptions={dropdownOptions} />
       )}
 
-      {isNewQuestionType && deleteButton}
+      {isNewQuestionType && buttons}
     </>
   );
 

@@ -17,6 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import { champBlackFontFamily } from "../typography";
+import { DropDownOptions } from "../../utils/types";
 
 const customStyles = {
   addNewOptionsButton: {
@@ -61,40 +62,33 @@ const customStyles = {
   },
 };
 
-type Props = {};
+type Props = { dropDownOptions: DropDownOptions[] };
 
-const DynamicDropdown = (props: Props) => {
-  const [options, setOptions] = useState<
-    {
-      id: number;
-      item: string;
-      isDelete: boolean;
-      newlyAdded: boolean;
-    }[]
-  >([
+const DynamicDropdown = ({ dropDownOptions }: Props) => {
+  const [options, setOptions] = useState<DropDownOptions[]>([
     {
       id: 1,
       item: "Aeres Hogeschool Dronten",
       isDelete: false,
-      newlyAdded: false,
+      isNewlyAdded: false,
     },
     {
       id: 2,
       item: "Aeres MBO Almere",
       isDelete: false,
-      newlyAdded: false,
+      isNewlyAdded: false,
     },
     {
       id: 3,
       item: "Aeres MBO Ede",
       isDelete: false,
-      newlyAdded: false,
+      isNewlyAdded: false,
     },
     {
       id: 4,
       item: "Aeres MBO Velp",
       isDelete: false,
-      newlyAdded: false,
+      isNewlyAdded: false,
     },
   ]);
   const [editableOptions, setEditableOptions] = useState<number[]>([]);
@@ -143,7 +137,7 @@ const DynamicDropdown = (props: Props) => {
         id: maxId + 1,
         item: AddNewOptionData,
         isDelete: false,
-        newlyAdded: true,
+        isNewlyAdded: true,
       });
       setOptions(newOptionsArr);
       setAddNewOptionData(undefined);
@@ -151,7 +145,7 @@ const DynamicDropdown = (props: Props) => {
   };
 
   return (
-    <FormControl>
+    <FormControl sx={{ width: "50%" }}>
       <InputLabel id="demo-simple-select-label">School</InputLabel>
       <Select
         MenuProps={{
@@ -208,7 +202,7 @@ const DynamicDropdown = (props: Props) => {
                 onChange={(e) => setAddNewOptionData(e.target.value)}
                 size="small"
                 fullWidth
-                disableUnderline
+                // disableUnderline
               />
               <Stack direction="row" alignItems="center" gap={1}>
                 <Button
@@ -255,7 +249,7 @@ const DynamicDropdown = (props: Props) => {
               height="35px"
               marginTop={1}
             >
-              {item.newlyAdded && editableOptions.includes(item.id) ? (
+              {item.isNewlyAdded && editableOptions.includes(item.id) ? (
                 <Input
                   id="outlined-basic"
                   value={item.item}
@@ -271,7 +265,7 @@ const DynamicDropdown = (props: Props) => {
               ) : (
                 <Typography>{item.item}</Typography>
               )}
-              {item.newlyAdded && (
+              {item.isNewlyAdded && (
                 <Stack direction="row" alignItems="center" gap={1}>
                   {editableOptions.includes(item.id) ? (
                     <Button

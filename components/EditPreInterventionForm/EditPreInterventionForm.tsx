@@ -9,11 +9,16 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import React, { SyntheticEvent, useState } from "react";
+import React, { SyntheticEvent, useMemo, useState } from "react";
 import DynamicField from "../../shared/DynamicField/DynamicField";
-import { FieldType } from "../../utils/enum";
+import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { champBlackFontFamily } from "../../shared/typography";
 import AddIcon from "@mui/icons-material/Add";
+import {
+  getStudentFormInfo,
+  postStudentFormInfo,
+} from "../../services/editQuestionSets.service";
+import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
 
 const customStyles = {
   snackbarAlert: {
@@ -113,346 +118,16 @@ const customStyles = {
   },
 };
 
-const sampleResponse = [
-  {
-    id: 2,
-    formType: 1,
-    questionText: "What school are you at?",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "Aeres Hogeschool Dronten",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "Aeres MBO Almere",
-        isDelete: false,
-      },
-      {
-        id: 3,
-        item: "Aeres MBO Ede",
-        isDelete: false,
-      },
-      {
-        id: 4,
-        item: "Aeres MBO Velp",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 3,
-    formType: 1,
-    questionText: "What do you study?",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "Havo",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "VWO",
-        isDelete: false,
-      },
-      {
-        id: 3,
-        item: "Vmbo TL",
-        isDelete: false,
-      },
-      {
-        id: 4,
-        item: "Vmbo Kader",
-        isDelete: false,
-      },
-      {
-        id: 5,
-        item: "Vmbo Basis",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 4,
-    formType: 1,
-    questionText: "What grade are you in?",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "1",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "2",
-        isDelete: false,
-      },
-      {
-        id: 3,
-        item: "3",
-        isDelete: false,
-      },
-      {
-        id: 4,
-        item: "4",
-        isDelete: false,
-      },
-      {
-        id: 5,
-        item: "5",
-        isDelete: false,
-      },
-      {
-        id: 6,
-        item: "6",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 5,
-    formType: 1,
-    questionText: "Which remind program are you following?",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "Leerlingentraining",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "Mentorlessen over slim jezelf zijn",
-        isDelete: false,
-      },
-      {
-        id: 3,
-        item: "Startdag",
-        isDelete: false,
-      },
-      {
-        id: 4,
-        item: "Doorstroomprogramma vmbo-mbo of mavo-havo",
-        isDelete: false,
-      },
-      {
-        id: 5,
-        item: "Examentraining",
-        isDelete: false,
-      },
-      {
-        id: 6,
-        item: "Zomerschool, herfstschool of lenteschool",
-        isDelete: false,
-      },
-      {
-        id: 7,
-        item: "Remind in de middag / Ondersteuningsprogramma",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 6,
-    formType: 1,
-    questionText: "In which class are you?",
-    fieldType: 1,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 10,
-    formType: 2,
-    questionText: "What school are you at?",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "Aeres Hogeschool Dronten",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "Aeres MBO Almere",
-        isDelete: false,
-      },
-      {
-        id: 3,
-        item: "Aeres MBO Ede",
-        isDelete: false,
-      },
-      {
-        id: 4,
-        item: "Aeres MBO Velp",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 11,
-    formType: 2,
-    questionText: "What do you study?",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "Havo",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "VWO",
-        isDelete: false,
-      },
-      {
-        id: 3,
-        item: "Vmbo TL",
-        isDelete: false,
-      },
-      {
-        id: 4,
-        item: "Vmbo Kader",
-        isDelete: false,
-      },
-      {
-        id: 5,
-        item: "Vmbo Basis",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 12,
-    formType: 2,
-    questionText: "What grade are you in?",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "1",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "2",
-        isDelete: false,
-      },
-      {
-        id: 3,
-        item: "3",
-        isDelete: false,
-      },
-      {
-        id: 4,
-        item: "4",
-        isDelete: false,
-      },
-      {
-        id: 5,
-        item: "5",
-        isDelete: false,
-      },
-      {
-        id: 6,
-        item: "6",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 13,
-    formType: 2,
-    questionText: "Which remind program are you following?",
-    fieldType: 0,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [
-      {
-        id: 1,
-        item: "Leerlingentraining",
-        isDelete: false,
-      },
-      {
-        id: 2,
-        item: "Mentorlessen over slim jezelf zijn",
-        isDelete: false,
-      },
-      {
-        id: 3,
-        item: "Startdag",
-        isDelete: false,
-      },
-      {
-        id: 4,
-        item: "Doorstroomprogramma vmbo-mbo of mavo-havo",
-        isDelete: false,
-      },
-      {
-        id: 5,
-        item: "Examentraining",
-        isDelete: false,
-      },
-      {
-        id: 6,
-        item: "Zomerschool, herfstschool of lenteschool",
-        isDelete: false,
-      },
-      {
-        id: 7,
-        item: "Remind in de middag / Ondersteuningsprogramma",
-        isDelete: false,
-      },
-    ],
-    minValue: 1,
-    maxValue: 6,
-  },
-  {
-    id: 14,
-    formType: 2,
-    questionText: "In which class are you?",
-    fieldType: 1,
-    sectionType: 0,
-    positionOrderId: 1,
-    dropdownOptions: [],
-    minValue: 1,
-    maxValue: 6,
-  },
-];
+const initialNewQuestionContent: Question = {
+  formType: FormEvaluation.PreInterventions,
+  questionText: "",
+  fieldType: FieldType.TextField,
+  sectionType: SectionType.PersonalDetails,
+  positionOrderId: 999,
+  dropdownOptions: [],
+  minValue: 0,
+  maxValue: 6,
+};
 
 const menuItems = [
   {
@@ -480,10 +155,67 @@ const EditPreInterventionForm = () => {
 
   const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
 
-  const [questions, setQuestions] = useState(sampleResponse);
+  const [questions, setQuestions] = useState<QuestionResponse[]>();
+
+  // const [newQuestion, setNewQuestion] = useState<{
+  //   formType: FormEvaluation;
+  //   questionText: string;
+  //   fieldType: FieldType;
+  //   sectionType: SectionType;
+  //   positionOrderId: number;
+  //   dropdownOptions: DropDownOptions[];
+  //   minValue: number;
+  //   maxValue: number;
+  // }>(initialNewQuestionContent);
+
+  // console.log(newQuestion);
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) => item.sectionType === SectionType.PersonalDetails
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
+  };
+
+  const handleAddNewQuestion = () => {
+    setDisplayNewQuestion(true);
+  };
+
+  const handleNewQuestionDelete = () => {
+    setDisplayNewQuestion(false);
+    // setNewQuestion(initialNewQuestionContent);
+  };
+
+  const handleNewQuestionSave = async ({
+    fieldType,
+    questionText,
+    dropdownOptions,
+  }: {
+    fieldType: FieldType;
+    questionText: string;
+    dropdownOptions: DropDownOptions[];
+  }) => {
+    const newQuestion = initialNewQuestionContent;
+    newQuestion.fieldType = fieldType;
+    newQuestion.questionText = questionText;
+    newQuestion.dropdownOptions = dropdownOptions;
+    const response = await postStudentFormInfo(newQuestion);
+    console.log(response);
   };
 
   const snackbar = (
@@ -520,12 +252,7 @@ const EditPreInterventionForm = () => {
 
   const addQuestionButton = (
     <Stack flexDirection="row" alignItems="center" my={5} mx={3}>
-      <Button
-        onClick={() =>
-          setDisplayNewQuestion((displayNewQuestion) => !displayNewQuestion)
-        }
-        sx={customStyles.primaryButton}
-      >
+      <Button onClick={handleAddNewQuestion} sx={customStyles.primaryButton}>
         <AddIcon />
 
         <Typography>Add Question</Typography>
@@ -571,37 +298,30 @@ const EditPreInterventionForm = () => {
               label="Question heading"
               fieldType={FieldType.TextField}
             />
-            {questions.map((question) => (
-              <DynamicField
-                title={`Question : ${question.id}`}
-                label="Type Question"
-                fieldType={question.fieldType as FieldType}
-                isQuestionnaireType={true}
-                questionText={question.questionText}
-                dropdownOptions={question.dropdownOptions}
-                key={question.id}
-              />
-            ))}
-            {/* <DynamicField
-              title="Question : 2"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
-            <DynamicField
-              title="Question : 3"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            /> */}
+            {questions &&
+              questions.map((question: QuestionResponse) => (
+                <DynamicField
+                  title={`Question : ${question.id}`}
+                  label="Type Question"
+                  fieldType={question.fieldType as FieldType}
+                  isQuestionnaireType={true}
+                  questionText={question.questionText}
+                  dropdownOptions={question.dropdownOptions}
+                  key={question.id}
+                />
+              ))}
 
             {displayNewQuestion && (
               <DynamicField
-                title="Question : 4"
+                title="Add New Question"
                 label="Type Question"
-                fieldType={FieldType.Scale1to6}
+                fieldType={initialNewQuestionContent.fieldType as FieldType}
+                questionText={initialNewQuestionContent.questionText}
+                dropdownOptions={initialNewQuestionContent.dropdownOptions}
                 isQuestionnaireType={true}
                 isNewQuestionType={true}
+                handleNewQuestionDelete={handleNewQuestionDelete}
+                handleNewQuestionSave={handleNewQuestionSave}
               />
             )}
 
@@ -656,7 +376,7 @@ const EditPreInterventionForm = () => {
         sx={customStyles.tabs}
       >
         {menuItems.map((item) => (
-          <Tab value={item.id} label={item.title} />
+          <Tab value={item.id} label={item.title} key={item.id} />
         ))}
       </Tabs>
     </Stack>
