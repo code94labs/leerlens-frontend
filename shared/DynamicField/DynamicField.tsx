@@ -125,6 +125,10 @@ const DynamicField = (props: Props) => {
 
   const [qText, setQText] = useState<string | undefined>(questionText);
 
+  const [options, setOptions] = useState<DropDownOptions[] | undefined>(
+    dropdownOptions
+  );
+
   const handleChangeQuestionType = (event: SelectChangeEvent) => {
     setQuestionType(parseInt(event.target.value));
   };
@@ -166,7 +170,7 @@ const DynamicField = (props: Props) => {
           handleNewQuestionSave({
             fieldType: questionType,
             questionText: qText ? qText : "",
-            dropdownOptions: [],
+            dropdownOptions: options ? options : [],
           })
         }
         sx={customStyles.saveButton}
@@ -248,7 +252,10 @@ const DynamicField = (props: Props) => {
       </Stack>
 
       {questionType === FieldType.DropDown && dropdownOptions && (
-        <DynamicDropdown dropDownOptions={dropdownOptions} />
+        <DynamicDropdown
+          options={options ? options : []}
+          setOptions={setOptions}
+        />
       )}
 
       {isNewQuestionType && buttons}

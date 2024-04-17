@@ -62,35 +62,12 @@ const customStyles = {
   },
 };
 
-type Props = { dropDownOptions: DropDownOptions[] };
+type Props = {
+  options: DropDownOptions[];
+  setOptions: (optionsArr: DropDownOptions[]) => void;
+};
 
-const DynamicDropdown = ({ dropDownOptions }: Props) => {
-  const [options, setOptions] = useState<DropDownOptions[]>([
-    {
-      id: 1,
-      item: "Aeres Hogeschool Dronten",
-      isDelete: false,
-      isNewlyAdded: false,
-    },
-    {
-      id: 2,
-      item: "Aeres MBO Almere",
-      isDelete: false,
-      isNewlyAdded: false,
-    },
-    {
-      id: 3,
-      item: "Aeres MBO Ede",
-      isDelete: false,
-      isNewlyAdded: false,
-    },
-    {
-      id: 4,
-      item: "Aeres MBO Velp",
-      isDelete: false,
-      isNewlyAdded: false,
-    },
-  ]);
+const DynamicDropdown = ({ options, setOptions }: Props) => {
   const [editableOptions, setEditableOptions] = useState<number[]>([]);
   const [AddNewOptionData, setAddNewOptionData] = useState<string | undefined>(
     undefined
@@ -146,7 +123,7 @@ const DynamicDropdown = ({ dropDownOptions }: Props) => {
 
   return (
     <FormControl sx={{ width: "50%" }}>
-      <InputLabel id="demo-simple-select-label">School</InputLabel>
+      <InputLabel id="demo-simple-select-label">Answers</InputLabel>
       <Select
         MenuProps={{
           autoFocus: false,
