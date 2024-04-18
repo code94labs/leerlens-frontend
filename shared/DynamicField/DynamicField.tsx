@@ -123,26 +123,25 @@ const DynamicField = (props: Props) => {
 
   const [questionType, setQuestionType] = useState(fieldType);
 
-  const [qText, setQText] = useState<string>();
+  const [qText, setQText] = useState<string | undefined>(
+    isNewQuestionType ? undefined : questionText
+  );
 
-  const [options, setOptions] = useState<DropDownOptions[]>();
-
-  useEffect(() => {
-    setQText(questionText);
-    setOptions(dropdownOptions);
-  }, []);
+  const [options, setOptions] = useState<DropDownOptions[] | undefined>(
+    isNewQuestionType ? undefined : dropdownOptions
+  );
 
   const handleChangeQuestionType = (event: SelectChangeEvent) => {
     setQuestionType(parseInt(event.target.value));
   };
 
   const handleSaveClick = () => {
-    if (qText && options) {
+    if (qText) {
       handleNewQuestionSave &&
         handleNewQuestionSave({
           fieldType: questionType,
           questionText: qText,
-          dropdownOptions: options,
+          dropdownOptions: options ?? [],
         });
     } else {
       console.log("atleast one of the required fields is empty");
@@ -257,7 +256,7 @@ const DynamicField = (props: Props) => {
         />
       </Stack>
 
-      {questionType === FieldType.DropDown && dropdownOptions && (
+      {questionType === FieldType.DropDown && (
         <DynamicDropdown
           options={options ? options : []}
           setOptions={setOptions}

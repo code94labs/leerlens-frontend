@@ -314,8 +314,8 @@ const EditPreInterventionForm = () => {
                 fieldType={initialNewQuestionContent.fieldType as FieldType}
                 questionText={initialNewQuestionContent.questionText}
                 dropdownOptions={initialNewQuestionContent.dropdownOptions}
-                isQuestionnaireType={true}
-                isNewQuestionType={true}
+                isQuestionnaireType
+                isNewQuestionType
                 handleNewQuestionDelete={handleNewQuestionDelete}
                 handleNewQuestionSave={handleNewQuestionSave}
               />

@@ -107,7 +107,10 @@ const DynamicDropdown = ({ options, setOptions }: Props) => {
   };
 
   const handleAddNewOption = () => {
-    const maxId = Math.max(...options.map((option) => option.id));
+    var maxId = 0;
+    if (options.length > 0) {
+      maxId = Math.max(...options.map((option) => option.id));
+    }
     const newOptionsArr = [...options];
     if (AddNewOptionData && AddNewOptionData.length > 0) {
       newOptionsArr.unshift({
