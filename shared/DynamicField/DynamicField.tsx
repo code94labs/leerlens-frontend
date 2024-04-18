@@ -1,7 +1,9 @@
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
   IconButton,
   InputLabel,
   MenuItem,
@@ -11,12 +13,16 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { champBlackFontFamily } from "../typography";
-import { FieldType } from "../../utils/enum";
+import { useFormik } from "formik";
+import * as yup from "yup";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+
+import { champBlackFontFamily } from "../typography";
+
 import DynamicDropdown from "../DynamicDropdown";
+
+import { FieldType } from "../../utils/enum";
 import { DropDownOptions } from "../../utils/types";
 
 const customStyles = {
@@ -92,6 +98,10 @@ const customStyles = {
   },
 };
 
+const validationSchema = yup.object({
+  questionText: yup.string().required("Question text is required"),
+});
+
 type Props = {
   title: string;
   label: string;
@@ -123,29 +133,37 @@ const DynamicField = (props: Props) => {
 
   const [questionType, setQuestionType] = useState(fieldType);
 
-  const [qText, setQText] = useState<string | undefined>(
-    isNewQuestionType ? undefined : questionText
-  );
+  // const [qText, setQText] = useState<string | undefined>(
+  //   isNewQuestionType ? undefined : questionText
+  // );
 
   const [options, setOptions] = useState<DropDownOptions[] | undefined>(
     isNewQuestionType ? undefined : dropdownOptions
   );
 
+  const formik = useFormik({
+    initialValues: {
+      questionText: isNewQuestionType ? undefined : questionText,
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values, { resetForm }) => {
+      // setDisplayAddNewOption(false);
+      values.questionText && handleSaveClick(values.questionText);
+      resetForm();
+    },
+  });
+
   const handleChangeQuestionType = (event: SelectChangeEvent) => {
     setQuestionType(parseInt(event.target.value));
   };
 
-  const handleSaveClick = () => {
-    if (qText) {
-      handleNewQuestionSave &&
-        handleNewQuestionSave({
-          fieldType: questionType,
-          questionText: qText,
-          dropdownOptions: options ?? [],
-        });
-    } else {
-      console.log("atleast one of the required fields is empty");
-    }
+  const handleSaveClick = (questionText: string) => {
+    handleNewQuestionSave &&
+      handleNewQuestionSave({
+        fieldType: questionType,
+        questionText,
+        dropdownOptions: options ?? [],
+      });
   };
 
   const metaDataField = (
@@ -179,7 +197,12 @@ const DynamicField = (props: Props) => {
 
   const buttons = (
     <Stack direction="row" justifyContent="end" my={2} gap={2}>
-      <Button onClick={handleSaveClick} sx={customStyles.saveButton}>
+      <Button
+        onClick={() => {
+          formik.handleSubmit();
+        }}
+        sx={customStyles.saveButton}
+      >
         Save
       </Button>
       <Button onClick={handleNewQuestionDelete} sx={customStyles.deleteButton}>
@@ -226,6 +249,7 @@ const DynamicField = (props: Props) => {
             value={questionType.toString()}
             label="Select Question Type"
             onChange={handleChangeQuestionType}
+            autoWidth
           >
             <MenuItem value={FieldType.TextField.toString()}>Text</MenuItem>
 
@@ -248,12 +272,29 @@ const DynamicField = (props: Props) => {
           type="text"
           // placeholder="abc@gmail.com"
           // disabled={isLoading}
-          value={qText}
-          onChange={(
-            e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-          ) => setQText(e.target.value)}
+          id="questionText"
+          name="questionText"
+          value={formik.values.questionText}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={
+            formik.touched.questionText && Boolean(formik.errors.questionText)
+          }
           sx={{ ...customStyles.textField, flex: 0.75 }}
         />
+      </Stack>
+
+      <Stack
+        direction="row"
+        justifyContent="flex-end"
+        alignItems="center"
+        mt={-2}
+      >
+        {formik.touched.questionText && (
+          <FormHelperText sx={{ color: "red" }}>
+            {formik.errors.questionText}
+          </FormHelperText>
+        )}
       </Stack>
 
       {questionType === FieldType.DropDown && (

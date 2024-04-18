@@ -248,7 +248,11 @@ const EditPreInterventionForm = () => {
 
   const addQuestionButton = (
     <Stack flexDirection="row" alignItems="center" my={5} mx={3}>
-      <Button onClick={handleAddNewQuestion} sx={customStyles.primaryButton}>
+      <Button
+        onClick={handleAddNewQuestion}
+        sx={customStyles.primaryButton}
+        disabled={displayNewQuestion}
+      >
         <AddIcon />
 
         <Typography>Add Question</Typography>
