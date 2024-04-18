@@ -109,7 +109,7 @@ const DynamicDropdown = ({ options, setOptions }: Props) => {
   const handleAddNewOption = () => {
     const maxId = Math.max(...options.map((option) => option.id));
     const newOptionsArr = [...options];
-    if (AddNewOptionData) {
+    if (AddNewOptionData && AddNewOptionData.length > 0) {
       newOptionsArr.unshift({
         id: maxId + 1,
         item: AddNewOptionData,
@@ -214,6 +214,7 @@ const DynamicDropdown = ({ options, setOptions }: Props) => {
         )}
         {options.map((item) => (
           <ListSubheader
+            key={item.id}
             value={item.id}
             disableSticky
             sx={{ borderBottom: 1, borderBottomColor: "#E6E6E6" }}

@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { champBlackFontFamily } from "../typography";
 import { FieldType } from "../../utils/enum";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -123,14 +123,30 @@ const DynamicField = (props: Props) => {
 
   const [questionType, setQuestionType] = useState(fieldType);
 
-  const [qText, setQText] = useState<string | undefined>(questionText);
+  const [qText, setQText] = useState<string>();
 
-  const [options, setOptions] = useState<DropDownOptions[] | undefined>(
-    dropdownOptions
-  );
+  const [options, setOptions] = useState<DropDownOptions[]>();
+
+  useEffect(() => {
+    setQText(questionText);
+    setOptions(dropdownOptions);
+  }, []);
 
   const handleChangeQuestionType = (event: SelectChangeEvent) => {
     setQuestionType(parseInt(event.target.value));
+  };
+
+  const handleSaveClick = () => {
+    if (qText && options) {
+      handleNewQuestionSave &&
+        handleNewQuestionSave({
+          fieldType: questionType,
+          questionText: qText,
+          dropdownOptions: options,
+        });
+    } else {
+      console.log("atleast one of the required fields is empty");
+    }
   };
 
   const metaDataField = (
@@ -164,17 +180,7 @@ const DynamicField = (props: Props) => {
 
   const buttons = (
     <Stack direction="row" justifyContent="end" my={2} gap={2}>
-      <Button
-        onClick={() =>
-          handleNewQuestionSave &&
-          handleNewQuestionSave({
-            fieldType: questionType,
-            questionText: qText ? qText : "",
-            dropdownOptions: options ? options : [],
-          })
-        }
-        sx={customStyles.saveButton}
-      >
+      <Button onClick={handleSaveClick} sx={customStyles.saveButton}>
         Save
       </Button>
       <Button onClick={handleNewQuestionDelete} sx={customStyles.deleteButton}>

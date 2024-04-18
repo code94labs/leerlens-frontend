@@ -157,19 +157,6 @@ const EditPreInterventionForm = () => {
 
   const [questions, setQuestions] = useState<QuestionResponse[]>();
 
-  // const [newQuestion, setNewQuestion] = useState<{
-  //   formType: FormEvaluation;
-  //   questionText: string;
-  //   fieldType: FieldType;
-  //   sectionType: SectionType;
-  //   positionOrderId: number;
-  //   dropdownOptions: DropDownOptions[];
-  //   minValue: number;
-  //   maxValue: number;
-  // }>(initialNewQuestionContent);
-
-  // console.log(newQuestion);
-
   useMemo(() => {
     const fetchData = async () => {
       try {
@@ -211,11 +198,20 @@ const EditPreInterventionForm = () => {
     dropdownOptions: DropDownOptions[];
   }) => {
     const newQuestion = initialNewQuestionContent;
-    newQuestion.fieldType = fieldType;
-    newQuestion.questionText = questionText;
-    newQuestion.dropdownOptions = dropdownOptions;
-    const response = await postStudentFormInfo(newQuestion);
-    console.log(response);
+    if (questionText.length > 1) {
+      newQuestion.fieldType = fieldType;
+      newQuestion.questionText = questionText;
+      newQuestion.dropdownOptions = dropdownOptions;
+      const response = await postStudentFormInfo(newQuestion);
+
+      const updatedQuestionsArr = questions;
+      updatedQuestionsArr?.push(response);
+      setQuestions(updatedQuestionsArr);
+
+      setDisplayNewQuestion(false);
+    } else {
+      console.log("questionText empty");
+    }
   };
 
   const snackbar = (

@@ -12,7 +12,7 @@ const ComponentsPage = () => {
       <Stack width={"100%"}>
         <AdminHeader title="Component Test" />
 
-        <DynamicDropdown dropDownOptions={[]} />
+        {/* <DynamicDropdown /> */}
       </Stack>
     </Stack>
   );
