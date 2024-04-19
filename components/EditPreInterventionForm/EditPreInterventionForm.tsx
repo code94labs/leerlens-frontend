@@ -9,11 +9,16 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import React, { SyntheticEvent, useState } from "react";
+import React, { SyntheticEvent, useMemo, useState } from "react";
 import DynamicField from "../../shared/DynamicField/DynamicField";
-import { FieldType } from "../../utils/enum";
+import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { champBlackFontFamily } from "../../shared/typography";
 import AddIcon from "@mui/icons-material/Add";
+import {
+  getStudentFormInfo,
+  postStudentFormInfo,
+} from "../../services/editQuestionSets.service";
+import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
 
 const customStyles = {
   snackbarAlert: {
@@ -113,6 +118,17 @@ const customStyles = {
   },
 };
 
+const initialNewQuestionContent: Question = {
+  formType: FormEvaluation.PreInterventions,
+  questionText: "",
+  fieldType: FieldType.TextField,
+  sectionType: SectionType.PersonalDetails,
+  positionOrderId: 999,
+  dropdownOptions: [],
+  minValue: 0,
+  maxValue: 6,
+};
+
 const menuItems = [
   {
     id: 0,
@@ -139,8 +155,63 @@ const EditPreInterventionForm = () => {
 
   const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
 
+  const [questions, setQuestions] = useState<QuestionResponse[]>();
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) => item.sectionType === SectionType.PersonalDetails
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
+  };
+
+  const handleAddNewQuestion = () => {
+    setDisplayNewQuestion(true);
+  };
+
+  const handleNewQuestionDelete = () => {
+    setDisplayNewQuestion(false);
+    // setNewQuestion(initialNewQuestionContent);
+  };
+
+  const handleNewQuestionSave = async ({
+    fieldType,
+    questionText,
+    dropdownOptions,
+  }: {
+    fieldType: FieldType;
+    questionText: string;
+    dropdownOptions: DropDownOptions[];
+  }) => {
+    const newQuestion = initialNewQuestionContent;
+    if (questionText.length > 1) {
+      newQuestion.fieldType = fieldType;
+      newQuestion.questionText = questionText;
+      newQuestion.dropdownOptions = dropdownOptions;
+      const response = await postStudentFormInfo(newQuestion);
+
+      const updatedQuestionsArr = questions;
+      updatedQuestionsArr?.push(response);
+      setQuestions(updatedQuestionsArr);
+
+      setDisplayNewQuestion(false);
+    } else {
+      console.log("questionText empty");
+    }
   };
 
   const snackbar = (
@@ -178,10 +249,9 @@ const EditPreInterventionForm = () => {
   const addQuestionButton = (
     <Stack flexDirection="row" alignItems="center" my={5} mx={3}>
       <Button
-        onClick={() =>
-          setDisplayNewQuestion((displayNewQuestion) => !displayNewQuestion)
-        }
+        onClick={handleAddNewQuestion}
         sx={customStyles.primaryButton}
+        disabled={displayNewQuestion}
       >
         <AddIcon />
 
@@ -228,32 +298,30 @@ const EditPreInterventionForm = () => {
               label="Question heading"
               fieldType={FieldType.TextField}
             />
-            <DynamicField
-              title="Question : 1"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
-            <DynamicField
-              title="Question : 2"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
-            <DynamicField
-              title="Question : 3"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
+            {questions &&
+              questions.map((question: QuestionResponse) => (
+                <DynamicField
+                  title={`Question : ${question.id}`}
+                  label="Type Question"
+                  fieldType={question.fieldType as FieldType}
+                  isQuestionnaireType={true}
+                  questionText={question.questionText}
+                  dropdownOptions={question.dropdownOptions}
+                  key={question.id}
+                />
+              ))}
 
             {displayNewQuestion && (
               <DynamicField
-                title="Question : 4"
+                title="Add New Question"
                 label="Type Question"
-                fieldType={FieldType.Scale1to6}
-                isQuestionnaireType={true}
-                isNewQuestionType={true}
+                fieldType={initialNewQuestionContent.fieldType as FieldType}
+                questionText={initialNewQuestionContent.questionText}
+                dropdownOptions={initialNewQuestionContent.dropdownOptions}
+                isQuestionnaireType
+                isNewQuestionType
+                handleNewQuestionDelete={handleNewQuestionDelete}
+                handleNewQuestionSave={handleNewQuestionSave}
               />
             )}
 
@@ -308,7 +376,7 @@ const EditPreInterventionForm = () => {
         sx={customStyles.tabs}
       >
         {menuItems.map((item) => (
-          <Tab value={item.id} label={item.title} />
+          <Tab value={item.id} label={item.title} key={item.id} />
         ))}
       </Tabs>
     </Stack>
