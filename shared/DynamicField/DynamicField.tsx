@@ -288,7 +288,7 @@ const DynamicField = (props: Props) => {
         direction="row"
         justifyContent="flex-end"
         alignItems="center"
-        mt={-2}
+        mt={formik.touched.questionText ? -2 : 0}
       >
         {formik.touched.questionText && (
           <FormHelperText sx={{ color: "red" }}>
