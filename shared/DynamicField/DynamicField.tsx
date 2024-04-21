@@ -7,23 +7,26 @@ import {
   IconButton,
   InputLabel,
   MenuItem,
+  Modal,
   Select,
   SelectChangeEvent,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 import { champBlackFontFamily } from "../typography";
 
 import DynamicDropdown from "../DynamicDropdown";
 
 import { FieldType } from "../../utils/enum";
-import { DropDownOptions } from "../../utils/types";
+import { DropDownOptions, QuestionResponse } from "../../utils/types";
 
 const customStyles = {
   textField: {
@@ -60,11 +63,14 @@ const customStyles = {
     borderRadius: 4,
     height: "min-content",
   },
-  dragDropButton: {
+  button: {
     backgroundColor: "#A879FF",
     color: "white",
     p: 0.5,
     ml: 0.5,
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+    },
   },
   deleteButton: {
     backgroundColor: "white",
@@ -96,6 +102,117 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
   },
+  modalContent: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    bgcolor: "background.paper",
+    boxShadow: 24,
+    borderRadius: 2,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    px: {
+      xs: 1,
+      md: 3,
+    },
+    py: {
+      xs: 1,
+      md: 3,
+    },
+    width: {
+      xs: "90%",
+      md: 514,
+    },
+    maxWidth: {
+      xs: 360,
+      md: 514,
+    },
+    boxSizing: "border-box",
+  },
+  modalTitle: {
+    fontWeight: 600,
+    fontSize: {
+      xs: 18,
+      md: 22,
+    },
+    mb: 2,
+    // textTransform: "uppercase",
+  },
+  modalStack: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    mt: 2,
+    width: {
+      xs: "100%",
+      md: 290,
+    },
+    gap: 1,
+  },
+  dialogBtnStack: {
+    display: "flex",
+    flexDirection: {
+      xs: "column",
+      md: "row",
+    },
+    justifyContent: "space-between",
+    width: "100%",
+    mt: {
+      xs: 2,
+      md: 4,
+    },
+    gap: {
+      xs: 1,
+      md: 2,
+    },
+  },
+  primaryBtn: {
+    backgroundColor: "#A879FF",
+    color: "white",
+    borderRadius: 2,
+    textTransform: "initial",
+    fontWeight: 900,
+    border: "2px #A879FF solid",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
+    },
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
+    fontFamily: champBlackFontFamily,
+  },
+  secondaryBtn: {
+    backgroundColor: "white",
+    color: "#A879FF",
+    borderRadius: 2,
+    textTransform: "initial",
+    fontWeight: 900,
+    border: "2px #A879FF solid",
+    padding: {
+      xs: 0.5,
+      md: 1.3,
+    },
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    fontSize: {
+      xs: 14,
+      md: 16,
+    },
+    fontFamily: champBlackFontFamily,
+  },
 };
 
 const validationSchema = yup.object({
@@ -103,19 +220,12 @@ const validationSchema = yup.object({
 });
 
 type Props = {
-  title: string;
-  label: string;
+  title?: string;
+  label?: string;
   fieldType: FieldType;
-  questionText?: string;
-  dropdownOptions?: DropDownOptions[];
   isQuestionnaireType?: boolean;
-  isNewQuestionType?: boolean;
-  handleNewQuestionDelete?: () => void;
-  handleNewQuestionSave?: (props: {
-    fieldType: FieldType;
-    questionText: string;
-    dropdownOptions: DropDownOptions[];
-  }) => void;
+  question?: QuestionResponse;
+  handleQuestionSoftDelete?: (id: number) => void;
 };
 
 const DynamicField = (props: Props) => {
@@ -123,12 +233,9 @@ const DynamicField = (props: Props) => {
     title,
     label,
     fieldType,
-    questionText,
-    dropdownOptions,
     isQuestionnaireType,
-    isNewQuestionType,
-    handleNewQuestionDelete,
-    handleNewQuestionSave,
+    question,
+    handleQuestionSoftDelete,
   } = props;
 
   const [questionType, setQuestionType] = useState(fieldType);
@@ -138,18 +245,27 @@ const DynamicField = (props: Props) => {
   // );
 
   const [options, setOptions] = useState<DropDownOptions[] | undefined>(
-    isNewQuestionType ? undefined : dropdownOptions
+    question?.dropdownOptions
   );
+
+  const [openDialog, setOpenDialog] = useState(false);
+
+  const handleQuestionDeleteDialogOpen = () => {
+    setOpenDialog(true);
+  };
+
+  const handleClose = () => {
+    setOpenDialog(false);
+  };
 
   const formik = useFormik({
     initialValues: {
-      questionText: isNewQuestionType ? undefined : questionText,
+      questionText: question?.questionText,
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {
-      // setDisplayAddNewOption(false);
-      values.questionText && handleSaveClick(values.questionText);
-      resetForm();
+      // values.questionText && handleSaveClick(values.questionText);
+      // resetForm();
     },
   });
 
@@ -157,14 +273,14 @@ const DynamicField = (props: Props) => {
     setQuestionType(parseInt(event.target.value));
   };
 
-  const handleSaveClick = (questionText: string) => {
-    handleNewQuestionSave &&
-      handleNewQuestionSave({
-        fieldType: questionType,
-        questionText,
-        dropdownOptions: options ?? [],
-      });
-  };
+  // const handleSaveClick = (questionText: string) => {
+  //   handleNewQuestionSave &&
+  //     handleNewQuestionSave({
+  //       fieldType: questionType,
+  //       questionText,
+  //       dropdownOptions: options ?? [],
+  //     });
+  // };
 
   const metaDataField = (
     <>
@@ -179,7 +295,7 @@ const DynamicField = (props: Props) => {
 
       <TextField
         variant="outlined"
-        label={label}
+        label={label ? label : "Type Question"}
         required
         type="text"
         multiline={fieldType === FieldType.TextArea}
@@ -195,20 +311,54 @@ const DynamicField = (props: Props) => {
     </>
   );
 
-  const buttons = (
-    <Stack direction="row" justifyContent="end" my={2} gap={2}>
-      <Button
-        onClick={() => {
-          formik.handleSubmit();
-        }}
-        sx={customStyles.saveButton}
-      >
-        Save
-      </Button>
-      <Button onClick={handleNewQuestionDelete} sx={customStyles.deleteButton}>
-        Delete
-      </Button>
-    </Stack>
+  const deleteQuestionDialogModel = (
+    <Box sx={customStyles.modalContent}>
+      <Typography variant="h6" sx={customStyles.modalTitle}>
+        Delete Question
+      </Typography>
+
+      <Typography variant="body1">
+        Are you sure want to delete question no. # ?
+      </Typography>
+
+      <Stack sx={customStyles.dialogBtnStack}>
+        <Button
+          variant="contained"
+          sx={{
+            ...customStyles.secondaryBtn,
+            order: {
+              xs: 2,
+              md: 1,
+            },
+          }}
+          fullWidth
+          onClick={handleClose}
+          disableElevation
+        >
+          Cancel
+        </Button>
+
+        <Button
+          variant="contained"
+          sx={{
+            ...customStyles.primaryBtn,
+            order: {
+              xs: 1,
+              md: 2,
+            },
+          }}
+          fullWidth
+          onClick={() =>
+            handleQuestionSoftDelete &&
+            question?.id &&
+            handleQuestionSoftDelete(question?.id)
+          }
+          disableElevation
+        >
+          Delete Question
+        </Button>
+      </Stack>
+    </Box>
   );
 
   const questionnaireField = (
@@ -224,19 +374,39 @@ const DynamicField = (props: Props) => {
           fontFamily={champBlackFontFamily}
           textTransform="uppercase"
         >
-          {title}
+          {title ? title : `Question : ${question?.id}`}
         </Typography>
 
         <Box>
-          <IconButton sx={customStyles.dragDropButton}>
+          {question?.isNewlyAdded && (
+            <Tooltip title="Delete Question">
+              <IconButton
+                sx={customStyles.button}
+                onClick={handleQuestionDeleteDialogOpen}
+              >
+                <DeleteOutlineIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+
+          <IconButton sx={customStyles.button}>
             <KeyboardArrowDownIcon fontSize="small" />
           </IconButton>
 
-          <IconButton sx={customStyles.dragDropButton}>
+          <IconButton sx={customStyles.button}>
             <KeyboardArrowUpIcon fontSize="small" />
           </IconButton>
         </Box>
       </Stack>
+
+      <Modal
+        open={openDialog}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        {deleteQuestionDialogModel}
+      </Modal>
 
       <Stack flexDirection="row" mt={1}>
         <FormControl sx={customStyles.dropdown}>
@@ -267,7 +437,7 @@ const DynamicField = (props: Props) => {
 
         <TextField
           variant="outlined"
-          label={label}
+          label={label ? label : "Type Question"}
           required
           type="text"
           // placeholder="abc@gmail.com"
@@ -303,8 +473,6 @@ const DynamicField = (props: Props) => {
           setOptions={setOptions}
         />
       )}
-
-      {isNewQuestionType && buttons}
     </>
   );
 

@@ -17,8 +17,10 @@ import AddIcon from "@mui/icons-material/Add";
 import {
   getStudentFormInfo,
   postStudentFormInfo,
+  studentFormInfoItemSoftDelete,
 } from "../../services/editQuestionSets.service";
 import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
+import AddNewField from "../../shared/AddNewField/AddNewField";
 
 const customStyles = {
   snackbarAlert: {
@@ -127,6 +129,8 @@ const initialNewQuestionContent: Question = {
   dropdownOptions: [],
   minValue: 0,
   maxValue: 6,
+  isDelete: false,
+  isNewlyAdded: false,
 };
 
 const menuItems = [
@@ -179,6 +183,17 @@ const EditPreInterventionForm = () => {
     setValue(newValue);
   };
 
+  const handleQuestionSoftDelete = async (id: number) => {
+    const response = await studentFormInfoItemSoftDelete(id);
+
+    const updatedQuestionsArr = questions;
+    updatedQuestionsArr?.filter(
+      (item: QuestionResponse) =>
+        !(item.id === (response as QuestionResponse).id)
+    );
+    setQuestions(updatedQuestionsArr);
+  };
+
   const handleAddNewQuestion = () => {
     setDisplayNewQuestion(true);
   };
@@ -202,6 +217,7 @@ const EditPreInterventionForm = () => {
       newQuestion.fieldType = fieldType;
       newQuestion.questionText = questionText;
       newQuestion.dropdownOptions = dropdownOptions;
+      newQuestion.isNewlyAdded = true;
       const response = await postStudentFormInfo(newQuestion);
 
       const updatedQuestionsArr = questions;
@@ -299,27 +315,20 @@ const EditPreInterventionForm = () => {
               fieldType={FieldType.TextField}
             />
             {questions &&
-              questions.map((question: QuestionResponse) => (
-                <DynamicField
-                  title={`Question : ${question.id}`}
-                  label="Type Question"
-                  fieldType={question.fieldType as FieldType}
-                  isQuestionnaireType={true}
-                  questionText={question.questionText}
-                  dropdownOptions={question.dropdownOptions}
-                  key={question.id}
-                />
-              ))}
+              questions
+                .filter((item: QuestionResponse) => !item.isDelete)
+                .map((question: QuestionResponse) => (
+                  <DynamicField
+                    key={question.id}
+                    fieldType={question.fieldType as FieldType}
+                    isQuestionnaireType
+                    question={question}
+                    handleQuestionSoftDelete={handleQuestionSoftDelete}
+                  />
+                ))}
 
             {displayNewQuestion && (
-              <DynamicField
-                title="Add New Question"
-                label="Type Question"
-                fieldType={initialNewQuestionContent.fieldType as FieldType}
-                questionText={initialNewQuestionContent.questionText}
-                dropdownOptions={initialNewQuestionContent.dropdownOptions}
-                isQuestionnaireType
-                isNewQuestionType
+              <AddNewField
                 handleNewQuestionDelete={handleNewQuestionDelete}
                 handleNewQuestionSave={handleNewQuestionSave}
               />

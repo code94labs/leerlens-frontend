@@ -16,6 +16,8 @@ export interface Question {
   dropdownOptions: DropDownOptions[];
   minValue: number;
   maxValue: number;
+  isDelete: boolean;
+  isNewlyAdded: boolean;
 }
 
 export interface QuestionResponse extends Question {

@@ -1,5 +1,5 @@
 import { leerLensApi } from "../api/api";
-import { getRequest, postRequest } from "../api/requests";
+import { getRequest, patchRequest, postRequest } from "../api/requests";
 import { Question } from "../utils/types";
 
 export const getStudentFormInfo = async () => {
@@ -19,7 +19,10 @@ export const getStudentFormInfo = async () => {
 
 export const postStudentFormInfo = async (newQuestion: Question) => {
   try {
-    const response = await postRequest(leerLensApi.studentFormInfo, newQuestion);
+    const response = await postRequest(
+      leerLensApi.studentFormInfo,
+      newQuestion
+    );
 
     if (response.status === 201) {
       return response.data;
@@ -28,6 +31,24 @@ export const postStudentFormInfo = async (newQuestion: Question) => {
     }
   } catch (error) {
     console.error("Error adding question:", error);
+    throw error;
+  }
+};
+
+export const studentFormInfoItemSoftDelete = async (id: number) => {
+  try {
+    const response = await patchRequest(
+      `${leerLensApi.studentFormInfoItemSoftDelete}/${id}`,
+      { isDelete: true }
+    );
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error("Failed to soft delete question");
+    }
+  } catch (error) {
+    console.error("Error soft deleting question:", error);
     throw error;
   }
 };
