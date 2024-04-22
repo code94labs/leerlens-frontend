@@ -4,10 +4,10 @@ export type DropDownOptions = {
   id: number;
   item: string;
   isDelete: boolean;
+  isNewlyAdded?: boolean;
 };
 
-export type Question = {
-  id: number;
+export interface Question {
   formType: FormEvaluation;
   questionText: string;
   fieldType: FieldType;
@@ -16,4 +16,10 @@ export type Question = {
   dropdownOptions: DropDownOptions[];
   minValue: number;
   maxValue: number;
-};
+  isDelete: boolean;
+  isNewlyAdded: boolean;
+}
+
+export interface QuestionResponse extends Question {
+  id: number;
+}

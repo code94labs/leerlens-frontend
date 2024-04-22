@@ -48,7 +48,7 @@ import {
 } from "../../services/questionnaire.service";
 
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
-import { DropDownOptions, Question } from "../../utils/types";
+import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 const customStyles = {
@@ -221,12 +221,12 @@ const PreInterventionForm = () => {
   const [age, setAge] = useState("");
   const [remindProgram, setRemindProgram] = useState("");
 
-  const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
+  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>([]);
 
-  const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
+  const [questionListPartOne, setQuestionListPartOne] = useState<QuestionResponse[]>(
     []
   );
-  const [questionListPartTwo, setQuestionListPartTwo] = useState<Question[]>(
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<QuestionResponse[]>(
     []
   );
 
@@ -314,7 +314,7 @@ const PreInterventionForm = () => {
 
         setStudentFormInfo(
           studentFormInfoQuestions.filter(
-            (item: Question) => item.sectionType === SectionType.PersonalDetails
+            (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
           )
         );
       } catch (error) {
@@ -375,7 +375,7 @@ const PreInterventionForm = () => {
     return completedSteps() === totalSteps();
   };
 
-  const formatQuestionnaire = (questionList: Question[], answers: number[]) => {
+  const formatQuestionnaire = (questionList: QuestionResponse[], answers: number[]) => {
     return questionList.map((question, index) => ({
       questionnaireId: question.id,
       answer: answers[index],
@@ -449,7 +449,7 @@ const PreInterventionForm = () => {
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
         studentFormInfo
-          .map((question: Question) => (
+          .map((question: QuestionResponse) => (
             <Grid item xs={12} md={6} key={question.id}>
               <FormControl fullWidth required>
                 {(() => {
@@ -621,7 +621,7 @@ const PreInterventionForm = () => {
           },
         }}
       >
-        {questionListPartOne.map((questionDetails: Question, index: number) => (
+        {questionListPartOne.map((questionDetails: QuestionResponse, index: number) => (
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
@@ -678,7 +678,7 @@ const PreInterventionForm = () => {
           },
         }}
       >
-        {questionListPartTwo.map((questionDetails: Question, index: number) => (
+        {questionListPartTwo.map((questionDetails: QuestionResponse, index: number) => (
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
@@ -713,7 +713,7 @@ const PreInterventionForm = () => {
         const preInterventionQuestions = await getAllPreInterventionQuestions();
 
         const questionsWithAnswerValue = preInterventionQuestions.map(
-          (question: Question) => ({
+          (question: QuestionResponse) => ({
             ...question,
             answerValue: 0,
           })
