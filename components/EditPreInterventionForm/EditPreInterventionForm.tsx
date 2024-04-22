@@ -316,7 +316,7 @@ const EditPreInterventionForm = () => {
             />
             {questions &&
               questions
-                .filter((item: QuestionResponse) => !item.isDelete)
+                // .filter((item: QuestionResponse) => !item.isDelete)
                 .map((question: QuestionResponse) => (
                   <DynamicField
                     key={question.id}
