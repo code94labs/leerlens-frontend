@@ -1,6 +1,12 @@
 import { leerLensApi } from "../api/api";
-import { getRequest, patchRequest, postRequest } from "../api/requests";
-import { Question } from "../utils/types";
+import {
+  getRequest,
+  patchRequest,
+  postRequest,
+  updateRequest,
+} from "../api/requests";
+import { FieldType, FormEvaluation, SectionType } from "../utils/enum";
+import { DropDownOptions, Question, QuestionResponse } from "../utils/types";
 
 export const getStudentFormInfo = async () => {
   try {
@@ -31,6 +37,34 @@ export const postStudentFormInfo = async (newQuestion: Question) => {
     }
   } catch (error) {
     console.error("Error adding question:", error);
+    throw error;
+  }
+};
+
+export const studentFormInfoItemUpdateById = async (updateQuestion: {
+  id: number;
+  formType: FormEvaluation;
+  questionText: string;
+  fieldType: FieldType;
+  sectionType: SectionType;
+  positionOrderId: number;
+  dropdownOptions: DropDownOptions[];
+  minValue: number;
+  maxValue: number;
+}) => {
+  try {
+    const response = await patchRequest(
+      `${leerLensApi.studentFormInfo}/${updateQuestion.id}`,
+      updateQuestion
+    );
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error("Failed to update question");
+    }
+  } catch (error) {
+    console.error("Error updating question:", error);
     throw error;
   }
 };

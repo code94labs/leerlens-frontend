@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { SyntheticEvent, useMemo, useState } from "react";
+import { omit } from "lodash";
 import DynamicField from "../../shared/DynamicField/DynamicField";
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { champBlackFontFamily } from "../../shared/typography";
@@ -18,6 +19,7 @@ import {
   getStudentFormInfo,
   postStudentFormInfo,
   studentFormInfoItemSoftDelete,
+  studentFormInfoItemUpdateById,
 } from "../../services/editQuestionSets.service";
 import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
 import AddNewField from "../../shared/AddNewField/AddNewField";
@@ -187,11 +189,31 @@ const EditPreInterventionForm = () => {
     const response = await studentFormInfoItemSoftDelete(id);
 
     const updatedQuestionsArr = questions;
-    updatedQuestionsArr?.filter(
-      (item: QuestionResponse) =>
-        !(item.id === (response as QuestionResponse).id)
-    );
+    updatedQuestionsArr?.filter((item: QuestionResponse) => {
+      console.log("ran");
+      return !(item.id === (response as QuestionResponse).id);
+    });
     setQuestions(updatedQuestionsArr);
+  };
+
+  const handleQuestionUpdate = async (question: QuestionResponse) => {
+    const response = await studentFormInfoItemUpdateById(
+      omit(question, ["isDelete", "isNewlyAdded"])
+    );
+
+    if (questions) {
+      const updatedQuestionsArr: QuestionResponse[] = questions.slice();
+
+      const index = updatedQuestionsArr.findIndex((q) => q.id === response.id);
+
+      if (index !== -1) {
+        updatedQuestionsArr[index] = response;
+
+        setQuestions(updatedQuestionsArr);
+      } else {
+        console.error(`Question with id ${response.id} not found`);
+      }
+    }
   };
 
   const handleAddNewQuestion = () => {
@@ -323,6 +345,7 @@ const EditPreInterventionForm = () => {
                     fieldType={question.fieldType as FieldType}
                     isQuestionnaireType
                     question={question}
+                    handleQuestionUpdate={handleQuestionUpdate}
                     handleQuestionSoftDelete={handleQuestionSoftDelete}
                   />
                 ))}

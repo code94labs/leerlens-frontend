@@ -20,6 +20,7 @@ import * as yup from "yup";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DoneIcon from "@mui/icons-material/Done";
 
 import { champBlackFontFamily } from "../typography";
 
@@ -225,6 +226,7 @@ type Props = {
   fieldType: FieldType;
   isQuestionnaireType?: boolean;
   question?: QuestionResponse;
+  handleQuestionUpdate?: (question: QuestionResponse) => void;
   handleQuestionSoftDelete?: (id: number) => void;
 };
 
@@ -235,6 +237,7 @@ const DynamicField = (props: Props) => {
     fieldType,
     isQuestionnaireType,
     question,
+    handleQuestionUpdate,
     handleQuestionSoftDelete,
   } = props;
 
@@ -244,8 +247,8 @@ const DynamicField = (props: Props) => {
   //   isNewQuestionType ? undefined : questionText
   // );
 
-  const [options, setOptions] = useState<DropDownOptions[] | undefined>(
-    question?.dropdownOptions
+  const [options, setOptions] = useState<DropDownOptions[]>(
+    question?.dropdownOptions ?? []
   );
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -258,14 +261,25 @@ const DynamicField = (props: Props) => {
     setOpenDialog(false);
   };
 
+  const handleSaveChanges = (questionText: string) => {
+    if (question && handleQuestionUpdate) {
+      const newQuestion: QuestionResponse = question;
+      newQuestion.fieldType = questionType;
+      newQuestion.questionText = questionText;
+      newQuestion.dropdownOptions = options;
+
+      handleQuestionUpdate(newQuestion);
+    }
+  };
+
   const formik = useFormik({
     initialValues: {
-      questionText: question?.questionText,
+      questionText: question?.questionText ?? "",
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {
-      // values.questionText && handleSaveClick(values.questionText);
-      // resetForm();
+      handleSaveChanges(values.questionText);
+      resetForm();
     },
   });
 
@@ -318,7 +332,7 @@ const DynamicField = (props: Props) => {
       </Typography>
 
       <Typography variant="body1">
-        Are you sure want to delete question no. # ?
+        Are you sure want to delete question no. {question?.id} ?
       </Typography>
 
       <Stack sx={customStyles.dialogBtnStack}>
@@ -348,11 +362,12 @@ const DynamicField = (props: Props) => {
             },
           }}
           fullWidth
-          onClick={() =>
+          onClick={() => {
             handleQuestionSoftDelete &&
-            question?.id &&
-            handleQuestionSoftDelete(question?.id)
-          }
+              question?.id &&
+              handleQuestionSoftDelete(question?.id);
+            setOpenDialog(false);
+          }}
           disableElevation
         >
           Delete Question
@@ -378,6 +393,17 @@ const DynamicField = (props: Props) => {
         </Typography>
 
         <Box>
+          {question?.isNewlyAdded && (
+            <Tooltip title="Save changes">
+              <IconButton
+                sx={customStyles.button}
+                onClick={() => formik.handleSubmit()}
+              >
+                <DoneIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          )}
+
           {question?.isNewlyAdded && (
             <Tooltip title="Delete Question">
               <IconButton
