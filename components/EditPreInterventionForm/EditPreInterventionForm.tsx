@@ -9,7 +9,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import React, { SyntheticEvent, useMemo, useState } from "react";
+import React, { SyntheticEvent, useEffect, useMemo, useState } from "react";
 import { omit } from "lodash";
 import DynamicField from "../../shared/DynamicField/DynamicField";
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
@@ -204,13 +204,13 @@ const EditPreInterventionForm = () => {
         const updatedQuestionsArr = [...prevQuestions];
 
         const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === response.id
+          (q) => q.id === question.id
         );
 
         if (index !== -1) {
-          updatedQuestionsArr[index] = response;
+          updatedQuestionsArr[index] = question;
         } else {
-          console.error(`Question with id ${response.id} not found`);
+          console.error(`Question with id ${question.id} not found`);
         }
 
         return updatedQuestionsArr;

@@ -279,7 +279,6 @@ const DynamicField = (props: Props) => {
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {
       handleSaveChanges(values.questionText);
-      resetForm();
     },
   });
 
@@ -484,7 +483,7 @@ const DynamicField = (props: Props) => {
         direction="row"
         justifyContent="flex-end"
         alignItems="center"
-        mt={formik.touched.questionText ? -2 : 0}
+        mt={formik.errors.questionText ? -2 : 0}
       >
         {formik.touched.questionText && (
           <FormHelperText sx={{ color: "red" }}>
