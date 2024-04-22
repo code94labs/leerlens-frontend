@@ -161,7 +161,7 @@ const EditPreInterventionForm = () => {
 
   const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
 
-  const [questions, setQuestions] = useState<QuestionResponse[]>();
+  const [questions, setQuestions] = useState<QuestionResponse[]>([]);
 
   useMemo(() => {
     const fetchData = async () => {
@@ -188,31 +188,35 @@ const EditPreInterventionForm = () => {
   const handleQuestionSoftDelete = async (id: number) => {
     const response = await studentFormInfoItemSoftDelete(id);
 
-    const updatedQuestionsArr = questions;
-    updatedQuestionsArr?.filter((item: QuestionResponse) => {
-      console.log("ran");
-      return !(item.id === (response as QuestionResponse).id);
-    });
+    const updatedQuestionsArr = questions.filter(
+      (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
+    );
     setQuestions(updatedQuestionsArr);
   };
 
   const handleQuestionUpdate = async (question: QuestionResponse) => {
-    const response = await studentFormInfoItemUpdateById(
-      omit(question, ["isDelete", "isNewlyAdded"])
-    );
+    try {
+      const response = await studentFormInfoItemUpdateById(
+        omit(question, ["isDelete", "isNewlyAdded"])
+      );
 
-    if (questions) {
-      const updatedQuestionsArr: QuestionResponse[] = questions.slice();
+      setQuestions((prevQuestions) => {
+        const updatedQuestionsArr = [...prevQuestions];
 
-      const index = updatedQuestionsArr.findIndex((q) => q.id === response.id);
+        const index = updatedQuestionsArr.findIndex(
+          (q) => q.id === response.id
+        );
 
-      if (index !== -1) {
-        updatedQuestionsArr[index] = response;
+        if (index !== -1) {
+          updatedQuestionsArr[index] = response;
+        } else {
+          console.error(`Question with id ${response.id} not found`);
+        }
 
-        setQuestions(updatedQuestionsArr);
-      } else {
-        console.error(`Question with id ${response.id} not found`);
-      }
+        return updatedQuestionsArr;
+      });
+    } catch (error) {
+      console.error("Error updating question:", error);
     }
   };
 
@@ -336,19 +340,16 @@ const EditPreInterventionForm = () => {
               label="Question heading"
               fieldType={FieldType.TextField}
             />
-            {questions &&
-              questions
-                // .filter((item: QuestionResponse) => !item.isDelete)
-                .map((question: QuestionResponse) => (
-                  <DynamicField
-                    key={question.id}
-                    fieldType={question.fieldType as FieldType}
-                    isQuestionnaireType
-                    question={question}
-                    handleQuestionUpdate={handleQuestionUpdate}
-                    handleQuestionSoftDelete={handleQuestionSoftDelete}
-                  />
-                ))}
+            {questions.map((question: QuestionResponse) => (
+              <DynamicField
+                key={question.id}
+                fieldType={question.fieldType as FieldType}
+                isQuestionnaireType
+                question={question}
+                handleQuestionUpdate={handleQuestionUpdate}
+                handleQuestionSoftDelete={handleQuestionSoftDelete}
+              />
+            ))}
 
             {displayNewQuestion && (
               <AddNewField
