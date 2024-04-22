@@ -833,7 +833,7 @@ const RemindEvaluationForm = () => {
           <Grid
             item
             xs={12}
-            md={question.fieldType === FieldType.Scale ? 12 : 6}
+            md={question.fieldType === FieldType.Scale1to10 ? 12 : 6}
             key={question.id}
           >
             <FormControl fullWidth required>
@@ -939,7 +939,7 @@ const RemindEvaluationForm = () => {
                         }
                       />
                     );
-                  case FieldType.Scale:
+                  case FieldType.Scale1to10:
                     return (
                       <CustomScale
                         {...question}

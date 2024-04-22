@@ -10,7 +10,7 @@ const EvaluationPage = () => {
       <Sidebar />
 
       <Stack width={"100%"}>
-        <AdminHeader title="Evaluation" />
+        <AdminHeader title="Evaluation" shouldDisplayBreadcrumb/>
 
         <EvaluationContent />
       </Stack>

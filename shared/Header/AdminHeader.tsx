@@ -60,10 +60,11 @@ const customStyles = {
 
 type Props = {
   title: string;
+  shouldDisplayBreadcrumb?: boolean;
 };
 
 const AdminHeader = (props: Props) => {
-  const { title } = props;
+  const { title, shouldDisplayBreadcrumb } = props;
 
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
@@ -83,10 +84,10 @@ const AdminHeader = (props: Props) => {
   const handleLogout = () => {
     dispatch(clearUser());
 
-    router.replace('/admin/login')
+    router.replace("/admin/login");
 
     handleClose();
-  }
+  };
 
   return (
     <>
@@ -148,7 +149,7 @@ const AdminHeader = (props: Props) => {
         </Box>
       </Stack>
 
-      <Breadcrumb />
+      {shouldDisplayBreadcrumb && <Breadcrumb />}
     </>
   );
 };

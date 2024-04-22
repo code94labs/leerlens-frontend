@@ -9,8 +9,8 @@ const NormGroupPage = () => {
     <Stack direction="row">
       <Sidebar />
 
-      <Stack width={"100%"}>
-        <AdminHeader title="Normgroup" />
+      <Stack width={"100%menu "}>
+        <AdminHeader title="Normgroup" shouldDisplayBreadcrumb/>
 
         <NormGroupContent />
       </Stack>
