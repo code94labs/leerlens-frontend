@@ -261,26 +261,30 @@ const DynamicField = (props: Props) => {
     setOpenDialog(false);
   };
 
-  const handleSaveChanges = (questionText: string) => {
-    if (question && handleQuestionUpdate) {
-      const newQuestion: QuestionResponse = question;
-      newQuestion.fieldType = questionType;
-      newQuestion.questionText = questionText;
-      newQuestion.dropdownOptions = options;
-
-      handleQuestionUpdate(newQuestion);
-    }
-  };
-
   const formik = useFormik({
     initialValues: {
       questionText: question?.questionText ?? "",
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {
-      handleSaveChanges(values.questionText);
+      // handleSaveChanges(values.questionText);
     },
   });
+
+  useEffect(() => {
+    const handleSaveChanges = () => {
+      if (question && handleQuestionUpdate) {
+        const newQuestion: QuestionResponse = question;
+        newQuestion.fieldType = questionType;
+        newQuestion.questionText = formik.values.questionText;
+        newQuestion.dropdownOptions = options;
+
+        handleQuestionUpdate(newQuestion);
+      }
+    };
+
+    handleSaveChanges();
+  }, [question, questionType, formik.values.questionText, options]);
 
   const handleChangeQuestionType = (event: SelectChangeEvent) => {
     setQuestionType(parseInt(event.target.value));

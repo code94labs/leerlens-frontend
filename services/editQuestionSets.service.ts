@@ -69,6 +69,36 @@ export const studentFormInfoItemUpdateById = async (updateQuestion: {
   }
 };
 
+export const studentFormInfoItemUpdateBulk = async (
+  updateQuestions: {
+    id: number;
+    formType: FormEvaluation;
+    questionText: string;
+    fieldType: FieldType;
+    sectionType: SectionType;
+    positionOrderId: number;
+    dropdownOptions: DropDownOptions[];
+    minValue: number;
+    maxValue: number;
+  }[]
+) => {
+  try {
+    const response = await patchRequest(
+      leerLensApi.studentFormInfo,
+      updateQuestions
+    );
+
+    if (response.status === 200) {
+      return response.data;
+    } else {
+      throw new Error("Failed to update questions");
+    }
+  } catch (error) {
+    console.error("Error updating questions:", error);
+    throw error;
+  }
+};
+
 export const studentFormInfoItemSoftDelete = async (id: number) => {
   try {
     const response = await patchRequest(

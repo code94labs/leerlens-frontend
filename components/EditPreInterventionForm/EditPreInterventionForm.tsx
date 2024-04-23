@@ -19,6 +19,7 @@ import {
   getStudentFormInfo,
   postStudentFormInfo,
   studentFormInfoItemSoftDelete,
+  studentFormInfoItemUpdateBulk,
   studentFormInfoItemUpdateById,
 } from "../../services/editQuestionSets.service";
 import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
@@ -171,6 +172,8 @@ const EditPreInterventionForm = () => {
         setQuestions(
           studentFormInfoQuestions.filter(
             (item: Question) => item.sectionType === SectionType.PersonalDetails
+            // item.sectionType === SectionType.PersonalDetails &&
+            // item.formType === FormEvaluation.PreInterventions
           )
         );
       } catch (error) {
@@ -195,28 +198,41 @@ const EditPreInterventionForm = () => {
   };
 
   const handleQuestionUpdate = async (question: QuestionResponse) => {
+    // try {
+    //   const response = await studentFormInfoItemUpdateById(
+    //     omit(question, ["isDelete", "isNewlyAdded"])
+    //   );
+
+    setQuestions((prevQuestions) => {
+      const updatedQuestionsArr = [...prevQuestions];
+
+      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
+
+      if (index !== -1) {
+        updatedQuestionsArr[index] = question;
+      } else {
+        console.error(`Question with id ${question.id} not found`);
+      }
+
+      return updatedQuestionsArr;
+    });
+    // } catch (error) {
+    //   console.error("Error updating question:", error);
+    // }
+  };
+
+  const handleUpdateAllQuestions = async () => {
     try {
-      const response = await studentFormInfoItemUpdateById(
-        omit(question, ["isDelete", "isNewlyAdded"])
-      );
-
-      setQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
+      const updatedQuestions = questions.map((question) => {
+        const { isDelete, isNewlyAdded, ...updatedQuestion } = question;
+        return updatedQuestion;
       });
+
+      // Call the update function with the updated array
+      const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
+      setQuestions(response);
     } catch (error) {
-      console.error("Error updating question:", error);
+      console.error("Error updating questions:", error);
     }
   };
 
@@ -314,7 +330,11 @@ const EditPreInterventionForm = () => {
         Cancel
       </Button>
 
-      <Button onClick={() => {}} sx={customStyles.updateButton} disabled>
+      <Button
+        onClick={handleUpdateAllQuestions}
+        sx={customStyles.updateButton}
+        // disabled
+      >
         Update
       </Button>
     </Stack>
