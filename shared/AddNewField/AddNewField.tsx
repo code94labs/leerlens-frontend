@@ -119,7 +119,7 @@ const AddNewField = (props: Props) => {
 
   const formik = useFormik({
     initialValues: {
-      questionText: undefined,
+      questionText: '',
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {

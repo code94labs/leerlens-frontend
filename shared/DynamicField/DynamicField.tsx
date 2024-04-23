@@ -396,7 +396,7 @@ const DynamicField = (props: Props) => {
         </Typography>
 
         <Box>
-          {question?.isNewlyAdded && (
+          {/* {question?.isNewlyAdded && (
             <Tooltip title="Save changes">
               <IconButton
                 sx={customStyles.button}
@@ -405,7 +405,7 @@ const DynamicField = (props: Props) => {
                 <DoneIcon fontSize="small" />
               </IconButton>
             </Tooltip>
-          )}
+          )} */}
 
           {question?.isNewlyAdded && (
             <Tooltip title="Delete Question">

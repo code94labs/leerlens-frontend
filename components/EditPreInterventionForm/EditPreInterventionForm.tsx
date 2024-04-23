@@ -171,9 +171,9 @@ const EditPreInterventionForm = () => {
 
         setQuestions(
           studentFormInfoQuestions.filter(
-            (item: Question) => item.sectionType === SectionType.PersonalDetails
-            // item.sectionType === SectionType.PersonalDetails &&
-            // item.formType === FormEvaluation.PreInterventions
+            (item: Question) =>
+              item.sectionType === SectionType.PersonalDetails &&
+              item.formType === FormEvaluation.PreInterventions
           )
         );
       } catch (error) {
@@ -197,12 +197,8 @@ const EditPreInterventionForm = () => {
     setQuestions(updatedQuestionsArr);
   };
 
+  // function to update the state of this(parent) component
   const handleQuestionUpdate = async (question: QuestionResponse) => {
-    // try {
-    //   const response = await studentFormInfoItemUpdateById(
-    //     omit(question, ["isDelete", "isNewlyAdded"])
-    //   );
-
     setQuestions((prevQuestions) => {
       const updatedQuestionsArr = [...prevQuestions];
 
@@ -216,9 +212,6 @@ const EditPreInterventionForm = () => {
 
       return updatedQuestionsArr;
     });
-    // } catch (error) {
-    //   console.error("Error updating question:", error);
-    // }
   };
 
   const handleUpdateAllQuestions = async () => {
@@ -228,7 +221,6 @@ const EditPreInterventionForm = () => {
         return updatedQuestion;
       });
 
-      // Call the update function with the updated array
       const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
       setQuestions(response);
     } catch (error) {
