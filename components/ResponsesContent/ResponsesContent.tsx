@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import React, { SyntheticEvent, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
-import DyanmicListItem from "./DyanmicListItem";
+import DyanmicListHeader from "./DyanmicListHeader";
 import ResponseAccordion from "./ResponseAccordion";
 
 const dateFilterList = [
@@ -60,6 +60,13 @@ const customStyles = {
   },
   tabContent: {
     width: "100%",
+    zIndex: 3,
+    border: "1px #A879FF solid",
+    borderRadius: 3,
+    p: 0.5,
+  },
+  stack: {
+    backgroundColor: "white",
   },
 };
 
@@ -158,7 +165,7 @@ const ResponsesContent = () => {
         );
       case 4:
         return (
-              <Stack sx={customStyles.tabContent}>
+          <Stack sx={customStyles.tabContent}>
             <Typography>Hello world</Typography>
             <Typography>Hello world</Typography>
             <Typography>Hello world</Typography>
@@ -183,7 +190,11 @@ const ResponsesContent = () => {
     <Stack px={2} mt={-3}>
       {tabHeader}
 
-      <DyanmicListItem isHeading />
+      <DyanmicListHeader
+        title="Recorded date"
+        subTitle="Question types"
+        isMainTitle
+      />
 
       {isLoading ? (
         loading
@@ -201,7 +212,7 @@ const ResponsesContent = () => {
   );
 
   return (
-    <Stack>
+    <Stack sx={customStyles.stack}>
       {titleContentSection}
 
       {tabSection}
