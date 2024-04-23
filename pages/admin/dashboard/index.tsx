@@ -9,7 +9,7 @@ const DashboardPage = () => {
       <Sidebar />
 
       <Stack width={"100%"}>
-        <AdminHeader title="Dashboard" />
+        <AdminHeader title="Dashboard" shouldDisplayBreadcrumb/>
 
         {/* Content */}
       </Stack>

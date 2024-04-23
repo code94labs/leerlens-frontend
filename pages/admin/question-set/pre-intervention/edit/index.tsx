@@ -10,7 +10,7 @@ const EditPreIntervention = () => {
       <Sidebar />
 
       <Stack width={"100%"}>
-        <AdminHeader title="Edit Questions" />
+        <AdminHeader title="Edit Questions" shouldDisplayBreadcrumb/>
 
         <EditPreInterventionForm />
       </Stack>

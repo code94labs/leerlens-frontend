@@ -439,7 +439,7 @@ const DynamicField = (props: Props) => {
 
       <Stack flexDirection="row" mt={1}>
         <FormControl sx={customStyles.dropdown}>
-          <InputLabel id="demo-simple-select-label">
+          <InputLabel>
             Select Question Type
             <span style={customStyles.dropdownAsterisk}> * </span>
           </InputLabel>

@@ -10,7 +10,7 @@ const PreInterventionPage = () => {
       <Sidebar />
 
       <Stack width={"100%"}>
-        <AdminHeader title="Pre-Intervention" />
+        <AdminHeader title="Pre-Intervention" shouldDisplayBreadcrumb/>
 
         <PreInterventionContent />
       </Stack>

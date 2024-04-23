@@ -10,7 +10,7 @@ const PostInterventionPage = () => {
       <Sidebar />
 
       <Stack width={"100%"}>
-        <AdminHeader title="Post-Intervention" />
+        <AdminHeader title="Post-Intervention" shouldDisplayBreadcrumb/>
 
         <PostInterventionContent />
       </Stack>

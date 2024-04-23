@@ -114,7 +114,7 @@ const PreInterventionContent = () => {
   >([]);
   const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
 
-  const handleChange = (event: SyntheticEvent, newValue: number) => {
+  const handleChange = (_: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -129,7 +129,7 @@ const PreInterventionContent = () => {
       <Typography variant="h5" fontWeight={900} ml={1}>
         PERSONAL DETAILS
       </Typography>
-
+      
       <Button
         variant="outlined"
         onClick={() => router.push("/admin/question-set/pre-intervention/edit")}
@@ -188,12 +188,8 @@ const PreInterventionContent = () => {
     await getStudentFormInfoByFormType(formType)
       .then((res) => {
         setPersonalDetails(res);
-
-        console.log(res);
       })
       .catch((err) => {
-        console.log(err);
-
         setIsError(true);
 
         setNotificationMsg("Error when fetching personal details data...");
@@ -208,12 +204,8 @@ const PreInterventionContent = () => {
     await getAllPreInterventionQuestions()
       .then((res) => {
         setPreQuestionnaireList(res);
-
-        console.log(res);
       })
       .catch((err) => {
-        console.log(err);
-
         setIsError(true);
 
         setNotificationMsg("Error when fetching pre questionnaire data...");
