@@ -1,20 +1,18 @@
-import {
-  Alert,
-  Button,
-  CircularProgress,
-  Divider,
-  Snackbar,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
 import React, { SyntheticEvent, useEffect, useMemo, useState } from "react";
-import { omit } from "lodash";
-import DynamicField from "../../shared/DynamicField/DynamicField";
-import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
-import { champBlackFontFamily } from "../../shared/typography";
+
 import AddIcon from "@mui/icons-material/Add";
+
+import Snackbar from "@mui/material/Snackbar";
+import Stack from "@mui/material/Stack";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import DynamicField from "../../shared/DynamicField/DynamicField";
+import AddNewField from "../../shared/AddNewField/AddNewField";
+
 import {
   getStudentFormInfo,
   postStudentFormInfo,
@@ -22,8 +20,11 @@ import {
   studentFormInfoItemUpdateBulk,
   studentFormInfoItemUpdateById,
 } from "../../services/editQuestionSets.service";
+
+import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
-import AddNewField from "../../shared/AddNewField/AddNewField";
+
+import { champBlackFontFamily } from "../../shared/typography";
 
 const customStyles = {
   snackbarAlert: {
@@ -264,6 +265,47 @@ const EditPreInterventionForm = () => {
     }
   };
 
+  // change position functionality
+  // Function to handle moving an item up in the array
+  const moveItemUp = (orderId: number | undefined) => {
+    if (!orderId) return;
+    if (orderId <= 1) return; // Already at the top, can't move up
+    const newQuestionArr = [...questions];
+    newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
+    newQuestionArr[orderId - 2].positionOrderId = orderId;
+
+    setQuestions(newQuestionArr);
+  };
+
+  // Function to handle moving an item down in the array
+  const moveItemDown = (orderId: number | undefined) => {
+    if (!orderId) return;
+    if (orderId >= questions.length) return; // Already at the bottom, can't move down
+    const newQuestionArr = [...questions];
+    newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
+    newQuestionArr[orderId].positionOrderId = orderId;
+
+    setQuestions(newQuestionArr);
+  };
+
+  // Function to add a new item to the array
+  // const addItem = () => {
+  //   const newPositionOrderId = questions.length; // Assign based on current length
+  //   const newItem: QuestionResponse = { ...newItemDetails, positionOrderId: newPositionOrderId };
+  //   setQuestions([...questions, newItem]);
+  // };
+
+  // Function to delete an item from the array
+  const deleteItem = (index: number) => {
+    const newQuestions = [...questions];
+    newQuestions.splice(index, 1);
+    // Update positionOrderId of subsequent items
+    for (let i = index; i < newQuestions.length; i++) {
+      newQuestions[i].positionOrderId--;
+    }
+    setQuestions(newQuestions);
+  };
+
   const snackbar = (
     <Snackbar
       open={displaySnackbarMsg}
@@ -352,16 +394,20 @@ const EditPreInterventionForm = () => {
               label="Question heading"
               fieldType={FieldType.TextField}
             />
-            {questions.map((question: QuestionResponse) => (
-              <DynamicField
-                key={question.id}
-                fieldType={question.fieldType as FieldType}
-                isQuestionnaireType
-                question={question}
-                handleQuestionUpdate={handleQuestionUpdate}
-                handleQuestionSoftDelete={handleQuestionSoftDelete}
-              />
-            ))}
+            {questions
+              .sort((a, b) => a.positionOrderId - b.positionOrderId)
+              .map((question: QuestionResponse) => (
+                <DynamicField
+                  key={question.id}
+                  fieldType={question.fieldType as FieldType}
+                  isQuestionnaireType
+                  question={question}
+                  handleQuestionUpdate={handleQuestionUpdate}
+                  handleQuestionSoftDelete={handleQuestionSoftDelete}
+                  moveItemUp={moveItemUp}
+                  moveItemDown={moveItemDown}
+                />
+              ))}
 
             {displayNewQuestion && (
               <AddNewField

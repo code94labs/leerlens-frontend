@@ -228,6 +228,8 @@ type Props = {
   question?: QuestionResponse;
   handleQuestionUpdate?: (question: QuestionResponse) => void;
   handleQuestionSoftDelete?: (id: number) => void;
+  moveItemUp?: (index: number | undefined) => void;
+  moveItemDown?: (index: number | undefined) => void;
 };
 
 const DynamicField = (props: Props) => {
@@ -239,6 +241,8 @@ const DynamicField = (props: Props) => {
     question,
     handleQuestionUpdate,
     handleQuestionSoftDelete,
+    moveItemUp,
+    moveItemDown,
   } = props;
 
   const [questionType, setQuestionType] = useState(fieldType);
@@ -392,7 +396,7 @@ const DynamicField = (props: Props) => {
           fontFamily={champBlackFontFamily}
           textTransform="uppercase"
         >
-          {title ? title : `Question : ${question?.id}`}
+          {title ? title : `Question : ${question?.positionOrderId}`}
         </Typography>
 
         <Box>
@@ -418,13 +422,27 @@ const DynamicField = (props: Props) => {
             </Tooltip>
           )}
 
-          <IconButton sx={customStyles.button}>
-            <KeyboardArrowDownIcon fontSize="small" />
-          </IconButton>
+          <Tooltip title="Move the question down the order">
+            <IconButton
+              sx={customStyles.button}
+              onClick={() =>
+                moveItemDown && moveItemDown(question?.positionOrderId)
+              }
+            >
+              <KeyboardArrowDownIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
 
-          <IconButton sx={customStyles.button}>
-            <KeyboardArrowUpIcon fontSize="small" />
-          </IconButton>
+          <Tooltip title="Move the question up the order">
+            <IconButton
+              sx={customStyles.button}
+              onClick={() =>
+                moveItemUp && moveItemUp(question?.positionOrderId)
+              }
+            >
+              <KeyboardArrowUpIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Box>
       </Stack>
 
