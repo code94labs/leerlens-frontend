@@ -248,11 +248,15 @@ const EditPreInterventionForm = () => {
     dropdownOptions: DropDownOptions[];
   }) => {
     const newQuestion = initialNewQuestionContent;
+
+    const newPositionOrderId = questions.length + 1;
+
     if (questionText.length > 1) {
       newQuestion.fieldType = fieldType;
       newQuestion.questionText = questionText;
       newQuestion.dropdownOptions = dropdownOptions;
       newQuestion.isNewlyAdded = true;
+      newQuestion.positionOrderId = newPositionOrderId;
       const response = await postStudentFormInfo(newQuestion);
 
       const updatedQuestionsArr = questions;
@@ -265,7 +269,6 @@ const EditPreInterventionForm = () => {
     }
   };
 
-  // change position functionality
   // Function to handle moving an item up in the array
   const moveItemUp = (orderId: number | undefined) => {
     if (!orderId) return;
@@ -287,13 +290,6 @@ const EditPreInterventionForm = () => {
 
     setQuestions(newQuestionArr);
   };
-
-  // Function to add a new item to the array
-  // const addItem = () => {
-  //   const newPositionOrderId = questions.length; // Assign based on current length
-  //   const newItem: QuestionResponse = { ...newItemDetails, positionOrderId: newPositionOrderId };
-  //   setQuestions([...questions, newItem]);
-  // };
 
   // Function to delete an item from the array
   const deleteItem = (index: number) => {
