@@ -300,7 +300,7 @@ const PostInterventionForm = () => {
   useMemo(() => {
     const fetchData = async () => {
       try {
-        const studentFormInfoQuestions: Question[] =
+        const studentFormInfoQuestions: QuestionResponse[] =
           await getStudentFormInfoByFormType(FormEvaluation.PostInterventions);
 
         setStudentFormInfo(
