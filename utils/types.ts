@@ -23,3 +23,15 @@ export interface Question {
 export interface QuestionResponse extends Question {
   id: number;
 }
+
+export type FormQuestion = {
+  id: number;
+  questionText: string;
+  positionOrderId: number;
+  minValue: number;
+  maxValue: number;
+  isDelete: boolean;
+  questionSetId: number;
+  questionSection: number;
+  answer?: number | string;
+};

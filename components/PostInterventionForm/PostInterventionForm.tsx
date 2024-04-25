@@ -25,11 +25,11 @@ import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import {
   getAllPostInterventionQuestions,
-  getStudentFormInfo,
+  getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
-import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
-import { FieldType, SectionType } from "../../utils/enum";
+import { DropDownOptions, FormQuestion, Question, QuestionResponse } from "../../utils/types";
+import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 const customStyles = {
@@ -145,6 +145,9 @@ const customStyles = {
 };
 
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
+
+const questionSectionOne = 0;
+const questionSectionTwo = 1;
 
 const PostInterventionForm = () => {
   const router = useRouter();
@@ -278,7 +281,13 @@ const PostInterventionForm = () => {
   };
 
   const handleSubmit = () => {
+    console.log('Personal detials');
+    console.log(formik.values);
+
+    console.log('Questionnaire set 01');
     console.log(answersPartOne);
+
+    console.log('Questionnaire set 02');
     console.log(answersPartTwo);
   };
 
@@ -291,7 +300,8 @@ const PostInterventionForm = () => {
   useMemo(() => {
     const fetchData = async () => {
       try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
+        const studentFormInfoQuestions: Question[] =
+          await getStudentFormInfoByFormType(FormEvaluation.PostInterventions);
 
         setStudentFormInfo(
           studentFormInfoQuestions.filter(
@@ -313,19 +323,24 @@ const PostInterventionForm = () => {
           await getAllPostInterventionQuestions();
 
         const questionsWithAnswerValue = postInterventionQuestions.map(
-          (question: QuestionResponse) => ({
+          (question: FormQuestion) => ({
             ...question,
             answerValue: 0,
           })
         );
 
-        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
+        const questionSetOne = questionsWithAnswerValue.filter(
+          (question: FormQuestion) =>
+            question.questionSection === questionSectionOne
+        );
 
-        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
-        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
+        const questionSetTwo = questionsWithAnswerValue.filter(
+          (question: FormQuestion) =>
+            question.questionSection === questionSectionTwo
+        );
 
-        setQuestionListPartOne(firstHalf);
-        setQuestionListPartTwo(secondHalf);
+        setQuestionListPartOne(questionSetOne);
+        setQuestionListPartTwo(questionSetTwo);
       } catch (error) {
         console.log(error);
       }
@@ -352,7 +367,7 @@ const PostInterventionForm = () => {
       ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
       : {},
     validationSchema,
-    onSubmit: () => {
+    onSubmit: (values) => {
       // Handle form submission here
       // You can access form values using formik.values
     },
