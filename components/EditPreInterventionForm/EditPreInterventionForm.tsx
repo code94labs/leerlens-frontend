@@ -1,19 +1,36 @@
-import {
-  Alert,
-  Button,
-  CircularProgress,
-  Divider,
-  Snackbar,
-  Stack,
-  Tab,
-  Tabs,
-  Typography,
-} from "@mui/material";
-import React, { SyntheticEvent, useState } from "react";
-import DynamicField from "../../shared/DynamicField/DynamicField";
-import { FieldType } from "../../utils/enum";
-import { champBlackFontFamily } from "../../shared/typography";
+import React, { SyntheticEvent, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import AddIcon from "@mui/icons-material/Add";
+import Snackbar from "@mui/material/Snackbar";
+import Stack from "@mui/material/Stack";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
+import Typography from "@mui/material/Typography";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import DynamicField from "../../shared/DynamicField/DynamicField";
+import AddNewField from "../../shared/AddNewField/AddNewField";
+
+import {
+  resetForm,
+  selectForm,
+  setFormModified,
+} from "../../redux/slices/formSlice";
+
+import {
+  getStudentFormInfo,
+  postStudentFormInfo,
+  studentFormInfoItemSoftDelete,
+  studentFormInfoItemUpdateBulk,
+  studentFormInfoItemUpdateById,
+} from "../../services/editQuestionSets.service";
+
+import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
+import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
+
+import { champBlackFontFamily } from "../../shared/typography";
 
 const customStyles = {
   snackbarAlert: {
@@ -113,6 +130,19 @@ const customStyles = {
   },
 };
 
+const initialNewQuestionContent: Question = {
+  formType: FormEvaluation.PreInterventions,
+  questionText: "",
+  fieldType: FieldType.TextField,
+  sectionType: SectionType.PersonalDetails,
+  positionOrderId: 999,
+  dropdownOptions: [],
+  minValue: 0,
+  maxValue: 6,
+  isDelete: false,
+  isNewlyAdded: false,
+};
+
 const menuItems = [
   {
     id: 0,
@@ -129,6 +159,10 @@ const menuItems = [
 ];
 
 const EditPreInterventionForm = () => {
+  const dispatch = useDispatch();
+
+  const formDetails = useSelector(selectForm);
+
   const [value, setValue] = useState(0);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
@@ -139,8 +173,142 @@ const EditPreInterventionForm = () => {
 
   const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
 
+  const [questions, setQuestions] = useState<QuestionResponse[]>([]);
+
+  useMemo(() => {
+    const fetchData = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.PersonalDetails &&
+              item.formType === FormEvaluation.PreInterventions
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
+  };
+
+  const handleQuestionSoftDelete = async (id: number, orderId: number) => {
+    const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
+
+    const newQuestionArr = [...questions];
+
+    for (let i = orderId; i < newQuestionArr.length; i++) {
+      newQuestionArr[i].positionOrderId--;
+    }
+
+    newQuestionArr[response.positionOrderId - 1].isDelete = true;
+
+    await studentFormInfoItemUpdateBulk(newQuestionArr);
+
+    const updatedQuestionsArr = newQuestionArr.filter(
+      (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
+    );
+
+    setQuestions(updatedQuestionsArr);
+  };
+
+  // function to update the state of this(parent) component
+  const handleQuestionUpdate = async (question: QuestionResponse) => {
+    setQuestions((prevQuestions) => {
+      const updatedQuestionsArr = [...prevQuestions];
+
+      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
+
+      if (index !== -1) {
+        updatedQuestionsArr[index] = question;
+      } else {
+        console.error(`Question with id ${question.id} not found`);
+      }
+
+      return updatedQuestionsArr;
+    });
+  };
+
+  const handleUpdateAllQuestions = async () => {
+    try {
+      const updatedQuestions = questions.map((question) => {
+        const { isDelete, isNewlyAdded, ...updatedQuestion } = question;
+        return updatedQuestion;
+      });
+
+      const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
+      setQuestions(response);
+      dispatch(resetForm());
+    } catch (error) {
+      console.error("Error updating questions:", error);
+    }
+  };
+
+  const handleAddNewQuestion = () => {
+    setDisplayNewQuestion(true);
+  };
+
+  const handleNewQuestionDelete = () => {
+    setDisplayNewQuestion(false);
+    // setNewQuestion(initialNewQuestionContent);
+  };
+
+  const handleNewQuestionSave = async ({
+    fieldType,
+    questionText,
+    dropdownOptions,
+  }: {
+    fieldType: FieldType;
+    questionText: string;
+    dropdownOptions: DropDownOptions[];
+  }) => {
+    const newQuestion = initialNewQuestionContent;
+
+    const newPositionOrderId = questions.length + 1;
+
+    newQuestion.fieldType = fieldType;
+    newQuestion.questionText = questionText;
+    newQuestion.dropdownOptions = dropdownOptions;
+    newQuestion.isNewlyAdded = true;
+    newQuestion.positionOrderId = newPositionOrderId;
+    const response = await postStudentFormInfo(newQuestion);
+
+    const updatedQuestionsArr = questions;
+    updatedQuestionsArr?.push(response);
+    setQuestions(updatedQuestionsArr);
+
+    setDisplayNewQuestion(false);
+  };
+
+  // Function to handle moving an item up in the array
+  const moveItemUp = (orderId: number | undefined) => {
+    if (!orderId) return;
+    if (orderId <= 1) return; // Already at the top, can't move up
+    const newQuestionArr = [...questions];
+    newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
+    newQuestionArr[orderId - 2].positionOrderId = orderId;
+
+    setQuestions(newQuestionArr);
+    dispatch(setFormModified());
+  };
+
+  // Function to handle moving an item down in the array
+  const moveItemDown = (orderId: number | undefined) => {
+    if (!orderId) return;
+    if (orderId >= questions.length) return; // Already at the bottom, can't move down
+    const newQuestionArr = [...questions];
+    newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
+    newQuestionArr[orderId].positionOrderId = orderId;
+
+    setQuestions(newQuestionArr);
+    dispatch(setFormModified());
   };
 
   const snackbar = (
@@ -178,10 +346,9 @@ const EditPreInterventionForm = () => {
   const addQuestionButton = (
     <Stack flexDirection="row" alignItems="center" my={5} mx={3}>
       <Button
-        onClick={() =>
-          setDisplayNewQuestion((displayNewQuestion) => !displayNewQuestion)
-        }
+        onClick={handleAddNewQuestion}
         sx={customStyles.primaryButton}
+        disabled={displayNewQuestion}
       >
         <AddIcon />
 
@@ -202,7 +369,11 @@ const EditPreInterventionForm = () => {
         Cancel
       </Button>
 
-      <Button onClick={() => {}} sx={customStyles.updateButton} disabled>
+      <Button
+        onClick={handleUpdateAllQuestions}
+        sx={customStyles.updateButton}
+        disabled={!formDetails.isModified}
+      >
         Update
       </Button>
     </Stack>
@@ -228,32 +399,25 @@ const EditPreInterventionForm = () => {
               label="Question heading"
               fieldType={FieldType.TextField}
             />
-            <DynamicField
-              title="Question : 1"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
-            <DynamicField
-              title="Question : 2"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
-            <DynamicField
-              title="Question : 3"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
+            {questions
+              .sort((a, b) => a.positionOrderId - b.positionOrderId)
+              .map((question: QuestionResponse) => (
+                <DynamicField
+                  key={question.id}
+                  fieldType={question.fieldType as FieldType}
+                  isQuestionnaireType
+                  question={question}
+                  handleQuestionUpdate={handleQuestionUpdate}
+                  handleQuestionSoftDelete={handleQuestionSoftDelete}
+                  moveItemUp={moveItemUp}
+                  moveItemDown={moveItemDown}
+                />
+              ))}
 
             {displayNewQuestion && (
-              <DynamicField
-                title="Question : 4"
-                label="Type Question"
-                fieldType={FieldType.Scale1to6}
-                isQuestionnaireType={true}
-                isNewQuestionType={true}
+              <AddNewField
+                handleNewQuestionDelete={handleNewQuestionDelete}
+                handleNewQuestionSave={handleNewQuestionSave}
               />
             )}
 
@@ -308,7 +472,7 @@ const EditPreInterventionForm = () => {
         sx={customStyles.tabs}
       >
         {menuItems.map((item) => (
-          <Tab value={item.id} label={item.title} />
+          <Tab value={item.id} label={item.title} key={item.id} />
         ))}
       </Tabs>
     </Stack>
