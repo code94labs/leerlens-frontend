@@ -17,3 +17,15 @@ export type Question = {
   minValue: number;
   maxValue: number;
 };
+
+export type FormQuestion = {
+  id: number;
+  questionText: string;
+  positionOrderId: number;
+  minValue: number;
+  maxValue: number;
+  isDelete: boolean;
+  questionSetId: number;
+  questionSection: number;
+  answer?: number | string;
+};

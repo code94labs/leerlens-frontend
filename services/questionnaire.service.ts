@@ -1,5 +1,6 @@
 import { leerLensApi } from "../api/api";
 import { getRequest } from "../api/requests";
+import { FormEvaluation } from "../utils/enum";
 
 export const getStudentFormInfo = async () => {
   try {
@@ -16,7 +17,7 @@ export const getStudentFormInfo = async () => {
   }
 };
 
-export const getStudentFormInfoByFormType = async (formType: number) => {
+export const getStudentFormInfoByFormType = async (formType: FormEvaluation) => {
   try {
     const response = await getRequest(`${leerLensApi.studentFormInfo}/formType/${formType}`);
 
