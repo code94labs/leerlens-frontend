@@ -227,7 +227,7 @@ type Props = {
   isQuestionnaireType?: boolean;
   question?: QuestionResponse;
   handleQuestionUpdate?: (question: QuestionResponse) => void;
-  handleQuestionSoftDelete?: (id: number) => void;
+  handleQuestionSoftDelete?: (id: number, orderId: number) => void;
   moveItemUp?: (index: number | undefined) => void;
   moveItemDown?: (index: number | undefined) => void;
 };
@@ -339,7 +339,7 @@ const DynamicField = (props: Props) => {
       </Typography>
 
       <Typography variant="body1">
-        Are you sure want to delete question no. {question?.id} ?
+        Are you sure want to delete question no. {question?.positionOrderId} ?
       </Typography>
 
       <Stack sx={customStyles.dialogBtnStack}>
@@ -372,7 +372,7 @@ const DynamicField = (props: Props) => {
           onClick={() => {
             handleQuestionSoftDelete &&
               question?.id &&
-              handleQuestionSoftDelete(question?.id);
+              handleQuestionSoftDelete(question?.id, question.positionOrderId);
             setOpenDialog(false);
           }}
           disableElevation

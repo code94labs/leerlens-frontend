@@ -189,12 +189,23 @@ const EditPreInterventionForm = () => {
     setValue(newValue);
   };
 
-  const handleQuestionSoftDelete = async (id: number) => {
-    const response = await studentFormInfoItemSoftDelete(id);
+  const handleQuestionSoftDelete = async (id: number, orderId: number) => {
+    const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
 
-    const updatedQuestionsArr = questions.filter(
+    const newQuestionArr = [...questions];
+
+    for (let i = orderId; i < newQuestionArr.length; i++) {
+      newQuestionArr[i].positionOrderId--;
+    }
+
+    newQuestionArr[response.positionOrderId - 1].isDelete = true;
+
+    await studentFormInfoItemUpdateBulk(newQuestionArr);
+
+    const updatedQuestionsArr = newQuestionArr.filter(
       (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
     );
+
     setQuestions(updatedQuestionsArr);
   };
 
