@@ -28,6 +28,8 @@ import DynamicDropdown from "../DynamicDropdown";
 
 import { FieldType } from "../../utils/enum";
 import { DropDownOptions, QuestionResponse } from "../../utils/types";
+import { useDispatch } from "react-redux";
+import { setFormModified } from "../../redux/slices/formSlice";
 
 const customStyles = {
   textField: {
@@ -245,6 +247,8 @@ const DynamicField = (props: Props) => {
     moveItemDown,
   } = props;
 
+  const dispatch = useDispatch();
+
   const [questionType, setQuestionType] = useState(fieldType);
 
   // const [qText, setQText] = useState<string | undefined>(
@@ -292,6 +296,7 @@ const DynamicField = (props: Props) => {
 
   const handleChangeQuestionType = (event: SelectChangeEvent) => {
     setQuestionType(parseInt(event.target.value));
+    dispatch(setFormModified());
   };
 
   // const handleSaveClick = (questionText: string) => {
@@ -492,7 +497,10 @@ const DynamicField = (props: Props) => {
           id="questionText"
           name="questionText"
           value={formik.values.questionText}
-          onChange={formik.handleChange}
+          onChange={(e) => {
+            formik.handleChange(e);
+            dispatch(setFormModified());
+          }}
           onBlur={formik.handleBlur}
           error={
             formik.touched.questionText && Boolean(formik.errors.questionText)

@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useFormik } from "formik";
+import * as yup from "yup";
+
 import {
   Button,
   Container,
@@ -17,9 +21,10 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+
+import { setFormModified } from "../../redux/slices/formSlice";
+
 import { champBlackFontFamily } from "../typography";
-import { useFormik } from "formik";
-import * as yup from "yup";
 
 import { DropDownOptions } from "../../utils/types";
 
@@ -76,6 +81,8 @@ type Props = {
 };
 
 const DynamicDropdown = ({ options, setOptions }: Props) => {
+  const dispatch = useDispatch();
+
   const [editableOptions, setEditableOptions] = useState<number[]>([]);
   const [displayAddNewOption, setDisplayAddNewOption] =
     useState<boolean>(false);
@@ -90,6 +97,7 @@ const DynamicDropdown = ({ options, setOptions }: Props) => {
   const handleDeleteOption = (id: number) => {
     const newOptionsArr = options.filter((option) => !(option.id === id));
     setOptions(newOptionsArr);
+    dispatch(setFormModified());
   };
 
   const handleEditOption = (id: number) => {
@@ -114,6 +122,7 @@ const DynamicDropdown = ({ options, setOptions }: Props) => {
       return option;
     });
     setOptions(updatedOptions);
+    dispatch(setFormModified());
   };
 
   const handleAddNewOption = (data: string) => {
@@ -129,6 +138,7 @@ const DynamicDropdown = ({ options, setOptions }: Props) => {
       isNewlyAdded: true,
     });
     setOptions(newOptionsArr);
+    dispatch(setFormModified());
   };
 
   const formik = useFormik({

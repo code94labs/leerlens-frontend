@@ -1,7 +1,7 @@
 import React, { SyntheticEvent, useEffect, useMemo, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 import AddIcon from "@mui/icons-material/Add";
-
 import Snackbar from "@mui/material/Snackbar";
 import Stack from "@mui/material/Stack";
 import Alert from "@mui/material/Alert";
@@ -12,6 +12,12 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import DynamicField from "../../shared/DynamicField/DynamicField";
 import AddNewField from "../../shared/AddNewField/AddNewField";
+
+import {
+  resetForm,
+  selectForm,
+  setFormModified,
+} from "../../redux/slices/formSlice";
 
 import {
   getStudentFormInfo,
@@ -153,6 +159,10 @@ const menuItems = [
 ];
 
 const EditPreInterventionForm = () => {
+  const dispatch = useDispatch();
+
+  const formDetails = useSelector(selectForm);
+
   const [value, setValue] = useState(0);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
@@ -235,6 +245,7 @@ const EditPreInterventionForm = () => {
 
       const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
       setQuestions(response);
+      dispatch(resetForm());
     } catch (error) {
       console.error("Error updating questions:", error);
     }
@@ -262,22 +273,18 @@ const EditPreInterventionForm = () => {
 
     const newPositionOrderId = questions.length + 1;
 
-    if (questionText.length > 1) {
-      newQuestion.fieldType = fieldType;
-      newQuestion.questionText = questionText;
-      newQuestion.dropdownOptions = dropdownOptions;
-      newQuestion.isNewlyAdded = true;
-      newQuestion.positionOrderId = newPositionOrderId;
-      const response = await postStudentFormInfo(newQuestion);
+    newQuestion.fieldType = fieldType;
+    newQuestion.questionText = questionText;
+    newQuestion.dropdownOptions = dropdownOptions;
+    newQuestion.isNewlyAdded = true;
+    newQuestion.positionOrderId = newPositionOrderId;
+    const response = await postStudentFormInfo(newQuestion);
 
-      const updatedQuestionsArr = questions;
-      updatedQuestionsArr?.push(response);
-      setQuestions(updatedQuestionsArr);
+    const updatedQuestionsArr = questions;
+    updatedQuestionsArr?.push(response);
+    setQuestions(updatedQuestionsArr);
 
-      setDisplayNewQuestion(false);
-    } else {
-      console.log("questionText empty");
-    }
+    setDisplayNewQuestion(false);
   };
 
   // Function to handle moving an item up in the array
@@ -289,6 +296,7 @@ const EditPreInterventionForm = () => {
     newQuestionArr[orderId - 2].positionOrderId = orderId;
 
     setQuestions(newQuestionArr);
+    dispatch(setFormModified());
   };
 
   // Function to handle moving an item down in the array
@@ -300,17 +308,7 @@ const EditPreInterventionForm = () => {
     newQuestionArr[orderId].positionOrderId = orderId;
 
     setQuestions(newQuestionArr);
-  };
-
-  // Function to delete an item from the array
-  const deleteItem = (index: number) => {
-    const newQuestions = [...questions];
-    newQuestions.splice(index, 1);
-    // Update positionOrderId of subsequent items
-    for (let i = index; i < newQuestions.length; i++) {
-      newQuestions[i].positionOrderId--;
-    }
-    setQuestions(newQuestions);
+    dispatch(setFormModified());
   };
 
   const snackbar = (
@@ -374,7 +372,7 @@ const EditPreInterventionForm = () => {
       <Button
         onClick={handleUpdateAllQuestions}
         sx={customStyles.updateButton}
-        // disabled
+        disabled={!formDetails.isModified}
       >
         Update
       </Button>
