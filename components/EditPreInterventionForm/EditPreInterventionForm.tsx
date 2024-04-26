@@ -26,11 +26,18 @@ import {
   studentFormInfoItemUpdateBulk,
   studentFormInfoItemUpdateById,
 } from "../../services/editQuestionSets.service";
+import { getPreInterventionFormInfo } from "../../services/editPreInerventionQuestionSets.service";
 
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
-import { DropDownOptions, Question, QuestionResponse } from "../../utils/types";
+import {
+  DropDownOptions,
+  FormQuestion,
+  Question,
+  QuestionResponse,
+} from "../../utils/types";
 
 import { champBlackFontFamily } from "../../shared/typography";
+import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
 
 const customStyles = {
   snackbarAlert: {
@@ -173,14 +180,19 @@ const EditPreInterventionForm = () => {
 
   const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
 
-  const [questions, setQuestions] = useState<QuestionResponse[]>([]);
+  const [personalDetailsQuestions, setPersonalDetailsQuestions] = useState<
+    QuestionResponse[]
+  >([]);
+
+  const [partOneQuestions, setPartOneQuestions] = useState<FormQuestion[]>([]);
+  const [partTwoQuestions, setPartTwoQuestions] = useState<FormQuestion[]>([]);
 
   useMemo(() => {
-    const fetchData = async () => {
+    const fetchPersonalDetailsQuestions = async () => {
       try {
         const studentFormInfoQuestions = await getStudentFormInfo();
 
-        setQuestions(
+        setPersonalDetailsQuestions(
           studentFormInfoQuestions.filter(
             (item: Question) =>
               item.sectionType === SectionType.PersonalDetails &&
@@ -192,7 +204,27 @@ const EditPreInterventionForm = () => {
       }
     };
 
-    fetchData();
+    const fetchPreInterventionsQuestions = async () => {
+      try {
+        const preInterventionQuestions = await getPreInterventionFormInfo();
+
+        setPartOneQuestions(
+          preInterventionQuestions.filter(
+            (item: FormQuestion) => item.questionSection === 0
+          )
+        );
+        setPartTwoQuestions(
+          preInterventionQuestions.filter(
+            (item: FormQuestion) => item.questionSection === 1
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchPersonalDetailsQuestions();
+    fetchPreInterventionsQuestions();
   }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
@@ -202,7 +234,7 @@ const EditPreInterventionForm = () => {
   const handleQuestionSoftDelete = async (id: number, orderId: number) => {
     const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
 
-    const newQuestionArr = [...questions];
+    const newQuestionArr = [...personalDetailsQuestions];
 
     for (let i = orderId; i < newQuestionArr.length; i++) {
       newQuestionArr[i].positionOrderId--;
@@ -216,12 +248,32 @@ const EditPreInterventionForm = () => {
       (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
     );
 
-    setQuestions(updatedQuestionsArr);
+    setPersonalDetailsQuestions(updatedQuestionsArr);
   };
 
   // function to update the state of this(parent) component
-  const handleQuestionUpdate = async (question: QuestionResponse) => {
-    setQuestions((prevQuestions) => {
+  const handlePersonalDetailsQuestionUpdate = async (
+    question: QuestionResponse
+  ) => {
+    setPersonalDetailsQuestions((prevQuestions) => {
+      const updatedQuestionsArr = [...prevQuestions];
+
+      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
+
+      if (index !== -1) {
+        updatedQuestionsArr[index] = question;
+      } else {
+        console.error(`Question with id ${question.id} not found`);
+      }
+
+      return updatedQuestionsArr;
+    });
+  };
+
+  const handlePreInterventionQuestionUpdate = async (
+    question: FormQuestion
+  ) => {
+    setPartOneQuestions((prevQuestions) => {
       const updatedQuestionsArr = [...prevQuestions];
 
       const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
@@ -238,13 +290,13 @@ const EditPreInterventionForm = () => {
 
   const handleUpdateAllQuestions = async () => {
     try {
-      const updatedQuestions = questions.map((question) => {
+      const updatedQuestions = personalDetailsQuestions.map((question) => {
         const { isDelete, isNewlyAdded, ...updatedQuestion } = question;
         return updatedQuestion;
       });
 
       const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
-      setQuestions(response);
+      setPersonalDetailsQuestions(response);
       dispatch(resetForm());
     } catch (error) {
       console.error("Error updating questions:", error);
@@ -271,7 +323,7 @@ const EditPreInterventionForm = () => {
   }) => {
     const newQuestion = initialNewQuestionContent;
 
-    const newPositionOrderId = questions.length + 1;
+    const newPositionOrderId = personalDetailsQuestions.length + 1;
 
     newQuestion.fieldType = fieldType;
     newQuestion.questionText = questionText;
@@ -280,9 +332,9 @@ const EditPreInterventionForm = () => {
     newQuestion.positionOrderId = newPositionOrderId;
     const response = await postStudentFormInfo(newQuestion);
 
-    const updatedQuestionsArr = questions;
+    const updatedQuestionsArr = personalDetailsQuestions;
     updatedQuestionsArr?.push(response);
-    setQuestions(updatedQuestionsArr);
+    setPersonalDetailsQuestions(updatedQuestionsArr);
 
     setDisplayNewQuestion(false);
   };
@@ -291,23 +343,23 @@ const EditPreInterventionForm = () => {
   const moveItemUp = (orderId: number | undefined) => {
     if (!orderId) return;
     if (orderId <= 1) return; // Already at the top, can't move up
-    const newQuestionArr = [...questions];
+    const newQuestionArr = [...personalDetailsQuestions];
     newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
     newQuestionArr[orderId - 2].positionOrderId = orderId;
 
-    setQuestions(newQuestionArr);
+    setPersonalDetailsQuestions(newQuestionArr);
     dispatch(setFormModified());
   };
 
   // Function to handle moving an item down in the array
   const moveItemDown = (orderId: number | undefined) => {
     if (!orderId) return;
-    if (orderId >= questions.length) return; // Already at the bottom, can't move down
-    const newQuestionArr = [...questions];
+    if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
+    const newQuestionArr = [...personalDetailsQuestions];
     newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
     newQuestionArr[orderId].positionOrderId = orderId;
 
-    setQuestions(newQuestionArr);
+    setPersonalDetailsQuestions(newQuestionArr);
     dispatch(setFormModified());
   };
 
@@ -399,7 +451,7 @@ const EditPreInterventionForm = () => {
               label="Question heading"
               fieldType={FieldType.TextField}
             />
-            {questions
+            {personalDetailsQuestions
               .sort((a, b) => a.positionOrderId - b.positionOrderId)
               .map((question: QuestionResponse) => (
                 <DynamicField
@@ -407,7 +459,7 @@ const EditPreInterventionForm = () => {
                   fieldType={question.fieldType as FieldType}
                   isQuestionnaireType
                   question={question}
-                  handleQuestionUpdate={handleQuestionUpdate}
+                  handleQuestionUpdate={handlePersonalDetailsQuestionUpdate}
                   handleQuestionSoftDelete={handleQuestionSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
@@ -429,18 +481,18 @@ const EditPreInterventionForm = () => {
       case 1:
         return (
           <>
-            <DynamicField
-              title="Question : 1"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
-            <DynamicField
-              title="Question : 1"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
+            {partOneQuestions
+              .sort((a, b) => a.positionOrderId - b.positionOrderId)
+              .map((question: FormQuestion) => (
+                <QuestionnaireDynamicField
+                  key={question.id}
+                  question={question}
+                  handleQuestionUpdate={handlePreInterventionQuestionUpdate}
+                  handleQuestionSoftDelete={handleQuestionSoftDelete}
+                  moveItemUp={moveItemUp}
+                  moveItemDown={moveItemDown}
+                />
+              ))}
 
             {addQuestionButton}
           </>
@@ -448,13 +500,18 @@ const EditPreInterventionForm = () => {
       case 2:
         return (
           <>
-            <DynamicField
-              title="Question : 1"
-              label="Type Question"
-              fieldType={FieldType.Scale1to6}
-              isQuestionnaireType={true}
-            />
-
+            {partTwoQuestions
+              .sort((a, b) => a.positionOrderId - b.positionOrderId)
+              .map((question: FormQuestion) => (
+                <QuestionnaireDynamicField
+                  key={question.id}
+                  question={question}
+                  handleQuestionUpdate={handlePreInterventionQuestionUpdate}
+                  handleQuestionSoftDelete={handleQuestionSoftDelete}
+                  moveItemUp={moveItemUp}
+                  moveItemDown={moveItemDown}
+                />
+              ))}
             {addQuestionButton}
           </>
         );

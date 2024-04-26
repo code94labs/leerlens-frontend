@@ -24,6 +24,17 @@ export interface QuestionResponse extends Question {
   id: number;
 }
 
+// export interface Questionnaire {
+//   id: number;
+//   questionText: string;
+//   positionOrderId: number;
+//   minValue: number;
+//   maxValue: number;
+//   isDelete: boolean;
+//   questionSetId: number;
+//   questionSection: number;
+// }
+
 export type FormQuestion = {
   id: number;
   questionText: string;
@@ -31,6 +42,7 @@ export type FormQuestion = {
   minValue: number;
   maxValue: number;
   isDelete: boolean;
+  isNewlyAdded?: boolean;
   questionSetId: number;
   questionSection: number;
   answer?: number | string;

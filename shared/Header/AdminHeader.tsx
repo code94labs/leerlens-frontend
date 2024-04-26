@@ -113,7 +113,7 @@ const AdminHeader = (props: Props) => {
             </IconButton>
 
             <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-              <MenuItem onClick={handleClose}>
+              {/* <MenuItem onClick={handleClose}>
                 <Stack flexDirection="row">
                   <Box pr={5}>
                     <Typography variant="h6" fontWeight={800} color="#A879FF">
@@ -131,7 +131,7 @@ const AdminHeader = (props: Props) => {
                     />
                   </Box>
                 </Stack>
-              </MenuItem>
+              </MenuItem> */}
 
               <MenuItem onClick={handleClose} sx={customStyles.menuItem}>
                 <PersonOutlineOutlinedIcon />

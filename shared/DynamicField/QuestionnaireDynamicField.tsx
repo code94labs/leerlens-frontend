@@ -1,4 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useFormik } from "formik";
+import * as yup from "yup";
+import { useDispatch } from "react-redux";
+
 import {
   Box,
   Button,
@@ -15,21 +19,23 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useFormik } from "formik";
-import * as yup from "yup";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DoneIcon from "@mui/icons-material/Done";
+
+import { setFormModified } from "../../redux/slices/formSlice";
 
 import { champBlackFontFamily } from "../typography";
 
 import DynamicDropdown from "../DynamicDropdown";
 
 import { FieldType } from "../../utils/enum";
-import { DropDownOptions, QuestionResponse } from "../../utils/types";
-import { useDispatch } from "react-redux";
-import { setFormModified } from "../../redux/slices/formSlice";
+import {
+  DropDownOptions,
+  FormQuestion,
+  QuestionResponse,
+} from "../../utils/types";
 
 const customStyles = {
   textField: {
@@ -225,21 +231,17 @@ const validationSchema = yup.object({
 type Props = {
   title?: string;
   label?: string;
-  fieldType: FieldType;
-  isQuestionnaireType?: boolean;
-  question?: QuestionResponse;
-  handleQuestionUpdate?: (question: QuestionResponse) => void;
+  question?: FormQuestion;
+  handleQuestionUpdate?: (question: FormQuestion) => void;
   handleQuestionSoftDelete?: (id: number, orderId: number) => void;
   moveItemUp?: (index: number | undefined) => void;
   moveItemDown?: (index: number | undefined) => void;
 };
 
-const DynamicField = (props: Props) => {
+const QuestionnaireDynamicField = (props: Props) => {
   const {
     title,
     label,
-    fieldType,
-    isQuestionnaireType,
     question,
     handleQuestionUpdate,
     handleQuestionSoftDelete,
@@ -248,16 +250,6 @@ const DynamicField = (props: Props) => {
   } = props;
 
   const dispatch = useDispatch();
-
-  const [questionType, setQuestionType] = useState(fieldType);
-
-  // const [qText, setQText] = useState<string | undefined>(
-  //   isNewQuestionType ? undefined : questionText
-  // );
-
-  const [options, setOptions] = useState<DropDownOptions[]>(
-    question?.dropdownOptions ?? []
-  );
 
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -282,22 +274,15 @@ const DynamicField = (props: Props) => {
   useEffect(() => {
     const handleSaveChanges = () => {
       if (question && handleQuestionUpdate) {
-        const newQuestion: QuestionResponse = question;
-        newQuestion.fieldType = questionType;
+        const newQuestion: FormQuestion = question;
         newQuestion.questionText = formik.values.questionText;
-        newQuestion.dropdownOptions = options;
 
         handleQuestionUpdate(newQuestion);
       }
     };
 
     handleSaveChanges();
-  }, [question, questionType, formik.values.questionText, options]);
-
-  const handleChangeQuestionType = (event: SelectChangeEvent) => {
-    setQuestionType(parseInt(event.target.value));
-    dispatch(setFormModified());
-  };
+  }, [question, formik.values.questionText]);
 
   // const handleSaveClick = (questionText: string) => {
   //   handleNewQuestionSave &&
@@ -307,35 +292,6 @@ const DynamicField = (props: Props) => {
   //       dropdownOptions: options ?? [],
   //     });
   // };
-
-  const metaDataField = (
-    <>
-      <Typography
-        my={1}
-        fontSize={20}
-        fontFamily={champBlackFontFamily}
-        textTransform="uppercase"
-      >
-        {title}
-      </Typography>
-
-      <TextField
-        variant="outlined"
-        label={label ? label : "Type Question"}
-        required
-        type="text"
-        multiline={fieldType === FieldType.TextArea}
-        rows={4}
-        // placeholder="abc@gmail.com"
-        // disabled={isLoading}
-        // value={qText}
-        // onChange={(
-        //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-        // ) => setQText(e.target.value)}
-        sx={customStyles.textField}
-      />
-    </>
-  );
 
   const deleteQuestionDialogModel = (
     <Box sx={customStyles.modalContent}>
@@ -452,27 +408,19 @@ const DynamicField = (props: Props) => {
       <Stack flexDirection="row" mt={1}>
         <FormControl sx={customStyles.dropdown}>
           <InputLabel>
-            Select Question Type
+            Question Type
             <span style={customStyles.dropdownAsterisk}> * </span>
           </InputLabel>
 
           <Select
-            value={questionType.toString()}
             label="Select Question Type"
-            onChange={handleChangeQuestionType}
             autoWidth
+            disabled
+            defaultValue={FieldType.Scale1to6.toString()}
           >
-            <MenuItem value={FieldType.TextField.toString()}>Text</MenuItem>
-
             <MenuItem value={FieldType.Scale1to6.toString()}>
               Scale 1 to 6
             </MenuItem>
-
-            <MenuItem value={FieldType.Scale1to10.toString()}>
-              Scale 1 to 10
-            </MenuItem>
-
-            <MenuItem value={FieldType.DropDown.toString()}>Drop Down</MenuItem>
           </Select>
         </FormControl>
 
@@ -510,21 +458,14 @@ const DynamicField = (props: Props) => {
           </FormHelperText>
         )}
       </Stack>
-
-      {questionType === FieldType.DropDown && (
-        <DynamicDropdown
-          options={options ? options : []}
-          setOptions={setOptions}
-        />
-      )}
     </>
   );
 
   return (
     <Stack mx={2} mt={2} px={3} py={1} sx={customStyles.stack}>
-      {isQuestionnaireType ? questionnaireField : metaDataField}
+      {questionnaireField}
     </Stack>
   );
 };
 
-export default DynamicField;
+export default QuestionnaireDynamicField;
