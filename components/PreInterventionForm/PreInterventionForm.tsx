@@ -40,7 +40,7 @@ import * as yup from "yup";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
-import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
+import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
 
 import {
   getAllPreInterventionQuestions,

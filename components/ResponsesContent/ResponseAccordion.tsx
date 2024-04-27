@@ -9,6 +9,13 @@ import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import DyanmicListHeader from "./DyanmicListHeader";
 import DyanmicListContent from "./DyanmicListContent";
+import { StudentResponse } from "../../utils/types";
+import {
+  FieldType,
+  QuestionnaireSection,
+  evaluationTypesTitles,
+} from "../../utils/enum";
+import { formatTimeStamp } from "../../utils/helper";
 
 const customStyles = {
   icon: {
@@ -19,12 +26,22 @@ const customStyles = {
   },
 };
 
-const ResponseAccordion = () => {
+type Props = {
+  response: StudentResponse;
+};
+
+const ResponseAccordion = (props: Props) => {
+  const { response } = props;
+
   const accordionSummary = (
     <AccordionSummary sx={customStyles.accordionSummary}>
-      <Typography sx={{ width: 200 }}>2024/02/22</Typography>
+      <Typography sx={{ width: 200 }}>
+        {formatTimeStamp(new Date(response.createdAt).toDateString())}
+      </Typography>
 
-      <Typography sx={{ flex: 1 }}>Pre-Intervention</Typography>
+      <Typography sx={{ flex: 1 }}>
+        {evaluationTypesTitles[response.formType]}
+      </Typography>
 
       <Box>
         <IconButton>
@@ -46,22 +63,17 @@ const ResponseAccordion = () => {
     <Stack mt={-3}>
       <DyanmicListHeader title="Personal details" subTitle="Answers" />
 
-      {/* we should have a state for this list render */}
       <Stack>
-        <DyanmicListContent
-          question="What school are you at?"
-          answer="ABC Northern Lights"
-        />
-        <DyanmicListContent question="What do you study?" answer="VMBO GL" />
-        <DyanmicListContent
-          question="What grade are you in?"
-          answer="Grade 6"
-        />
-        <DyanmicListContent question="In which class are you?" answer="12th" />
-        <DyanmicListContent
-          question="Which Remind program are you following?"
-          answer="Student training"
-        />
+        {response.studentDetails.map((studentInfo) => (
+          <DyanmicListContent
+            question={studentInfo.questionTitle}
+            answer={
+              studentInfo.fieldType === FieldType.DropDown
+                ? studentInfo.dropdownTitle
+                : studentInfo.answer
+            }
+          />
+        ))}
       </Stack>
     </Stack>
   );
@@ -70,24 +82,19 @@ const ResponseAccordion = () => {
     <Stack mt={-3}>
       <DyanmicListHeader title="Question | Part 01" subTitle="Answers" />
 
-      {/* we should have a state for this list render */}
       <Stack>
-        <DyanmicListContent
-          question="1. Intelligence is sometahing you are born with and cannot change."
-          answer="Completely disagree 01"
-        />
-        <DyanmicListContent
-          question="2. I know how to motivate myself to learn."
-          answer="Somewhat agree 05"
-        />
-        <DyanmicListContent
-          question="3. I know many different tips, strategies and ways to learn smart"
-          answer="Completely disagree 01"
-        />
-        <DyanmicListContent
-          question="4. I can't really bring myself to learn when there are other interesting things to do"
-          answer="Somewhat agree 05"
-        />
+        {response.responses
+          .filter(
+            (item) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
+          )
+          .map((question, index) => (
+            <DyanmicListContent
+              key={index}
+              question={`${question.questionId}. ${question.questionTitle}`}
+              answer={question.answerText}
+            />
+          ))}
       </Stack>
     </Stack>
   );
@@ -96,24 +103,19 @@ const ResponseAccordion = () => {
     <Stack mt={-3}>
       <DyanmicListHeader title="Question | Part 02" subTitle="Answers" />
 
-      {/* we should have a state for this list render */}
       <Stack>
-        <DyanmicListContent
-          question="1. Intelligence is sometahing you are born with and cannot change."
-          answer="Completely disagree 01"
-        />
-        <DyanmicListContent
-          question="2. I know how to motivate myself to learn."
-          answer="Somewhat agree 05"
-        />
-        <DyanmicListContent
-          question="3. I know many different tips, strategies and ways to learn smart"
-          answer="Completely disagree 01"
-        />
-        <DyanmicListContent
-          question="4. I can't really bring myself to learn when there are other interesting things to do"
-          answer="Somewhat agree 05"
-        />
+        {response.responses
+          .filter(
+            (item) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
+          )
+          .map((question, index) => (
+            <DyanmicListContent
+              key={index}
+              question={`${question.questionId}. ${question.questionTitle}`}
+              answer={question.answerText}
+            />
+          ))}
       </Stack>
     </Stack>
   );

@@ -7,6 +7,8 @@ export const leerLensApi = {
   evaluation: `${baseUrl}/questionnaire/evaluation`,
   normgroup: `${baseUrl}/questionnaire/normgroup`,
 
+  response: `${baseUrl}/response`,
+
   login: `${baseUrl}/auth/login`,
   forgotPassword: `${baseUrl}/auth/forgot-password`,
   resetPassword: `${baseUrl}/auth/reset-password`,

@@ -128,6 +128,17 @@ const menuItems = [
   },
 ];
 
+export const loading = (
+  <Stack
+    flexDirection="row"
+    alignItems="center"
+    justifyContent="center"
+    height="50vh"
+  >
+    <CircularProgress sx={{ color: "#A879FF" }} />
+  </Stack>
+);
+
 const EditPreInterventionForm = () => {
   const [value, setValue] = useState(0);
 
@@ -162,17 +173,6 @@ const EditPreInterventionForm = () => {
         {notificationMsg}
       </Alert>
     </Snackbar>
-  );
-
-  const loading = (
-    <Stack
-      flexDirection="row"
-      alignItems="center"
-      justifyContent="center"
-      height="50vh"
-    >
-      <CircularProgress sx={{ color: "#A879FF" }} />
-    </Stack>
   );
 
   const addQuestionButton = (

@@ -39,7 +39,7 @@ import {
   getStudentFormInfo,
 } from "../../services/questionnaire.service";
 import { champBlackFontFamily } from "../../shared/typography";
-import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
+import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
 
 const customStyles = {

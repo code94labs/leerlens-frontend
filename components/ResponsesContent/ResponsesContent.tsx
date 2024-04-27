@@ -1,19 +1,25 @@
 import {
+  Alert,
   CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
+  Snackbar,
   Stack,
   Tab,
   Tabs,
   Typography,
 } from "@mui/material";
-import React, { SyntheticEvent, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 import DyanmicListHeader from "./DyanmicListHeader";
 import ResponseAccordion from "./ResponseAccordion";
+import { getAllStudentResponses } from "../../services/response.service";
+import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
+import { StudentResponse } from "../../utils/types";
+import { FormEvaluation } from "../../utils/enum";
 
 const dateFilterList = [
   "01/01/2022 - 31/12/2022",
@@ -68,13 +74,28 @@ const customStyles = {
   stack: {
     backgroundColor: "white",
   },
+  snackbarAlert: {
+    width: "100%",
+    bgcolor: "white",
+    fontWeight: 600,
+    borderRadius: 2,
+    border: "none",
+  },
 };
 
 const ResponsesContent = () => {
   const [value, setValue] = useState(0);
   const [date, setDate] = useState(dateFilterList[0]);
 
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
+  const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [studentResponses, setStudentResponses] = useState<StudentResponse[]>(
+    []
+  );
 
   const handleChangeDate = (event: SelectChangeEvent) => {
     setDate(event.target.value);
@@ -118,57 +139,68 @@ const ResponsesContent = () => {
     </Stack>
   );
 
-  const loading = (
-    <Stack
-      flexDirection="row"
-      alignItems="center"
-      justifyContent="center"
-      height="50vh"
-    >
-      <CircularProgress sx={{ color: "#A879FF" }} />
-    </Stack>
-  );
+  const getResponsesByFormType = (formType?: FormEvaluation) => {
+    if (!formType && formType !== 0) {
+      return studentResponses;
+    }
+
+    return studentResponses.filter(
+      (response) => response.formType === formType
+    );
+  };
 
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
       case 0:
         return (
           <Stack sx={customStyles.tabContent}>
-            <ResponseAccordion />
-            <ResponseAccordion />
-            <ResponseAccordion />
+            {getResponsesByFormType().map((response) => (
+              <ResponseAccordion key={response?.id} response={response} />
+            ))}
           </Stack>
         );
       case 1:
         return (
           <Stack sx={customStyles.tabContent}>
-            <Typography>Hello world</Typography>
-            <Typography>Hello world</Typography>
-            <Typography>Hello world</Typography>
+            {getResponsesByFormType(FormEvaluation.PreInterventions).map(
+              (response) =>
+                response && (
+                  <ResponseAccordion key={response.id} response={response} />
+                )
+            )}
           </Stack>
         );
       case 2:
         return (
           <Stack sx={customStyles.tabContent}>
-            <Typography>Hello world</Typography>
-            <Typography>Hello world</Typography>
-            <Typography>Hello world</Typography>
+            {getResponsesByFormType(FormEvaluation.PostInterventions).map(
+              (response) =>
+                response && (
+                  <ResponseAccordion key={response.id} response={response} />
+                )
+            )}
           </Stack>
         );
       case 3:
         return (
           <Stack sx={customStyles.tabContent}>
-            <Typography>Hello world</Typography>
-            <Typography>Hello world</Typography>
-            <Typography>Hello world</Typography>
+            {getResponsesByFormType(FormEvaluation.Evaluation).map(
+              (response) =>
+                response && (
+                  <ResponseAccordion key={response.id} response={response} />
+                )
+            )}
           </Stack>
         );
       case 4:
         return (
           <Stack sx={customStyles.tabContent}>
-            <Typography>Hello world</Typography>
-            <Typography>Hello world</Typography>
-            <Typography>Hello world</Typography>
+            {getResponsesByFormType(FormEvaluation.Normgroup).map(
+              (response) =>
+                response && (
+                  <ResponseAccordion key={response.id} response={response} />
+                )
+            )}
           </Stack>
         );
       default:
@@ -197,7 +229,7 @@ const ResponsesContent = () => {
       />
 
       {isLoading ? (
-        loading
+        <ProgressSpinner />
       ) : (
         <Stack
           flexDirection="row"
@@ -211,12 +243,63 @@ const ResponsesContent = () => {
     </Stack>
   );
 
-  return (
-    <Stack sx={customStyles.stack}>
-      {titleContentSection}
+  const fetchingAllStudentInfo = async () => {
+    await getAllStudentResponses()
+      .then((res) => {
+        setStudentResponses(res);
+      })
+      .catch(() => {
+        setIsError(true);
 
-      {tabSection}
-    </Stack>
+        setNotificationMsg("Error when fetching all student responses...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+
+      await fetchingAllStudentInfo();
+    };
+
+    fetchData();
+  }, []);
+
+  const snackbar = (
+    <Snackbar
+      open={displaySnackbarMsg}
+      autoHideDuration={6000}
+      onClose={() => setDisplaySnackbarMsg(false)}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "right",
+      }}
+    >
+      <Alert
+        onClose={() => setDisplaySnackbarMsg(false)}
+        severity={isError ? "error" : "success"}
+        variant="outlined"
+        sx={customStyles.snackbarAlert}
+      >
+        {notificationMsg}
+      </Alert>
+    </Snackbar>
+  );
+
+  return (
+    <>
+      <Stack sx={customStyles.stack}>
+        {titleContentSection}
+
+        {tabSection}
+      </Stack>
+
+      {snackbar}
+    </>
   );
 };
 

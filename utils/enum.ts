@@ -47,3 +47,10 @@ export const fieldTypeTitles = {
   [FieldType.Scale1to6]: "Scale 1 to 6",
   [FieldType.Scale1to10]: "Scale 1 to 10",
 };
+
+export const evaluationTypesTitles = {
+  [FormEvaluation.PreInterventions]: "Pre-Intervention",
+  [FormEvaluation.PostInterventions]: "Post-Intervention",
+  [FormEvaluation.Evaluation]: "Evaluation",
+  [FormEvaluation.Normgroup]: "Normgroup",
+};

@@ -55,6 +55,7 @@ type CustomScaleProps = {
   maxValue: number;
   positionOrderId: number;
   updateAnswer: (answer: number) => void;
+  isDisabled: boolean;
 };
 
 const generateScaleArr = (min: number, max: number) => {
@@ -68,7 +69,7 @@ const generateScaleArr = (min: number, max: number) => {
 };
 
 const CustomScale = (props: CustomScaleProps) => {
-  const { questionText, minValue, maxValue, positionOrderId, updateAnswer } =
+  const { questionText, minValue, maxValue, positionOrderId, updateAnswer, isDisabled } =
     props;
 
   const [selectedValue, setSelectedValue] = useState(0);
@@ -125,6 +126,7 @@ const CustomScale = (props: CustomScaleProps) => {
         {scale.map((scaleValue, index) => (
           <IconButton
             key={index}
+            disabled={isDisabled}
             onClick={() => handleButtonClick(scaleValue)}
             sx={
               selectedValue === scaleValue
