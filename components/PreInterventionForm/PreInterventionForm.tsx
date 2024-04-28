@@ -1,4 +1,5 @@
 import {
+  Alert,
   Autocomplete,
   Box,
   Button,
@@ -12,6 +13,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -45,11 +47,22 @@ import { CircularProgressWithLabel } from "../../shared/CircularProgress/Circula
 import {
   getAllPreInterventionQuestions,
   getStudentFormInfo,
+  getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
 
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
-import { DropDownOptions, Question } from "../../utils/types";
+import {
+  CreateStudentResponse,
+  DropDownOptions,
+  FormQuestion,
+  Question,
+  QuestionniareAnswer,
+  StudentDetailsAnswer,
+} from "../../utils/types";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
+import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
+import { generateStudentDetails } from "../../utils/helper";
+import { createStudentResponse } from "../../services/response.service";
 
 const customStyles = {
   mainBox: {
@@ -161,6 +174,13 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
   },
+  snackbarAlert: {
+    width: "100%",
+    bgcolor: "white",
+    fontWeight: 600,
+    borderRadius: 2,
+    border: "none",
+  },
 };
 
 const RootDiv = styled("div")`
@@ -209,20 +229,19 @@ const Input = React.forwardRef(function CustomInput(
 
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
+const questionSectionOne = 0;
+const questionSectionTwo = 1;
+
 const PreInterventionForm = () => {
   const router = useRouter();
 
-  const [school, setSchool] = useState("");
-  const [searchTextSchool, setSearchTextSchool] = useState("");
-  const [studyField, setStudyField] = useState("");
-  const [grade, setGrade] = useState("");
-  const [studentClass, setClass] = useState("");
-  const [completeSentence, setCompleteSentence] = useState("");
-  const [age, setAge] = useState("");
-  const [remindProgram, setRemindProgram] = useState("");
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
-
   const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
     []
   );
@@ -230,11 +249,11 @@ const PreInterventionForm = () => {
     []
   );
 
-  const [answersPartOne, setAnswersPartOne] = useState<number[]>(
-    Array(questionListPartOne.length).fill(0)
+  const [answersPartOne, setAnswersPartOne] = useState<QuestionniareAnswer[]>(
+    []
   );
-  const [answersPartTwo, setAnswersPartTwo] = useState<number[]>(
-    Array(questionListPartTwo.length).fill(0)
+  const [answersPartTwo, setAnswersPartTwo] = useState<QuestionniareAnswer[]>(
+    []
   );
 
   const [allAnsweredPartOne, setAllAnsweredPartOne] = useState<boolean>(false);
@@ -252,7 +271,25 @@ const PreInterventionForm = () => {
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
       const newAnswers = [...prevAnswers];
-      newAnswers[questionId] = answer;
+      let isPresent = false;
+
+      newAnswers.map((item, index) => {
+        if (item.questionId === questionId) {
+          isPresent = true;
+
+          newAnswers[index] = {
+            questionId,
+            answer,
+          };
+        }
+      });
+
+      if (!isPresent) {
+        const appendAnswer = [...newAnswers, { questionId, answer }];
+
+        return appendAnswer;
+      }
+
       return newAnswers;
     });
   };
@@ -260,70 +297,28 @@ const PreInterventionForm = () => {
   const updateAnswerPartTwo = (questionId: number, answer: number) => {
     setAnswersPartTwo((prevAnswers) => {
       const newAnswers = [...prevAnswers];
-      newAnswers[questionId] = answer;
+      let isPresent = false;
+
+      newAnswers.map((item, index) => {
+        if (item.questionId === questionId) {
+          isPresent = true;
+
+          newAnswers[index] = {
+            questionId,
+            answer,
+          };
+        }
+      });
+
+      if (!isPresent) {
+        const appendAnswer = [...newAnswers, { questionId, answer }];
+
+        return appendAnswer;
+      }
+
       return newAnswers;
     });
   };
-
-  useMemo(() => {
-    const partOneAllAnswered = () => {
-      if (answersPartOne.length !== questionListPartOne.length) {
-        return false;
-      }
-
-      for (let i = 0; i < answersPartOne.length; i++) {
-        if (
-          answersPartOne[i] === undefined ||
-          answersPartOne[i] === null ||
-          answersPartOne[i] === 0
-        ) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    setAllAnsweredPartOne(partOneAllAnswered());
-  }, [answersPartOne, questionListPartOne]);
-
-  useMemo(() => {
-    const partTwoAllAnswered = () => {
-      if (answersPartTwo.length !== questionListPartTwo.length) {
-        return false;
-      }
-
-      for (let i = 0; i < answersPartTwo.length; i++) {
-        if (
-          answersPartTwo[i] === undefined ||
-          answersPartTwo[i] === null ||
-          answersPartTwo[i] === 0
-        ) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    setAllAnsweredPartTwo(partTwoAllAnswered());
-  }, [answersPartTwo, questionListPartTwo]);
-
-  useMemo(() => {
-    const fetchData = async () => {
-      try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
-
-        setStudentFormInfo(
-          studentFormInfoQuestions.filter(
-            (item: Question) => item.sectionType === SectionType.PersonalDetails
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const validationSchema = yup
     .object()
@@ -382,38 +377,36 @@ const PreInterventionForm = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    // Question id of the element refers to (Input Element type & Question)
-    // TODO: We have to look into this once the admin panel is ready or we can replicate it using sample data from the database.
-    const studentDetails = [
-      { questionId: 1, answer: school },
-      { questionId: 2, answer: studyField },
-      { questionId: 3, answer: grade },
-      { questionId: 4, answer: studentClass },
-      { questionId: 5, answer: completeSentence },
-      { questionId: 6, answer: age },
-      { questionId: 7, answer: remindProgram },
-    ];
-
-    const partOneResponses = formatQuestionnaire(
-      questionListPartOne,
-      answersPartOne
+  const handleSubmit = async () => {
+    const personDetailsInfo: StudentDetailsAnswer[] = generateStudentDetails(
+      formik.values,
+      studentFormInfo
     );
 
-    const partTwoResponses = formatQuestionnaire(
-      questionListPartTwo,
-      answersPartTwo
-    );
-
-    const responses = [...partOneResponses, ...partTwoResponses];
-
-    const request = {
+    const requestBody: CreateStudentResponse = {
       formType: FormEvaluation.PreInterventions,
-      studentDetails,
-      responses,
+      studentDetails: personDetailsInfo,
+      responses: [...answersPartOne, ...answersPartTwo],
     };
+    setIsLoading(true);
 
-    console.log("request", request);
+    await createStudentResponse(requestBody)
+      .then(() => {
+        setNotificationMsg("Form Submitted Successfully...");
+
+        setDisplaySnackbarMsg(true);
+
+        router.back();
+      })
+      .catch(() => {
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching personal details data...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const handleNext = () => {
@@ -445,118 +438,102 @@ const PreInterventionForm = () => {
   };
   // End of form step creation
 
-  const personalDetailsForm = (
+  const personalDetailsForm = isLoading ? (
+    <ProgressSpinner />
+  ) : (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
-        studentFormInfo
-          .map((question: Question) => (
-            <Grid item xs={12} md={6} key={question.id}>
-              <FormControl fullWidth required>
-                {(() => {
-                  switch (question.fieldType) {
-                    case FieldType.DropDown:
-                      return (
-                        <>
-                          <InputLabel>{question.questionText}</InputLabel>
-                          <Select
-                            MenuProps={{
-                              autoFocus: false,
-                              PaperProps: {
-                                style: {
-                                  maxHeight: 200, // Set the maximum height here
-                                },
+        studentFormInfo.map((question: Question) => (
+          <Grid item xs={12} md={6} key={question.id}>
+            <FormControl fullWidth required>
+              {(() => {
+                switch (question.fieldType) {
+                  case FieldType.DropDown:
+                    return (
+                      <>
+                        <InputLabel>{question.questionText}</InputLabel>
+                        <Select
+                          MenuProps={{
+                            autoFocus: false,
+                            PaperProps: {
+                              style: {
+                                maxHeight: 200, // Set the maximum height here
                               },
-                            }}
-                            labelId={`search-select-`}
-                            id={String(question.id)}
-                            name={String(question.id)}
-                            value={formik.values[question.id]}
-                            label={question.questionText}
-                            onChange={formik.handleChange}
-                            onClose={() =>
-                              setSearchStrings({
-                                ...searchStrings,
-                                [question.id]: "",
-                              })
-                            }
-                            renderValue={() => formik.values[question.id]}
-                            onBlur={formik.handleBlur}
-                            error={
-                              formik.touched[question.id] &&
-                              Boolean(formik.errors[question.id])
-                            }
-                          >
-                            <ListSubheader>
-                              <TextField
-                                size="small"
-                                autoFocus
-                                placeholder="Type to search..."
-                                fullWidth
-                                InputProps={{
-                                  startAdornment: (
-                                    <InputAdornment position="start">
-                                      <SearchRoundedIcon />
-                                    </InputAdornment>
-                                  ),
-                                }}
-                                value={searchStrings[question.id] || ""}
-                                onChange={(e) =>
-                                  setSearchStrings({
-                                    ...searchStrings,
-                                    [question.id]: e.target.value,
-                                  })
-                                }
-                                onKeyDown={(e) => {
-                                  if (e.key !== "Escape") {
-                                    e.stopPropagation();
-                                  }
-                                }}
-                              />
-                            </ListSubheader>
-                            {question.dropdownOptions
-                              .filter((item) => !item.isDelete)
-                              .filter((option) =>
-                                containsText(
-                                  option.item,
-                                  searchStrings[question.id] || ""
-                                )
-                              )
-                              .map((item: DropDownOptions, index: number) => (
-                                <MenuItem value={item.item} key={index}>
-                                  {item.item}
-                                </MenuItem>
-                              ))}
-                          </Select>
-                        </>
-                      );
-                    case FieldType.TextArea:
-                      return (
-                        <>
-                          {/* <InputLabel>{question.questionText}</InputLabel> */}
-                          <Input
-                            aria-label={question.questionText}
-                            multiline
-                            placeholder={question.questionText}
-                            id={String(question.id)}
-                            name={String(question.id)}
-                            value={formik.values[question.id]}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            error={
-                              formik.touched[question.id] &&
-                              Boolean(formik.errors[question.id])
-                            }
-                          />
-                        </>
-                      );
-                    default:
-                      return (
-                        <TextField
+                            },
+                          }}
+                          labelId={`search-select-`}
                           id={String(question.id)}
                           name={String(question.id)}
-                          label={question.questionText}
                           value={formik.values[question.id]}
-                          // placeholder="Placeholder"
+                          label={question.questionText}
+                          onChange={formik.handleChange}
+                          onClose={() =>
+                            setSearchStrings({
+                              ...searchStrings,
+                              [question.id]: "",
+                            })
+                          }
+                          renderValue={() => formik.values[question.id]}
+                          onBlur={formik.handleBlur}
+                          error={
+                            formik.touched[question.id] &&
+                            Boolean(formik.errors[question.id])
+                          }
+                        >
+                          <ListSubheader>
+                            <TextField
+                              size="small"
+                              autoFocus
+                              placeholder="Type to search..."
+                              fullWidth
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <SearchRoundedIcon />
+                                  </InputAdornment>
+                                ),
+                              }}
+                              value={searchStrings[question.id] || ""}
+                              onChange={(e) =>
+                                setSearchStrings({
+                                  ...searchStrings,
+                                  [question.id]: e.target.value,
+                                })
+                              }
+                              onKeyDown={(e) => {
+                                if (e.key !== "Escape") {
+                                  e.stopPropagation();
+                                }
+                              }}
+                            />
+                          </ListSubheader>
+                          {question.dropdownOptions
+                            .filter((item) => !item.isDelete)
+                            .filter((option) =>
+                              containsText(
+                                option.item,
+                                searchStrings[question.id] || ""
+                              )
+                            )
+                            .map((item: DropDownOptions, index: number) => (
+                              <MenuItem value={item.item} key={index}>
+                                {item.item}
+                              </MenuItem>
+                            ))}
+                        </Select>
+                      </>
+                    );
+                  case FieldType.TextArea:
+                    return (
+                      <>
+                        {/* <InputLabel>{question.questionText}</InputLabel> */}
+                        <Input
+                          aria-label={question.questionText}
+                          multiline
+                          placeholder={question.questionText}
+                          id={String(question.id)}
+                          name={String(question.id)}
+                          value={formik.values[question.id]}
                           onChange={formik.handleChange}
                           onBlur={formik.handleBlur}
                           error={
@@ -564,17 +541,34 @@ const PreInterventionForm = () => {
                             Boolean(formik.errors[question.id])
                           }
                         />
-                      );
-                  }
-                })()}
-                {formik.touched[question.id] && (
-                  <FormHelperText sx={{ color: "red", mb: -2.5 }}>
-                    {formik.errors[question.id]}
-                  </FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-          ))}
+                      </>
+                    );
+                  default:
+                    return (
+                      <TextField
+                        id={String(question.id)}
+                        name={String(question.id)}
+                        label={question.questionText}
+                        value={formik.values[question.id]}
+                        // placeholder="Placeholder"
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        error={
+                          formik.touched[question.id] &&
+                          Boolean(formik.errors[question.id])
+                        }
+                      />
+                    );
+                }
+              })()}
+              {formik.touched[question.id] && (
+                <FormHelperText sx={{ color: "red", mb: -2.5 }}>
+                  {formik.errors[question.id]}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+        ))}
     </Grid>
   );
 
@@ -624,9 +618,10 @@ const PreInterventionForm = () => {
         {questionListPartOne.map((questionDetails: Question, index: number) => (
           <CustomScale
             key={questionDetails.id}
+            isDisabled={isLoading}
             {...questionDetails}
             updateAnswer={(answer: number) =>
-              updateAnswerPartOne(index, answer)
+              updateAnswerPartOne(questionDetails.id, answer)
             }
           />
         ))}
@@ -682,8 +677,9 @@ const PreInterventionForm = () => {
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
+            isDisabled={isLoading}
             updateAnswer={(answer: number) =>
-              updateAnswerPartTwo(index, answer)
+              updateAnswerPartTwo(questionDetails.id, answer)
             }
           />
         ))}
@@ -707,31 +703,107 @@ const PreInterventionForm = () => {
     }
   };
 
-  useMemo(() => {
-    const fetchData = async () => {
-      try {
-        const preInterventionQuestions = await getAllPreInterventionQuestions();
+  const snackbar = (
+    <Snackbar
+      open={displaySnackbarMsg}
+      autoHideDuration={6000}
+      onClose={() => setDisplaySnackbarMsg(false)}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "right",
+      }}
+    >
+      <Alert
+        onClose={() => setDisplaySnackbarMsg(false)}
+        severity={isError ? "error" : "success"}
+        variant="outlined"
+        sx={customStyles.snackbarAlert}
+      >
+        {notificationMsg}
+      </Alert>
+    </Snackbar>
+  );
 
-        const questionsWithAnswerValue = preInterventionQuestions.map(
-          (question: Question) => ({
+  useMemo(() => {
+    const fetchQuestionnaireData = async () => {
+      try {
+        setIsLoading(true);
+        
+        const postInterventionQuestions =
+          await getAllPreInterventionQuestions();
+
+        const questionsWithAnswerValue = postInterventionQuestions.map(
+          (question: FormQuestion) => ({
             ...question,
             answerValue: 0,
           })
         );
 
-        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
+        const questionSetOne = questionsWithAnswerValue.filter(
+          (question: FormQuestion) =>
+            question.questionSection === questionSectionOne
+        );
 
-        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
-        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
+        const questionSetTwo = questionsWithAnswerValue.filter(
+          (question: FormQuestion) =>
+            question.questionSection === questionSectionTwo
+        );
 
-        setQuestionListPartOne(firstHalf);
-        setQuestionListPartTwo(secondHalf);
+        setQuestionListPartOne(questionSetOne);
+        setQuestionListPartTwo(questionSetTwo);
       } catch (error) {
         console.log(error);
       }
     };
 
-    fetchData();
+    fetchQuestionnaireData();
+  }, []);
+
+  useMemo(() => {
+    const partOneAllAnswered = () => {
+      if (answersPartOne.length !== questionListPartOne.length) {
+        return false;
+      }
+
+      return true;
+    };
+
+    setAllAnsweredPartOne(partOneAllAnswered());
+  }, [answersPartOne, questionListPartOne]);
+
+  useMemo(() => {
+    const partTwoAllAnswered = () => {
+      if (answersPartTwo.length !== questionListPartTwo.length) {
+        return false;
+      }
+
+      return true;
+    };
+
+    setAllAnsweredPartTwo(partTwoAllAnswered());
+  }, [answersPartTwo, questionListPartTwo]);
+
+  useMemo(() => {
+    const fetchDataStudentInfo = async () => {
+      try {
+        setIsLoading(true);
+
+        const studentFormInfoQuestions: Question[] =
+          await getStudentFormInfoByFormType(FormEvaluation.PreInterventions);
+
+        const studentFormInfoPersonal = studentFormInfoQuestions.filter(
+          (item: Question) => item.sectionType === SectionType.PersonalDetails
+        );
+
+        setStudentFormInfo(studentFormInfoPersonal);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDataStudentInfo();
   }, []);
 
   return (
@@ -773,6 +845,7 @@ const PreInterventionForm = () => {
               activeStep={activeStep}
               totalSteps={steps.length}
             />
+
             <Box
               sx={{
                 display: "flex",
@@ -846,9 +919,11 @@ const PreInterventionForm = () => {
                     variant="outlined"
                     onClick={handleSubmit}
                     sx={customStyles.primaryButton}
-                    disabled={activeStep === 2 && !allAnsweredPartTwo}
+                    disabled={
+                      activeStep === 2 && !allAnsweredPartTwo && isLoading
+                    }
                   >
-                    Complete
+                    {isLoading ? "Submitting..." : "Complete"}
                   </Button>
                 ) : (
                   <Button
@@ -869,6 +944,8 @@ const PreInterventionForm = () => {
           )}
         </Box>
       </Box>
+
+      {snackbar}
     </Stack>
   );
 };

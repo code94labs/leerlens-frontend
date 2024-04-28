@@ -54,8 +54,8 @@ export type CreateStudentResponse = {
   formType: FormEvaluation;
   responses: QuestionniareAnswer[];
   studentDetails: StudentDetailsAnswer[];
-  createdAt: string;
-  updateAt: string;
+  createdAt?: string;
+  updateAt?: string;
 };
 
 export type StudentResponse = CreateStudentResponse & {

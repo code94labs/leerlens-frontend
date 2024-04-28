@@ -324,18 +324,10 @@ const PostInterventionForm = () => {
   };
 
   const handleSubmit = async () => {
-    console.log("Personal detials");
     const personDetailsInfo: StudentDetailsAnswer[] = generateStudentDetails(
       formik.values,
       studentFormInfo
     );
-    console.log(personDetailsInfo);
-
-    console.log("Questionnaire set 01");
-    console.log(answersPartOne);
-
-    console.log("Questionnaire set 02");
-    console.log(answersPartTwo);
 
     const requestBody: CreateStudentResponse = {
       formType: FormEvaluation.PostInterventions,
@@ -363,13 +355,8 @@ const PostInterventionForm = () => {
       });
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
-  };
-
   useMemo(() => {
-    const fetchData = async () => {
+    const fetchingStudentInfo = async () => {
       try {
         setIsLoading(true);
 
@@ -388,13 +375,14 @@ const PostInterventionForm = () => {
       }
     };
 
-    fetchData();
+    fetchingStudentInfo();
   }, []);
 
   useMemo(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
+        
         const postInterventionQuestions =
           await getAllPostInterventionQuestions();
 
@@ -691,6 +679,7 @@ const PostInterventionForm = () => {
             }}
           >
             <CircularProgressWithLabel activeStep={activeStep} totalSteps={3} />
+
             <Box
               sx={{
                 display: "flex",

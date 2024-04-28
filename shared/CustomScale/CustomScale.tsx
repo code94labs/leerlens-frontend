@@ -55,7 +55,7 @@ type CustomScaleProps = {
   maxValue: number;
   positionOrderId: number;
   updateAnswer: (answer: number) => void;
-  isDisabled: boolean;
+  isDisabled?: boolean;
 };
 
 const generateScaleArr = (min: number, max: number) => {
