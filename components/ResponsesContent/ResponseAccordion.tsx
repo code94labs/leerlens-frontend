@@ -36,7 +36,8 @@ const ResponseAccordion = (props: Props) => {
   const accordionSummary = (
     <AccordionSummary sx={customStyles.accordionSummary}>
       <Typography sx={{ width: 200 }}>
-        {response.createdAt && formatTimeStamp(new Date(response.createdAt).toDateString())}
+        {response.createdAt &&
+          formatTimeStamp(new Date(response.createdAt).toDateString())}
       </Typography>
 
       <Typography sx={{ flex: 1 }}>

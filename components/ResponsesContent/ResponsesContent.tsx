@@ -1,6 +1,5 @@
 import {
   Alert,
-  CircularProgress,
   FormControl,
   InputLabel,
   MenuItem,
@@ -12,7 +11,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import React, { SyntheticEvent, useEffect, useMemo, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 import DyanmicListHeader from "./DyanmicListHeader";
 import ResponseAccordion from "./ResponseAccordion";
@@ -20,12 +19,8 @@ import { getAllStudentResponses } from "../../services/response.service";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 import { StudentResponse } from "../../utils/types";
 import { FormEvaluation } from "../../utils/enum";
-
-const dateFilterList = [
-  "01/01/2022 - 31/12/2022",
-  "01/01/2023 - 31/12/2023",
-  "01/01/2024 - 31/12/2024",
-];
+import { dateFilterList } from "../../utils/constant";
+import { getDateRange } from "../../utils/helper";
 
 const customStyles = {
   dropdown: {
@@ -85,7 +80,7 @@ const customStyles = {
 
 const ResponsesContent = () => {
   const [value, setValue] = useState(0);
-  const [date, setDate] = useState(dateFilterList[0]);
+  const [filterDate, setFilterDate] = useState(dateFilterList[0]);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
@@ -97,8 +92,12 @@ const ResponsesContent = () => {
     []
   );
 
+  const [filteredStudentResponses, setFilteredStudentResponses] = useState<
+    StudentResponse[]
+  >([]);
+
   const handleChangeDate = (event: SelectChangeEvent) => {
-    setDate(event.target.value);
+    setFilterDate(event.target.value);
   };
 
   const handleChangeTabs = (_: SyntheticEvent, newValue: number) => {
@@ -109,7 +108,7 @@ const ResponsesContent = () => {
     <FormControl sx={customStyles.dropdown}>
       <InputLabel>Date</InputLabel>
 
-      <Select value={date} label="Date" onChange={handleChangeDate}>
+      <Select value={filterDate} label="Date" onChange={handleChangeDate}>
         {dateFilterList.map((date) => (
           <MenuItem value={date} key={date}>
             {date}
@@ -139,12 +138,33 @@ const ResponsesContent = () => {
     </Stack>
   );
 
+  const filterResponsesByDate = (responses: StudentResponse[]) => {
+    const dateRangeStr = filterDate;
+
+    const dateRange = getDateRange(dateRangeStr);
+
+    const fromDate = new Date(dateRange[0]);
+    const toDate = new Date(dateRange[1]);
+
+    const filteredResponses = responses.filter((response) => {
+      if (response.createdAt) {
+        const createdAtDate = new Date(response.createdAt);
+
+        return createdAtDate >= fromDate && createdAtDate <= toDate;
+      }
+
+      return false;
+    });
+
+    setFilteredStudentResponses(filteredResponses);
+  };
+
   const getResponsesByFormType = (formType?: FormEvaluation) => {
     if (!formType && formType !== 0) {
-      return studentResponses;
+      return filteredStudentResponses;
     }
 
-    return studentResponses.filter(
+    return filteredStudentResponses.filter(
       (response) => response.formType === formType
     );
   };
@@ -159,6 +179,7 @@ const ResponsesContent = () => {
             ))}
           </Stack>
         );
+
       case 1:
         return (
           <Stack sx={customStyles.tabContent}>
@@ -170,6 +191,7 @@ const ResponsesContent = () => {
             )}
           </Stack>
         );
+
       case 2:
         return (
           <Stack sx={customStyles.tabContent}>
@@ -181,6 +203,7 @@ const ResponsesContent = () => {
             )}
           </Stack>
         );
+
       case 3:
         return (
           <Stack sx={customStyles.tabContent}>
@@ -192,6 +215,7 @@ const ResponsesContent = () => {
             )}
           </Stack>
         );
+
       case 4:
         return (
           <Stack sx={customStyles.tabContent}>
@@ -203,6 +227,7 @@ const ResponsesContent = () => {
             )}
           </Stack>
         );
+
       default:
         return null;
     }
@@ -259,16 +284,6 @@ const ResponsesContent = () => {
       });
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-
-      await fetchingAllStudentInfo();
-    };
-
-    fetchData();
-  }, []);
-
   const snackbar = (
     <Snackbar
       open={displaySnackbarMsg}
@@ -289,6 +304,20 @@ const ResponsesContent = () => {
       </Alert>
     </Snackbar>
   );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+
+      await fetchingAllStudentInfo();
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    filterResponsesByDate(studentResponses);
+  }, [filterDate]);
 
   return (
     <>
