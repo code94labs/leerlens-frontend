@@ -1,4 +1,5 @@
-export const baseUrl = "http://localhost:5000";
+// export const baseUrl = "http://localhost:5000";
+export const baseUrl = "http://leerlens-backend-nestjs-env-env.eba-4m4wcq8f.us-east-1.elasticbeanstalk.com"
 
 export const leerLensApi = {
   studentFormInfo: `${baseUrl}/studentFormInfo`,
