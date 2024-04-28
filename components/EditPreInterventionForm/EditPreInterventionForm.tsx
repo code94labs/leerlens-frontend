@@ -264,22 +264,42 @@ const EditPreInterventionForm = () => {
   const handlePreInterventionQuestionUpdate = async (
     question: FormQuestion
   ) => {
-    setPartOneQuestions((prevQuestions) => {
-      const updatedQuestionsArr = [...prevQuestions];
+    if (tab === 1) {
+      setPartOneQuestions((prevQuestions) => {
+        const updatedQuestionsArr = [...prevQuestions];
 
-      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
+        const index = updatedQuestionsArr.findIndex(
+          (q) => q.id === question.id
+        );
 
-      if (index !== -1) {
-        updatedQuestionsArr[index] = question;
-      } else {
-        console.error(`Question with id ${question.id} not found`);
-      }
+        if (index !== -1) {
+          updatedQuestionsArr[index] = question;
+        } else {
+          console.error(`Question with id ${question.id} not found`);
+        }
 
-      return updatedQuestionsArr;
-    });
+        return updatedQuestionsArr;
+      });
+    } else {
+      setPartTwoQuestions((prevQuestions) => {
+        const updatedQuestionsArr = [...prevQuestions];
+
+        const index = updatedQuestionsArr.findIndex(
+          (q) => q.id === question.id
+        );
+
+        if (index !== -1) {
+          updatedQuestionsArr[index] = question;
+        } else {
+          console.error(`Question with id ${question.id} not found`);
+        }
+
+        return updatedQuestionsArr;
+      });
+    }
   };
 
-  const handleUpdateAllQuestions = async () => {
+  const handleUpdateAllPersonalDetailsQuestions = async () => {
     try {
       const updatedQuestions = personalDetailsQuestions.map((question) => {
         const { isDelete, isNewlyAdded, ...updatedQuestion } = question;
@@ -288,6 +308,32 @@ const EditPreInterventionForm = () => {
 
       const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
       setPersonalDetailsQuestions(response);
+      dispatch(resetForm());
+    } catch (error) {
+      console.error("Error updating questions:", error);
+    }
+  };
+
+  const handleUpdateAllPreInterventionQuestions = async () => {
+    const arrayToMap = tab === 1 ? partOneQuestions : partTwoQuestions;
+
+    const updatedQuestions = arrayToMap.map((question) => {
+      const { isDelete, isNewlyAdded, answer, ...updatedQuestion } = question;
+      return updatedQuestion;
+    });
+
+    try {
+      const response = await preInterventionQuesionsUpdateBulk(
+        updatedQuestions
+      );
+
+      setPartOneQuestions(
+        response.filter((item: FormQuestion) => item.questionSection === 1)
+      );
+      setPartTwoQuestions(
+        response.filter((item: FormQuestion) => item.questionSection === 2)
+      );
+
       dispatch(resetForm());
     } catch (error) {
       console.error("Error updating questions:", error);
@@ -494,7 +540,11 @@ const EditPreInterventionForm = () => {
       </Button>
 
       <Button
-        onClick={handleUpdateAllQuestions}
+        onClick={
+          tab < 1
+            ? handleUpdateAllPersonalDetailsQuestions
+            : handleUpdateAllPreInterventionQuestions
+        }
         sx={customStyles.updateButton}
         disabled={!formDetails.isModified}
       >

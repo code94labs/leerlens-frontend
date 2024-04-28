@@ -50,18 +50,16 @@ export const postPreInterventionQuestions = async (
 
 export const preInterventionQuestionUpdateById = async (updateQuestion: {
   id: number;
-  formType: FormEvaluation;
   questionText: string;
-  fieldType: FieldType;
-  sectionType: SectionType;
   positionOrderId: number;
-  dropdownOptions: DropDownOptions[];
   minValue: number;
   maxValue: number;
+  questionSetId: number;
+  questionSection: number;
 }) => {
   try {
     const response = await patchRequest(
-      `${leerLensApi.studentFormInfo}/${updateQuestion.id}`,
+      `${leerLensApi.preIntervention}/${updateQuestion.id}`,
       updateQuestion
     );
 
@@ -78,14 +76,13 @@ export const preInterventionQuestionUpdateById = async (updateQuestion: {
 
 export const preInterventionQuesionsUpdateBulk = async (
   updateQuestions: {
-    id: number;
-    formType: FormEvaluation;
+    id?: number;
     questionText: string;
-    fieldType: FieldType;
-    sectionType: SectionType;
     positionOrderId: number;
     minValue: number;
     maxValue: number;
+    questionSetId: number;
+    questionSection: number;
   }[]
 ) => {
   try {
