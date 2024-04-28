@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Divider,
@@ -10,48 +11,46 @@ import {
   ListSubheader,
   MenuItem,
   Select,
-  SelectChangeEvent,
+  Snackbar,
   Stack,
-  Step,
-  StepButton,
-  Stepper,
   TextField,
   Typography,
 } from "@mui/material";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
-import {
-  ageList,
-  completeSentenceList,
-  gradeList,
-  remindProgramList,
-  schoolList,
-  studyFieldList,
-} from "../../utils/constant";
 import { Formik, useFormik } from "formik";
 import * as yup from "yup";
 import { useRouter } from "next/router";
 import CustomScale from "../../shared/CustomScale/CustomScale";
-import { DropDownOptions, Question } from "../../utils/types";
+import {
+  CreateStudentResponse,
+  DropDownOptions,
+  FormQuestion,
+  Question,
+  QuestionniareAnswer,
+  StudentDetailsAnswer,
+} from "../../utils/types";
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import {
   getAllNormGroupQuestions,
   getStudentFormInfo,
+  getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
 import { champBlackFontFamily } from "../../shared/typography";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
+import { generateStudentDetails } from "../../utils/helper";
+import { createStudentResponse } from "../../services/response.service";
+import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
 const customStyles = {
   mainBox: {
-    // width: "100%",
     border: "1px #E6E6E6 solid",
     p: 5,
     borderRadius: 2,
   },
   stack: {
     width: {
-      // xs: "100%",
       md: "90%",
     },
     maxWidth: 1200,
@@ -152,20 +151,28 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
   },
+  snackbarAlert: {
+    width: "100%",
+    bgcolor: "white",
+    fontWeight: 600,
+    borderRadius: 2,
+    border: "none",
+  },
 };
 
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
+const questionSectionOne = 0;
+const questionSectionTwo = 1;
+
 const NormGroupForm = () => {
   const router = useRouter();
 
-  const [school, setSchool] = useState("");
-  const [studyField, setStudyField] = useState("");
-  const [grade, setGrade] = useState("");
-  const [studentClass, setClass] = useState("");
-  const [completeSentence, setCompleteSentence] = useState("");
-  const [age, setAge] = useState("");
-  const [remindProgram, setRemindProgram] = useState("");
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
   const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
@@ -175,11 +182,11 @@ const NormGroupForm = () => {
     []
   );
 
-  const [answersPartOne, setAnswersPartOne] = useState<number[]>(
-    Array(questionListPartOne.length).fill(0)
+  const [answersPartOne, setAnswersPartOne] = useState<QuestionniareAnswer[]>(
+    []
   );
-  const [answersPartTwo, setAnswersPartTwo] = useState<number[]>(
-    Array(questionListPartTwo.length).fill(0)
+  const [answersPartTwo, setAnswersPartTwo] = useState<QuestionniareAnswer[]>(
+    []
   );
 
   const [allAnsweredPartOne, setAllAnsweredPartOne] = useState<boolean>(false);
@@ -197,7 +204,25 @@ const NormGroupForm = () => {
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
       const newAnswers = [...prevAnswers];
-      newAnswers[questionId] = answer;
+      let isPresent = false;
+
+      newAnswers.map((item, index) => {
+        if (item.questionId === questionId) {
+          isPresent = true;
+
+          newAnswers[index] = {
+            questionId,
+            answer,
+          };
+        }
+      });
+
+      if (!isPresent) {
+        const appendAnswer = [...newAnswers, { questionId, answer }];
+
+        return appendAnswer;
+      }
+
       return newAnswers;
     });
   };
@@ -205,57 +230,32 @@ const NormGroupForm = () => {
   const updateAnswerPartTwo = (questionId: number, answer: number) => {
     setAnswersPartTwo((prevAnswers) => {
       const newAnswers = [...prevAnswers];
-      newAnswers[questionId] = answer;
+      let isPresent = false;
+
+      newAnswers.map((item, index) => {
+        if (item.questionId === questionId) {
+          isPresent = true;
+
+          newAnswers[index] = {
+            questionId,
+            answer,
+          };
+        }
+      });
+
+      if (!isPresent) {
+        const appendAnswer = [...newAnswers, { questionId, answer }];
+
+        return appendAnswer;
+      }
+
       return newAnswers;
     });
   };
 
-  useMemo(() => {
-    const partOneAllAnswered = () => {
-      if (answersPartOne.length !== questionListPartOne.length) {
-        return false;
-      }
-
-      for (let i = 0; i < answersPartOne.length; i++) {
-        if (
-          answersPartOne[i] === undefined ||
-          answersPartOne[i] === null ||
-          answersPartOne[i] === 0
-        ) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    setAllAnsweredPartOne(partOneAllAnswered());
-  }, [answersPartOne, questionListPartOne]);
-
-  useMemo(() => {
-    const partTwoAllAnswered = () => {
-      if (answersPartTwo.length !== questionListPartTwo.length) {
-        return false;
-      }
-
-      for (let i = 0; i < answersPartTwo.length; i++) {
-        if (
-          answersPartTwo[i] === undefined ||
-          answersPartTwo[i] === null ||
-          answersPartTwo[i] === 0
-        ) {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    setAllAnsweredPartTwo(partTwoAllAnswered());
-  }, [answersPartTwo, questionListPartTwo]);
-
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
-  // These functions are used to handle the form step changes
   const totalSteps = () => {
     return steps.length;
   };
@@ -272,45 +272,36 @@ const NormGroupForm = () => {
     return completedSteps() === totalSteps();
   };
 
-  const formatQuestionnaire = (questionList: Question[], answers: number[]) => {
-    return questionList.map((question, index) => ({
-      questionnaireId: question.id,
-      answer: answers[index],
-    }));
-  };
-
-  const handleSubmit = () => {
-    // Question id of the element refers to (Input Element type & Question)
-    // TODO: We have to look into this once the admin panel is ready or we can replicate it using sample data from the database.
-    const studentDetails = [
-      { questionId: 1, answer: school },
-      { questionId: 2, answer: studyField },
-      { questionId: 3, answer: grade },
-      { questionId: 4, answer: studentClass },
-      { questionId: 5, answer: completeSentence },
-      { questionId: 6, answer: age },
-      { questionId: 7, answer: remindProgram },
-    ];
-
-    const partOneResponses = formatQuestionnaire(
-      questionListPartOne,
-      answersPartOne
+  const handleSubmit = async () => {
+    const personDetailsInfo: StudentDetailsAnswer[] = generateStudentDetails(
+      formik.values,
+      studentFormInfo
     );
 
-    const partTwoResponses = formatQuestionnaire(
-      questionListPartTwo,
-      answersPartTwo
-    );
-
-    const responses = [...partOneResponses, ...partTwoResponses];
-
-    const request = {
+    const requestBody: CreateStudentResponse = {
       formType: FormEvaluation.Normgroup,
-      studentDetails,
-      responses,
+      studentDetails: personDetailsInfo,
+      responses: [...answersPartOne, ...answersPartTwo],
     };
+    setIsLoading(true);
 
-    console.log("request", request);
+    await createStudentResponse(requestBody)
+      .then(() => {
+        setNotificationMsg("Form Submitted Successfully...");
+
+        setDisplaySnackbarMsg(true);
+
+        router.back();
+      })
+      .catch(() => {
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching personal details data...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const handleNext = () => {
@@ -336,30 +327,6 @@ const NormGroupForm = () => {
     setActiveStep(step);
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
-  };
-  // End of form step creation
-
-  useMemo(() => {
-    const fetchData = async () => {
-      try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
-
-        setStudentFormInfo(
-          studentFormInfoQuestions.filter(
-            (item: Question) => item.sectionType === SectionType.PersonalDetails
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   const validationSchema = yup
     .object()
     .shape(
@@ -384,114 +351,109 @@ const NormGroupForm = () => {
     },
   });
 
-  const handleChange = (event: any) => {
-    const { name, value } = event.target;
-    formik.setFieldValue(name, value);
-  };
-
-  const personalDetailsForm = (
+  const personalDetailsForm = isLoading ? (
+    <ProgressSpinner />
+  ) : (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
-        studentFormInfo
-          // .filter((item) => item.sectionType === SectionType.PersonalDetails)
-          .map((question: Question) => (
-            <Grid item xs={12} md={6} key={question.id}>
-              <FormControl fullWidth required>
-                {question.fieldType === FieldType.DropDown ? (
-                  <>
-                    <InputLabel>{question.questionText}</InputLabel>
-                    <Select
-                      MenuProps={{
-                        autoFocus: false,
-                        PaperProps: {
-                          style: {
-                            maxHeight: 200, // Set the maximum height here
-                          },
+        studentFormInfo.map((question: Question) => (
+          <Grid item xs={12} md={6} key={question.id}>
+            <FormControl fullWidth required>
+              {question.fieldType === FieldType.DropDown ? (
+                <>
+                  <InputLabel>{question.questionText}</InputLabel>
+                  <Select
+                    MenuProps={{
+                      autoFocus: false,
+                      PaperProps: {
+                        style: {
+                          maxHeight: 200, // Set the maximum height here
                         },
-                      }}
-                      labelId={`search-select-`}
-                      id={String(question.id)}
-                      name={String(question.id)}
-                      value={formik.values[question.id]}
-                      label={question.questionText}
-                      onChange={formik.handleChange}
-                      onClose={() =>
-                        setSearchStrings({
-                          ...searchStrings,
-                          [question.id]: "",
-                        })
-                      }
-                      renderValue={() => formik.values[question.id]}
-                      onBlur={formik.handleBlur}
-                      error={
-                        formik.touched[question.id] &&
-                        Boolean(formik.errors[question.id])
-                      }
-                    >
-                      <ListSubheader>
-                        <TextField
-                          size="small"
-                          autoFocus
-                          placeholder="Type to search..."
-                          fullWidth
-                          InputProps={{
-                            startAdornment: (
-                              <InputAdornment position="start">
-                                <SearchRoundedIcon />
-                              </InputAdornment>
-                            ),
-                          }}
-                          value={searchStrings[question.id] || ""}
-                          onChange={(e) =>
-                            setSearchStrings({
-                              ...searchStrings,
-                              [question.id]: e.target.value,
-                            })
-                          }
-                          onKeyDown={(e) => {
-                            if (e.key !== "Escape") {
-                              e.stopPropagation();
-                            }
-                          }}
-                        />
-                      </ListSubheader>
-                      {question.dropdownOptions
-                        .filter((item) => !item.isDelete)
-                        .filter((option) =>
-                          containsText(
-                            option.item,
-                            searchStrings[question.id] || ""
-                          )
-                        )
-                        .map((item: DropDownOptions, index: number) => (
-                          <MenuItem value={item.item} key={index}>
-                            {item.item}
-                          </MenuItem>
-                        ))}
-                    </Select>
-                  </>
-                ) : (
-                  <TextField
+                      },
+                    }}
+                    labelId={`search-select-`}
                     id={String(question.id)}
                     name={String(question.id)}
-                    label={question.questionText}
                     value={formik.values[question.id]}
+                    label={question.questionText}
                     onChange={formik.handleChange}
+                    onClose={() =>
+                      setSearchStrings({
+                        ...searchStrings,
+                        [question.id]: "",
+                      })
+                    }
+                    renderValue={() => formik.values[question.id]}
                     onBlur={formik.handleBlur}
                     error={
                       formik.touched[question.id] &&
                       Boolean(formik.errors[question.id])
                     }
-                  />
-                )}
-                {formik.touched[question.id] && (
-                  <FormHelperText sx={{ color: "red", mb: -2.5 }}>
-                    {formik.errors[question.id]}
-                  </FormHelperText>
-                )}
-              </FormControl>
-            </Grid>
-          ))}
+                  >
+                    <ListSubheader>
+                      <TextField
+                        size="small"
+                        autoFocus
+                        placeholder="Type to search..."
+                        fullWidth
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              <SearchRoundedIcon />
+                            </InputAdornment>
+                          ),
+                        }}
+                        value={searchStrings[question.id] || ""}
+                        onChange={(e) =>
+                          setSearchStrings({
+                            ...searchStrings,
+                            [question.id]: e.target.value,
+                          })
+                        }
+                        onKeyDown={(e) => {
+                          if (e.key !== "Escape") {
+                            e.stopPropagation();
+                          }
+                        }}
+                      />
+                    </ListSubheader>
+                    {question.dropdownOptions
+                      .filter((item) => !item.isDelete)
+                      .filter((option) =>
+                        containsText(
+                          option.item,
+                          searchStrings[question.id] || ""
+                        )
+                      )
+                      .map((item: DropDownOptions, index: number) => (
+                        <MenuItem value={item.item} key={index}>
+                          {item.item}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </>
+              ) : (
+                <TextField
+                  id={String(question.id)}
+                  name={String(question.id)}
+                  label={question.questionText}
+                  value={formik.values[question.id]}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched[question.id] &&
+                    Boolean(formik.errors[question.id])
+                  }
+                />
+              )}
+              {formik.touched[question.id] && (
+                <FormHelperText sx={{ color: "red", mb: -2.5 }}>
+                  {formik.errors[question.id]}
+                </FormHelperText>
+              )}
+            </FormControl>
+          </Grid>
+        ))}
     </Grid>
   );
 
@@ -508,12 +470,13 @@ const NormGroupForm = () => {
       </Typography>
 
       <FormControl>
-        {questionListPartOne.map((questionDetails: Question, index: number) => (
+        {questionListPartOne.map((questionDetails: Question) => (
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
+            isDisabled={isLoading}
             updateAnswer={(answer: number) =>
-              updateAnswerPartOne(index, answer)
+              updateAnswerPartOne(questionDetails.id, answer)
             }
           />
         ))}
@@ -534,12 +497,13 @@ const NormGroupForm = () => {
       </Typography>
 
       <FormControl>
-        {questionListPartTwo.map((questionDetails: Question, index: number) => (
+        {questionListPartTwo.map((questionDetails: Question) => (
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
+            isDisabled={isLoading}
             updateAnswer={(answer: number) =>
-              updateAnswerPartTwo(index, answer)
+              updateAnswerPartTwo(questionDetails.id, answer)
             }
           />
         ))}
@@ -563,31 +527,106 @@ const NormGroupForm = () => {
     }
   };
 
+  const snackbar = (
+    <Snackbar
+      open={displaySnackbarMsg}
+      autoHideDuration={6000}
+      onClose={() => setDisplaySnackbarMsg(false)}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "right",
+      }}
+    >
+      <Alert
+        onClose={() => setDisplaySnackbarMsg(false)}
+        severity={isError ? "error" : "success"}
+        variant="outlined"
+        sx={customStyles.snackbarAlert}
+      >
+        {notificationMsg}
+      </Alert>
+    </Snackbar>
+  );
+
   useMemo(() => {
-    const fetchData = async () => {
+    const fetchQuestionnaireData = async () => {
       try {
+        setIsLoading(true);
+
         const normGroupQuestions = await getAllNormGroupQuestions();
 
         const questionsWithAnswerValue = normGroupQuestions.map(
-          (question: Question) => ({
+          (question: FormQuestion) => ({
             ...question,
             answerValue: 0,
           })
         );
 
-        const midpointIndex = Math.ceil(questionsWithAnswerValue.length / 2);
+        const questionSetOne = questionsWithAnswerValue.filter(
+          (question: FormQuestion) =>
+            question.questionSection === questionSectionOne
+        );
 
-        const firstHalf = questionsWithAnswerValue.slice(0, midpointIndex);
-        const secondHalf = questionsWithAnswerValue.slice(midpointIndex);
+        const questionSetTwo = questionsWithAnswerValue.filter(
+          (question: FormQuestion) =>
+            question.questionSection === questionSectionTwo
+        );
 
-        setQuestionListPartOne(firstHalf);
-        setQuestionListPartTwo(secondHalf);
+        setQuestionListPartOne(questionSetOne);
+        setQuestionListPartTwo(questionSetTwo);
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchData();
+    fetchQuestionnaireData();
+  }, []);
+
+  useMemo(() => {
+    const partOneAllAnswered = () => {
+      if (answersPartOne.length !== questionListPartOne.length) {
+        return false;
+      }
+
+      return true;
+    };
+
+    setAllAnsweredPartOne(partOneAllAnswered());
+  }, [answersPartOne, questionListPartOne]);
+
+  useMemo(() => {
+    const partTwoAllAnswered = () => {
+      if (answersPartTwo.length !== questionListPartTwo.length) {
+        return false;
+      }
+
+      return true;
+    };
+
+    setAllAnsweredPartTwo(partTwoAllAnswered());
+  }, [answersPartTwo, questionListPartTwo]);
+
+  useMemo(() => {
+    const fetchingStudentInfo = async () => {
+      try {
+        const studentFormInfoQuestions: Question[] =
+          await getStudentFormInfoByFormType(FormEvaluation.Normgroup);
+
+        const studentFormInfoPersonal = studentFormInfoQuestions.filter(
+          (item: Question) => item.sectionType === SectionType.PersonalDetails
+        );
+
+        setStudentFormInfo(studentFormInfoPersonal);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchingStudentInfo();
   }, []);
 
   return (
@@ -688,9 +727,11 @@ const NormGroupForm = () => {
                   variant="outlined"
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
-                  disabled={activeStep === 2 && !allAnsweredPartTwo}
+                  disabled={
+                    activeStep === 2 && !allAnsweredPartTwo && isLoading
+                  }
                 >
-                  Complete
+                  {isLoading ? "Submitting..." : "Complete"}
                 </Button>
               ) : (
                 <Button
@@ -711,6 +752,8 @@ const NormGroupForm = () => {
           </Fragment>
         </Box>
       </Box>
+
+      {snackbar}
     </Stack>
   );
 };

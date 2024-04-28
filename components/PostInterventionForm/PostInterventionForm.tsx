@@ -379,7 +379,7 @@ const PostInterventionForm = () => {
   }, []);
 
   useMemo(() => {
-    const fetchData = async () => {
+    const fetchQuestionnaireData = async () => {
       try {
         setIsLoading(true);
         
@@ -412,7 +412,7 @@ const PostInterventionForm = () => {
       }
     };
 
-    fetchData();
+    fetchQuestionnaireData();
   }, []);
 
   const validationSchema = yup
@@ -434,15 +434,9 @@ const PostInterventionForm = () => {
       : {},
     validationSchema,
     onSubmit: (values) => {
-      // Handle form submission here
       // You can access form values using formik.values
     },
   });
-
-  // const handleChange = (event: any) => {
-  //   const { name, value } = event.target;
-  //   formik.setFieldValue(name, value);
-  // };
 
   const personalDetailsForm = isLoading ? (
     <ProgressSpinner />
@@ -592,7 +586,7 @@ const PostInterventionForm = () => {
       </Typography>
 
       <FormControl>
-        {questionListPartTwo.map((questionDetails: Question, index: number) => (
+        {questionListPartTwo.map((questionDetails: Question) => (
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
