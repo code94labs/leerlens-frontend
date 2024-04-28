@@ -178,7 +178,6 @@ const ResponsesContent = () => {
               <ResponseAccordion
                 key={response?.id}
                 response={response}
-                filteredStudentResponses={filteredStudentResponses}
                 setFilteredStudentResponses={setFilteredStudentResponses}
               />
             ))}
@@ -194,7 +193,6 @@ const ResponsesContent = () => {
                   <ResponseAccordion
                     key={response.id}
                     response={response}
-                    filteredStudentResponses={filteredStudentResponses}
                     setFilteredStudentResponses={setFilteredStudentResponses}
                   />
                 )
@@ -211,7 +209,6 @@ const ResponsesContent = () => {
                   <ResponseAccordion
                     key={response.id}
                     response={response}
-                    filteredStudentResponses={filteredStudentResponses}
                     setFilteredStudentResponses={setFilteredStudentResponses}
                   />
                 )
@@ -228,7 +225,6 @@ const ResponsesContent = () => {
                   <ResponseAccordion
                     key={response.id}
                     response={response}
-                    filteredStudentResponses={filteredStudentResponses}
                     setFilteredStudentResponses={setFilteredStudentResponses}
                   />
                 )
@@ -245,7 +241,6 @@ const ResponsesContent = () => {
                   <ResponseAccordion
                     key={response.id}
                     response={response}
-                    filteredStudentResponses={filteredStudentResponses}
                     setFilteredStudentResponses={setFilteredStudentResponses}
                   />
                 )

@@ -344,16 +344,9 @@ const PreInterventionForm = () => {
     },
   });
 
-  // const handleChange = (event: any) => {
-  //   console.log(event.target);
-  //   const { name, value } = event.target;
-  //   formik.setFieldValue(name, value);
-  // };
-
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
-  // These functions are used to handle the form step changes
   const totalSteps = () => {
     return steps.length;
   };
@@ -368,13 +361,6 @@ const PreInterventionForm = () => {
 
   const allStepsCompleted = () => {
     return completedSteps() === totalSteps();
-  };
-
-  const formatQuestionnaire = (questionList: Question[], answers: number[]) => {
-    return questionList.map((question, index) => ({
-      questionnaireId: question.id,
-      answer: answers[index],
-    }));
   };
 
   const handleSubmit = async () => {
