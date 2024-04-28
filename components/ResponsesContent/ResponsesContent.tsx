@@ -175,7 +175,12 @@ const ResponsesContent = () => {
         return (
           <Stack sx={customStyles.tabContent}>
             {getResponsesByFormType().map((response) => (
-              <ResponseAccordion key={response?.id} response={response} />
+              <ResponseAccordion
+                key={response?.id}
+                response={response}
+                filteredStudentResponses={filteredStudentResponses}
+                setFilteredStudentResponses={setFilteredStudentResponses}
+              />
             ))}
           </Stack>
         );
@@ -186,7 +191,12 @@ const ResponsesContent = () => {
             {getResponsesByFormType(FormEvaluation.PreInterventions).map(
               (response) =>
                 response && (
-                  <ResponseAccordion key={response.id} response={response} />
+                  <ResponseAccordion
+                    key={response.id}
+                    response={response}
+                    filteredStudentResponses={filteredStudentResponses}
+                    setFilteredStudentResponses={setFilteredStudentResponses}
+                  />
                 )
             )}
           </Stack>
@@ -198,7 +208,12 @@ const ResponsesContent = () => {
             {getResponsesByFormType(FormEvaluation.PostInterventions).map(
               (response) =>
                 response && (
-                  <ResponseAccordion key={response.id} response={response} />
+                  <ResponseAccordion
+                    key={response.id}
+                    response={response}
+                    filteredStudentResponses={filteredStudentResponses}
+                    setFilteredStudentResponses={setFilteredStudentResponses}
+                  />
                 )
             )}
           </Stack>
@@ -210,7 +225,12 @@ const ResponsesContent = () => {
             {getResponsesByFormType(FormEvaluation.Evaluation).map(
               (response) =>
                 response && (
-                  <ResponseAccordion key={response.id} response={response} />
+                  <ResponseAccordion
+                    key={response.id}
+                    response={response}
+                    filteredStudentResponses={filteredStudentResponses}
+                    setFilteredStudentResponses={setFilteredStudentResponses}
+                  />
                 )
             )}
           </Stack>
@@ -222,7 +242,12 @@ const ResponsesContent = () => {
             {getResponsesByFormType(FormEvaluation.Normgroup).map(
               (response) =>
                 response && (
-                  <ResponseAccordion key={response.id} response={response} />
+                  <ResponseAccordion
+                    key={response.id}
+                    response={response}
+                    filteredStudentResponses={filteredStudentResponses}
+                    setFilteredStudentResponses={setFilteredStudentResponses}
+                  />
                 )
             )}
           </Stack>
@@ -317,7 +342,7 @@ const ResponsesContent = () => {
 
   useEffect(() => {
     filterResponsesByDate(studentResponses);
-  }, [filterDate]);
+  }, [filterDate, studentResponses]);
 
   return (
     <>

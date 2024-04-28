@@ -1,5 +1,5 @@
 import { leerLensApi } from "../api/api";
-import { getRequest, postRequest } from "../api/requests";
+import { deleteRequest, getRequest, postRequest } from "../api/requests";
 import { CreateStudentResponse } from "../utils/types";
 
 export const createStudentResponse = async (reqBody: CreateStudentResponse) => {
@@ -19,6 +19,17 @@ export const getAllStudentResponses = async () => {
     const response = await getRequest(leerLensApi.response);
 
     return response.data;
+  } catch (error) {
+    console.error("Error fetching student info questions:", error);
+
+    throw error;
+  }
+};
+
+export const deleteStudentResponseById = async (id: number) => {
+  try {
+    await deleteRequest(`${leerLensApi.response}/${id}`);
+
   } catch (error) {
     console.error("Error fetching student info questions:", error);
 

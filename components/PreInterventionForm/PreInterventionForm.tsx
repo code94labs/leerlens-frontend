@@ -728,7 +728,7 @@ const PreInterventionForm = () => {
     const fetchQuestionnaireData = async () => {
       try {
         setIsLoading(true);
-        
+
         const postInterventionQuestions =
           await getAllPreInterventionQuestions();
 
@@ -753,6 +753,8 @@ const PreInterventionForm = () => {
         setQuestionListPartTwo(questionSetTwo);
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 

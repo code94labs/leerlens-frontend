@@ -1,8 +1,21 @@
-import * as React from "react";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  IconButton,
+  Snackbar,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
@@ -16,6 +29,8 @@ import {
   evaluationTypesTitles,
 } from "../../utils/enum";
 import { formatTimeStamp } from "../../utils/helper";
+import { useState } from "react";
+import { deleteStudentResponseById } from "../../services/response.service";
 
 const customStyles = {
   icon: {
@@ -24,14 +39,140 @@ const customStyles = {
   accordionSummary: {
     backgroundColor: "white",
   },
+  cancelBtn: {
+    color: "#E55C55",
+    fontWeight: 700,
+  },
+  deleteBtn: {
+    backgroundColor: "#E55C55",
+    color: "white",
+    fontWeight: 700,
+    px: 2,
+  },
+  snackbarAlert: {
+    width: "100%",
+    bgcolor: "white",
+    fontWeight: 600,
+    borderRadius: 2,
+    border: "none",
+  },
 };
 
 type Props = {
   response: StudentResponse;
+  filteredStudentResponses: StudentResponse[];
+  setFilteredStudentResponses: any;
 };
 
 const ResponseAccordion = (props: Props) => {
-  const { response } = props;
+  const { response, filteredStudentResponses, setFilteredStudentResponses } =
+    props;
+
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+  };
+
+  const handleEditResponse = (event: any) => {
+    event.stopPropagation();
+  };
+
+  const handleDeleteResponse = (event: any) => {
+    event.stopPropagation();
+
+    setOpenDeleteDialog(true);
+  };
+
+  const handleDeleteConfirmation = async () => {
+    try {
+      setIsLoading(true);
+
+      await deleteStudentResponseById(response.id);
+
+      setNotificationMsg("Successfully deleted student response..");
+      setDisplaySnackbarMsg(true);
+
+      handleCloseDeleteDialog();
+      
+      setFilteredStudentResponses((prev: StudentResponse[]) => {
+        return prev.filter((stdResponse: StudentResponse) => stdResponse.id !== response.id);
+      });
+    } catch (_) {
+      setIsError(true);
+
+      setNotificationMsg("Error when deleting student response...");
+      setDisplaySnackbarMsg(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const deleteResponseDialog = (
+    <Dialog
+      open={openDeleteDialog}
+      keepMounted
+      onClose={handleCloseDeleteDialog}
+    >
+      <DialogTitle>Are you sure?</DialogTitle>
+
+      <DialogContent>
+        <DialogContentText color="black">
+          The response item will be delete completely, however it can be
+          recovered when needed.
+        </DialogContentText>
+      </DialogContent>
+
+      <DialogActions>
+        <Button
+          onClick={handleCloseDeleteDialog}
+          sx={customStyles.cancelBtn}
+          disabled={isLoading}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          onClick={handleDeleteConfirmation}
+          sx={customStyles.deleteBtn}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <CircularProgress size={25} sx={{ color: "white" }} />
+          ) : (
+            "Delete"
+          )}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
+  const snackbar = (
+    <Snackbar
+      open={displaySnackbarMsg}
+      autoHideDuration={6000}
+      onClose={() => setDisplaySnackbarMsg(false)}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "right",
+      }}
+    >
+      <Alert
+        onClose={() => setDisplaySnackbarMsg(false)}
+        severity={isError ? "error" : "success"}
+        variant="outlined"
+        sx={customStyles.snackbarAlert}
+      >
+        {notificationMsg}
+      </Alert>
+    </Snackbar>
+  );
 
   const accordionSummary = (
     <AccordionSummary sx={customStyles.accordionSummary}>
@@ -49,11 +190,11 @@ const ResponseAccordion = (props: Props) => {
           <KeyboardArrowDownRoundedIcon sx={customStyles.icon} />
         </IconButton>
 
-        <IconButton>
+        <IconButton onClick={handleEditResponse}>
           <BorderColorRoundedIcon sx={customStyles.icon} />
         </IconButton>
 
-        <IconButton>
+        <IconButton onClick={handleDeleteResponse}>
           <DeleteOutlinedIcon sx={customStyles.icon} />
         </IconButton>
       </Box>
@@ -139,11 +280,17 @@ const ResponseAccordion = (props: Props) => {
     </AccordionDetails>
   );
   return (
-    <Accordion>
-      {accordionSummary}
+    <>
+      <Accordion>
+        {accordionSummary}
 
-      {accordionContent}
-    </Accordion>
+        {accordionContent}
+      </Accordion>
+
+      {deleteResponseDialog}
+
+      {snackbar}
+    </>
   );
 };
 
