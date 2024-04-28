@@ -105,7 +105,7 @@ export const preInterventionQuesionsUpdateBulk = async (
 export const preInterventionQuestionFormSoftDelete = async (id: number) => {
   try {
     const response = await patchRequest(
-      `${leerLensApi.studentFormInfoItemSoftDelete}/${id}`,
+      `${leerLensApi.preInterventionSoftDelete}/${id}`,
       { isDelete: true }
     );
 

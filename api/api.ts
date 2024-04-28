@@ -5,6 +5,7 @@ export const leerLensApi = {
   studentFormInfoItemSoftDelete: `${baseUrl}/studentFormInfo/soft-delete`,
   
   preIntervention: `${baseUrl}/questionnaire/pre-intervention`,
+  preInterventionSoftDelete: `${baseUrl}/questionnaire/pre-intervention/soft-delete`,
   
   postIntervention: `${baseUrl}/questionnaire/post-intervention`,
   evaluation: `${baseUrl}/questionnaire/evaluation`,

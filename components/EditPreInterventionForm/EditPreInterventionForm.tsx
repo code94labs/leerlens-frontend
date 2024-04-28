@@ -30,6 +30,7 @@ import {
   getPreInterventionQuestions,
   postPreInterventionQuestions,
   preInterventionQuesionsUpdateBulk,
+  preInterventionQuestionFormSoftDelete,
 } from "../../services/editPreInerventionQuestionSets.service";
 
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
@@ -222,7 +223,10 @@ const EditPreInterventionForm = () => {
     setTab(newValue);
   };
 
-  const handleQuestionSoftDelete = async (id: number, orderId: number) => {
+  const handlePersonalDetailsSoftDelete = async (
+    id: number,
+    orderId: number
+  ) => {
     const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
 
     const newQuestionArr = [...personalDetailsQuestions];
@@ -231,15 +235,35 @@ const EditPreInterventionForm = () => {
       newQuestionArr[i].positionOrderId--;
     }
 
-    newQuestionArr[response.positionOrderId - 1].isDelete = true;
-
-    await studentFormInfoItemUpdateBulk(newQuestionArr);
-
     const updatedQuestionsArr = newQuestionArr.filter(
       (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
     );
 
     setPersonalDetailsQuestions(updatedQuestionsArr);
+  };
+
+  const handlePreInterventionSoftDelete = async (
+    id: number,
+    orderId: number
+  ) => {
+    const response: FormQuestion = await preInterventionQuestionFormSoftDelete(
+      id
+    );
+
+    const newQuestionArr =
+      tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
+
+    for (let i = orderId; i < newQuestionArr.length; i++) {
+      newQuestionArr[i].positionOrderId--;
+    }
+
+    const updatedQuestionsArr = newQuestionArr.filter(
+      (item: FormQuestion) => item.id !== (response as FormQuestion).id
+    );
+
+    tab === 1
+      ? setPartOneQuestions(updatedQuestionsArr)
+      : setPartTwoQuestions(updatedQuestionsArr);
   };
 
   // function to update the state of this(parent) component
@@ -582,7 +606,7 @@ const EditPreInterventionForm = () => {
                   isQuestionnaireType
                   question={question}
                   handleQuestionUpdate={handlePersonalDetailsQuestionUpdate}
-                  handleQuestionSoftDelete={handleQuestionSoftDelete}
+                  handleQuestionSoftDelete={handlePersonalDetailsSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
                 />
@@ -610,7 +634,7 @@ const EditPreInterventionForm = () => {
                   key={question.id}
                   question={question}
                   handleQuestionUpdate={handlePreInterventionQuestionUpdate}
-                  handleQuestionSoftDelete={handleQuestionSoftDelete}
+                  handleQuestionSoftDelete={handlePreInterventionSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
                 />
@@ -639,7 +663,7 @@ const EditPreInterventionForm = () => {
                   key={question.id}
                   question={question}
                   handleQuestionUpdate={handlePreInterventionQuestionUpdate}
-                  handleQuestionSoftDelete={handleQuestionSoftDelete}
+                  handleQuestionSoftDelete={handlePreInterventionSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
                 />
