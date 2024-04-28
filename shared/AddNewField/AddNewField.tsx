@@ -106,12 +106,15 @@ type Props = {
     questionText: string;
     dropdownOptions: DropDownOptions[];
   }) => void;
+  questionnaireType?: boolean;
 };
 
 const AddNewField = (props: Props) => {
-  const { handleNewQuestionDelete, handleNewQuestionSave } = props;
+  const { handleNewQuestionDelete, handleNewQuestionSave, questionnaireType } = props;
 
-  const [questionType, setQuestionType] = useState(FieldType.TextField);
+  const [questionType, setQuestionType] = useState(
+    questionnaireType ? FieldType.Scale1to6 : FieldType.TextField
+  );
 
   const [options, setOptions] = useState<DropDownOptions[] | undefined>(
     undefined
@@ -119,7 +122,7 @@ const AddNewField = (props: Props) => {
 
   const formik = useFormik({
     initialValues: {
-      questionText: '',
+      questionText: "",
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {
@@ -187,6 +190,7 @@ const AddNewField = (props: Props) => {
             label="Select Question Type"
             onChange={handleChangeQuestionType}
             autoWidth
+            disabled={questionnaireType}
           >
             <MenuItem value={FieldType.TextField.toString()}>Text</MenuItem>
 

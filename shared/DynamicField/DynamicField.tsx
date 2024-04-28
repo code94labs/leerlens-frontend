@@ -230,8 +230,16 @@ type Props = {
   question?: QuestionResponse;
   handleQuestionUpdate?: (question: QuestionResponse) => void;
   handleQuestionSoftDelete?: (id: number, orderId: number) => void;
-  moveItemUp?: (index: number | undefined) => void;
-  moveItemDown?: (index: number | undefined) => void;
+  moveItemUp?: (
+    orderId: number | undefined,
+    questionnaireType: boolean,
+    sectionType?: number
+  ) => void;
+  moveItemDown?: (
+    orderId: number | undefined,
+    questionnaireType: boolean,
+    sectionType?: number
+  ) => void;
 };
 
 const DynamicField = (props: Props) => {
@@ -420,7 +428,7 @@ const DynamicField = (props: Props) => {
             <IconButton
               sx={customStyles.button}
               onClick={() =>
-                moveItemDown && moveItemDown(question?.positionOrderId)
+                moveItemDown && moveItemDown(question?.positionOrderId, false)
               }
             >
               <KeyboardArrowDownIcon fontSize="small" />
@@ -431,7 +439,7 @@ const DynamicField = (props: Props) => {
             <IconButton
               sx={customStyles.button}
               onClick={() =>
-                moveItemUp && moveItemUp(question?.positionOrderId)
+                moveItemUp && moveItemUp(question?.positionOrderId, false)
               }
             >
               <KeyboardArrowUpIcon fontSize="small" />

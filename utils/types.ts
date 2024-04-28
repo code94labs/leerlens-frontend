@@ -24,19 +24,8 @@ export interface QuestionResponse extends Question {
   id: number;
 }
 
-// export interface Questionnaire {
-//   id: number;
-//   questionText: string;
-//   positionOrderId: number;
-//   minValue: number;
-//   maxValue: number;
-//   isDelete: boolean;
-//   questionSetId: number;
-//   questionSection: number;
-// }
-
 export type FormQuestion = {
-  id: number;
+  id?: number;
   questionText: string;
   positionOrderId: number;
   minValue: number;

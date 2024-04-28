@@ -234,8 +234,16 @@ type Props = {
   question?: FormQuestion;
   handleQuestionUpdate?: (question: FormQuestion) => void;
   handleQuestionSoftDelete?: (id: number, orderId: number) => void;
-  moveItemUp?: (index: number | undefined) => void;
-  moveItemDown?: (index: number | undefined) => void;
+  moveItemUp?: (
+    orderId: number | undefined,
+    questionnaireType: boolean,
+    sectionType?: number
+  ) => void;
+  moveItemDown?: (
+    orderId: number | undefined,
+    questionnaireType: boolean,
+    sectionType?: number
+  ) => void;
 };
 
 const QuestionnaireDynamicField = (props: Props) => {
@@ -283,15 +291,6 @@ const QuestionnaireDynamicField = (props: Props) => {
 
     handleSaveChanges();
   }, [question, formik.values.questionText]);
-
-  // const handleSaveClick = (questionText: string) => {
-  //   handleNewQuestionSave &&
-  //     handleNewQuestionSave({
-  //       fieldType: questionType,
-  //       questionText,
-  //       dropdownOptions: options ?? [],
-  //     });
-  // };
 
   const deleteQuestionDialogModel = (
     <Box sx={customStyles.modalContent}>
@@ -376,7 +375,12 @@ const QuestionnaireDynamicField = (props: Props) => {
             <IconButton
               sx={customStyles.button}
               onClick={() =>
-                moveItemDown && moveItemDown(question?.positionOrderId)
+                moveItemDown &&
+                moveItemDown(
+                  question?.positionOrderId,
+                  true,
+                  question?.questionSetId
+                )
               }
             >
               <KeyboardArrowDownIcon fontSize="small" />
@@ -387,7 +391,12 @@ const QuestionnaireDynamicField = (props: Props) => {
             <IconButton
               sx={customStyles.button}
               onClick={() =>
-                moveItemUp && moveItemUp(question?.positionOrderId)
+                moveItemUp &&
+                moveItemUp(
+                  question?.positionOrderId,
+                  true,
+                  question?.questionSetId
+                )
               }
             >
               <KeyboardArrowUpIcon fontSize="small" />
