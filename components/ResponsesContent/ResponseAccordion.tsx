@@ -10,11 +10,20 @@ import {
   DialogActions,
   DialogContent,
   DialogContentText,
+  DialogProps,
   DialogTitle,
   Divider,
+  FormControl,
+  Grid,
   IconButton,
+  Input,
+  InputAdornment,
+  InputLabel,
+  ListSubheader,
+  Select,
   Snackbar,
   Stack,
+  TextField,
   Typography,
 } from "@mui/material";
 
@@ -23,7 +32,11 @@ import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import DyanmicListHeader from "./DyanmicListHeader";
 import DyanmicListContent from "./DyanmicListContent";
-import { StudentResponse } from "../../utils/types";
+import {
+  Question,
+  StudentDetailsAnswer,
+  StudentResponse,
+} from "../../utils/types";
 import {
   FieldType,
   QuestionnaireSection,
@@ -35,6 +48,7 @@ import { deleteStudentResponseById } from "../../services/response.service";
 import { champBlackFontFamily } from "../../shared/typography";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
+import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
 const customStyles = {
   mainBox: {
@@ -57,10 +71,7 @@ const customStyles = {
     },
   },
   titleBox: {
-    py: {
-      xs: 2.5,
-      md: 4,
-    },
+    py: 2
   },
   title: {
     fontWeight: {
@@ -159,6 +170,11 @@ const customStyles = {
     color: "white",
     fontWeight: 700,
     px: 2,
+
+    ":hover": {
+      backgroundColor: "#E55C55",
+      color: "white",
+    },
   },
   snackbarAlert: {
     width: "100%",
@@ -180,8 +196,14 @@ const generalSteps = [
   "Part 02 Questions",
 ];
 
+const dropdownPaperProp = {
+  style: {
+    maxHeight: 200,
+  },
+};
+
 const ResponseAccordion = (props: Props) => {
-  const { response, setFilteredStudentResponses } = props;
+  const { response: studentResponse, setFilteredStudentResponses } = props;
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
@@ -191,6 +213,8 @@ const ResponseAccordion = (props: Props) => {
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
+
+  const [maxWidth] = useState<DialogProps['maxWidth']>('md');
 
   const closeEditDialog = () => {
     setOpenEditDialog(false);
@@ -216,7 +240,7 @@ const ResponseAccordion = (props: Props) => {
     try {
       setIsLoading(true);
 
-      await deleteStudentResponseById(response.id);
+      await deleteStudentResponseById(studentResponse.id);
 
       setNotificationMsg("Successfully deleted student response..");
       setDisplaySnackbarMsg(true);
@@ -225,7 +249,8 @@ const ResponseAccordion = (props: Props) => {
 
       setFilteredStudentResponses((prev: StudentResponse[]) => {
         return prev.filter(
-          (stdResponse: StudentResponse) => stdResponse.id !== response.id
+          (stdResponse: StudentResponse) =>
+            stdResponse.id !== studentResponse.id
         );
       });
     } catch (_) {
@@ -326,16 +351,72 @@ const ResponseAccordion = (props: Props) => {
 
   const handleUpdate = () => {};
 
+  const personalDetailsForm = isLoading ? (
+    <ProgressSpinner />
+  ) : (
+    <Grid container rowSpacing={4} columnSpacing={4}>
+      {studentResponse &&
+        studentResponse.studentDetails.map((item: StudentDetailsAnswer) => (
+          <Grid item xs={12} md={6} key={item.questionId}>
+            <FormControl fullWidth required>
+              {(() => {
+                switch (item.fieldType) {
+                  case FieldType.DropDown:
+                    return (
+                      <>
+                        <InputLabel>{item.questionTitle}</InputLabel>
+
+                        <Select
+                          MenuProps={{
+                            autoFocus: false,
+                            PaperProps: dropdownPaperProp,
+                          }}
+                          value={item.dropdownTitle}
+                          label={item.questionTitle}
+                          disabled={true}
+                          renderValue={() => item.dropdownTitle}
+                        />
+                      </>
+                    );
+                  case FieldType.TextArea:
+                    return (
+                      <>
+                        <Input
+                          aria-label={item.questionTitle}
+                          multiline
+                          placeholder={item.questionTitle}
+                          value={item.answer}
+                          onChange={() => {}}
+                        />
+                      </>
+                    );
+                  default:
+                    return (
+                      <TextField
+                        label={item.questionTitle}
+                        value={item.answer}
+                        onChange={() => {}}
+                      />
+                    );
+                }
+              })()}
+            </FormControl>
+          </Grid>
+        ))}
+    </Grid>
+  );
+
   const editResponseDialog = (
     <Dialog
       open={openEditDialog}
       keepMounted
       onClose={closeEditDialog}
+      maxWidth={maxWidth}
     >
       <DialogContent>
         <Box sx={customStyles.titleBox}>
           <Typography variant="h5" sx={customStyles.title}>
-            Pre-Intervention Measurement
+            {evaluationTypesTitles[studentResponse.formType]} Measurement
           </Typography>
 
           <Typography variant="h6" sx={customStyles.body}>
@@ -383,7 +464,7 @@ const ResponseAccordion = (props: Props) => {
                 >
                   {generalSteps[activeStep]}
                 </Typography>
-                {activeStep < 2 && (
+                {/* {activeStep < 2 && (
                   <Typography
                     variant="caption"
                     sx={{
@@ -394,7 +475,7 @@ const ResponseAccordion = (props: Props) => {
                   >
                     Next : {generalSteps[activeStep + 1]}
                   </Typography>
-                )}
+                )} */}
               </Box>
             </Box>
           )}
@@ -414,14 +495,14 @@ const ResponseAccordion = (props: Props) => {
               </Fragment>
             ) : (
               <Fragment>
-                {/* <Box sx={customStyles.formBox}>{personalDetailsForm}</Box> */}
+                <Box sx={customStyles.formBox}>{personalDetailsForm}</Box>
 
-                <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
+                <Box sx={{ display: "flex", flexDirection: "row", pt: 2, mb: -3 }}>
                   {activeStep === 0 ? (
                     <Button
                       color="inherit"
                       variant="outlined"
-                      onClick={() => {}}
+                      onClick={closeEditDialog}
                       sx={customStyles.secondaryButton}
                     >
                       Cancel
@@ -451,10 +532,11 @@ const ResponseAccordion = (props: Props) => {
                   ) : (
                     <Button
                       variant="outlined"
-                      onClick={handleNext}
+                      onClick={handleUpdate}
                       sx={customStyles.primaryButton}
+                      // disabled
                     >
-                      Next
+                      Update
                     </Button>
                   )}
                 </Box>
@@ -490,12 +572,12 @@ const ResponseAccordion = (props: Props) => {
   const accordionSummary = (
     <AccordionSummary sx={customStyles.accordionSummary}>
       <Typography sx={{ width: 200 }}>
-        {response.createdAt &&
-          formatTimeStamp(new Date(response.createdAt).toDateString())}
+        {studentResponse.createdAt &&
+          formatTimeStamp(new Date(studentResponse.createdAt).toDateString())}
       </Typography>
 
       <Typography sx={{ flex: 1 }}>
-        {evaluationTypesTitles[response.formType]}
+        {evaluationTypesTitles[studentResponse.formType]}
       </Typography>
 
       <Box>
@@ -519,7 +601,7 @@ const ResponseAccordion = (props: Props) => {
       <DyanmicListHeader title="Personal details" subTitle="Answers" />
 
       <Stack>
-        {response.studentDetails.map((studentInfo) => (
+        {studentResponse.studentDetails.map((studentInfo) => (
           <DyanmicListContent
             question={studentInfo.questionTitle}
             answer={
@@ -538,7 +620,7 @@ const ResponseAccordion = (props: Props) => {
       <DyanmicListHeader title="Question | Part 01" subTitle="Answers" />
 
       <Stack>
-        {response.responses
+        {studentResponse.responses
           .filter(
             (item) =>
               item.questionSection === QuestionnaireSection.QuestionPartOne
@@ -559,7 +641,7 @@ const ResponseAccordion = (props: Props) => {
       <DyanmicListHeader title="Question | Part 02" subTitle="Answers" />
 
       <Stack>
-        {response.responses
+        {studentResponse.responses
           .filter(
             (item) =>
               item.questionSection === QuestionnaireSection.QuestionPartTwo

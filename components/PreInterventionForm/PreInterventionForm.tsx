@@ -1,6 +1,5 @@
 import {
   Alert,
-  Autocomplete,
   Box,
   Button,
   Divider,
@@ -12,7 +11,6 @@ import {
   ListSubheader,
   MenuItem,
   Select,
-  SelectChangeEvent,
   Snackbar,
   Stack,
   TextField,
@@ -22,9 +20,7 @@ import { Input as BaseInput, InputProps } from "@mui/base/Input";
 import { styled } from "@mui/system";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import React, {
-  ChangeEvent,
   Fragment,
-  useEffect,
   useMemo,
   useState,
 } from "react";
