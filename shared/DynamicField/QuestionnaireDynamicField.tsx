@@ -375,12 +375,7 @@ const QuestionnaireDynamicField = (props: Props) => {
             <IconButton
               sx={customStyles.button}
               onClick={() =>
-                moveItemDown &&
-                moveItemDown(
-                  question?.positionOrderId,
-                  true,
-                  question?.questionSetId
-                )
+                moveItemDown && moveItemDown(question?.positionOrderId, true)
               }
             >
               <KeyboardArrowDownIcon fontSize="small" />
@@ -391,12 +386,7 @@ const QuestionnaireDynamicField = (props: Props) => {
             <IconButton
               sx={customStyles.button}
               onClick={() =>
-                moveItemUp &&
-                moveItemUp(
-                  question?.positionOrderId,
-                  true,
-                  question?.questionSetId
-                )
+                moveItemUp && moveItemUp(question?.positionOrderId, true)
               }
             >
               <KeyboardArrowUpIcon fontSize="small" />

@@ -220,6 +220,7 @@ const EditPreInterventionForm = () => {
   }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
+    dispatch(resetForm());
     setTab(newValue);
   };
 
@@ -439,8 +440,7 @@ const EditPreInterventionForm = () => {
   // Function to handle moving an item up in the array
   const moveItemUp = (
     orderId: number | undefined,
-    questionnaireType: boolean,
-    sectionType?: number
+    questionnaireType: boolean
   ) => {
     if (!orderId) return;
     if (orderId <= 1) return; // Already at the top, can't move up
@@ -451,13 +451,13 @@ const EditPreInterventionForm = () => {
 
       setPersonalDetailsQuestions(newQuestionArr);
     } else {
-      if (sectionType === 0) {
+      if (tab === 1) {
         const newQuestionArr = [...partOneQuestions];
         newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
         newQuestionArr[orderId - 2].positionOrderId = orderId;
 
         setPartOneQuestions(newQuestionArr);
-      } else if ((sectionType = 1)) {
+      } else if (tab === 2) {
         const newQuestionArr = [...partTwoQuestions];
         newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
         newQuestionArr[orderId - 2].positionOrderId = orderId;
@@ -471,8 +471,7 @@ const EditPreInterventionForm = () => {
   // Function to handle moving an item down in the array
   const moveItemDown = (
     orderId: number | undefined,
-    questionnaireType: boolean,
-    sectionType?: number
+    questionnaireType: boolean
   ) => {
     if (!orderId) return;
     if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
@@ -483,13 +482,13 @@ const EditPreInterventionForm = () => {
 
       setPersonalDetailsQuestions(newQuestionArr);
     } else {
-      if (sectionType === 0) {
+      if (tab === 1) {
         const newQuestionArr = [...partOneQuestions];
         newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
         newQuestionArr[orderId].positionOrderId = orderId;
 
         setPartOneQuestions(newQuestionArr);
-      } else if ((sectionType = 1)) {
+      } else if (tab === 2) {
         const newQuestionArr = [...partTwoQuestions];
         newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
         newQuestionArr[orderId].positionOrderId = orderId;
