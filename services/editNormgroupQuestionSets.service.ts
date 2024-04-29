@@ -7,27 +7,27 @@ import {
 } from "../api/requests";
 import { FormQuestion } from "../utils/types";
 
-export const getPreInterventionQuestions = async () => {
+export const getNormgroupQuestions = async () => {
   try {
-    const response = await getRequest(leerLensApi.preIntervention);
+    const response = await getRequest(leerLensApi.normgroup);
 
     if (response.status === 200) {
       return response.data;
     } else {
-      throw new Error("Failed to fetch pre intervention questions");
+      throw new Error("Failed to fetch norm group questions");
     }
   } catch (error) {
-    console.error("Error fetching pre intervention questions:", error);
+    console.error("Error fetching norm group questions:", error);
     throw error;
   }
 };
 
-export const postPreInterventionQuestions = async (
+export const postNormgroupQuestions = async (
   newQuestion: FormQuestion
 ) => {
   try {
     const response = await postRequest(
-      leerLensApi.preIntervention,
+      leerLensApi.normgroup,
       newQuestion
     );
 
@@ -42,7 +42,7 @@ export const postPreInterventionQuestions = async (
   }
 };
 
-export const preInterventionQuestionUpdateById = async (updateQuestion: {
+export const normgroupQuestionUpdateById = async (updateQuestion: {
   id: number;
   questionText: string;
   positionOrderId: number;
@@ -53,7 +53,7 @@ export const preInterventionQuestionUpdateById = async (updateQuestion: {
 }) => {
   try {
     const response = await patchRequest(
-      `${leerLensApi.preIntervention}/${updateQuestion.id}`,
+      `${leerLensApi.normgroup}/${updateQuestion.id}`,
       updateQuestion
     );
 
@@ -68,7 +68,7 @@ export const preInterventionQuestionUpdateById = async (updateQuestion: {
   }
 };
 
-export const preInterventionQuesionsUpdateBulk = async (
+export const normgroupQuesionsUpdateBulk = async (
   updateQuestions: {
     id?: number;
     questionText: string;
@@ -81,7 +81,7 @@ export const preInterventionQuesionsUpdateBulk = async (
 ) => {
   try {
     const response = await patchRequest(
-      leerLensApi.preIntervention,
+      leerLensApi.normgroup,
       updateQuestions
     );
 
@@ -96,10 +96,10 @@ export const preInterventionQuesionsUpdateBulk = async (
   }
 };
 
-export const preInterventionQuestionFormSoftDelete = async (id: number) => {
+export const normgroupQuestionFormSoftDelete = async (id: number) => {
   try {
     const response = await patchRequest(
-      `${leerLensApi.preInterventionSoftDelete}/${id}`,
+      `${leerLensApi.normgroupSoftDelete}/${id}`,
       { isDelete: true }
     );
 

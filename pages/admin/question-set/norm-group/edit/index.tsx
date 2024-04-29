@@ -1,9 +1,21 @@
+import { Stack } from "@mui/material";
 import React from "react";
+import AdminHeader from "../../../../../shared/Header/AdminHeader";
+import Sidebar from "../../../../../shared/Sidebar/Sidebar";
+import EditNormgroupForm from "../../../../../components/EditNormgroupForm/EditNormgroupForm";
 
-type Props = {};
+const EditNormgroup = () => {
+  return (
+    <Stack direction="row">
+      <Sidebar />
 
-const index = (props: Props) => {
-  return <div>index</div>;
+      <Stack width={"100%"}>
+        <AdminHeader title="Edit Questions" shouldDisplayBreadcrumb/>
+
+        <EditNormgroupForm />
+      </Stack>
+    </Stack>
+  );
 };
 
-export default index;
+export default EditNormgroup;

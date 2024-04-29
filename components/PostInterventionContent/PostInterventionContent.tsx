@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { SyntheticEvent, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionSet from "../../shared/QuestionSet/QuestionSet";
 import {
@@ -74,10 +75,10 @@ const customStyles = {
     borderBottom: "5px solid #E6E6E6",
   },
   scrollableList: {
-    overflowY: "auto", 
-    maxHeight: "60vh", 
+    overflowY: "auto",
+    maxHeight: "60vh",
     "&::-webkit-scrollbar": {
-      width: "0", 
+      width: "0",
     },
   },
 };
@@ -118,6 +119,8 @@ const PostInterventionContent = () => {
   >([]);
   const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
 
+  const router = useRouter();
+
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -136,7 +139,9 @@ const PostInterventionContent = () => {
 
       <Button
         variant="outlined"
-        onClick={() => {}}
+        onClick={() =>
+          router.push("/admin/question-set/post-intervention/edit")
+        }
         sx={customStyles.primaryButton}
       >
         Edit Question

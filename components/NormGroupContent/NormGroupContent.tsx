@@ -21,6 +21,7 @@ import {
   getAllNormGroupQuestions,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
+import { useRouter } from "next/navigation";
 
 const customStyles = {
   snackbarAlert: {
@@ -74,10 +75,10 @@ const customStyles = {
     borderBottom: "5px solid #E6E6E6",
   },
   scrollableList: {
-    overflowY: "auto", 
-    maxHeight: "60vh", 
+    overflowY: "auto",
+    maxHeight: "60vh",
     "&::-webkit-scrollbar": {
-      width: "0", 
+      width: "0",
     },
   },
 };
@@ -118,6 +119,8 @@ const NormGroupContent = () => {
   >([]);
   const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
 
+  const router = useRouter();
+
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -136,7 +139,9 @@ const NormGroupContent = () => {
 
       <Button
         variant="outlined"
-        onClick={() => {}}
+        onClick={() =>
+          router.push("/admin/question-set/norm-group/edit")
+        }
         sx={customStyles.primaryButton}
       >
         Edit Question
@@ -220,7 +225,9 @@ const NormGroupContent = () => {
 
         setIsError(true);
 
-        setNotificationMsg("Error when fetching normgroup questionnaire data...");
+        setNotificationMsg(
+          "Error when fetching normgroup questionnaire data..."
+        );
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
