@@ -58,6 +58,15 @@ export type CreateStudentResponse = {
   updateAt?: string;
 };
 
+export type UpdateQuestionResponse = {
+  questionId: number;
+  answer: string | number;
+};
+
+export type UpdateStudentResponse = {
+  studentDetails: UpdateQuestionResponse[]
+}
+
 export type StudentResponse = CreateStudentResponse & {
   id: number;
 };

@@ -33,9 +33,10 @@ import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import DyanmicListHeader from "./DyanmicListHeader";
 import DyanmicListContent from "./DyanmicListContent";
 import {
-  Question,
   StudentDetailsAnswer,
   StudentResponse,
+  UpdateQuestionResponse,
+  UpdateStudentResponse,
 } from "../../utils/types";
 import {
   FieldType,
@@ -43,8 +44,11 @@ import {
   evaluationTypesTitles,
 } from "../../utils/enum";
 import { formatTimeStamp } from "../../utils/helper";
-import { Fragment, useState } from "react";
-import { deleteStudentResponseById } from "../../services/response.service";
+import { Fragment, useEffect, useState } from "react";
+import {
+  deleteStudentResponseById,
+  updateStudentResponse,
+} from "../../services/response.service";
 import { champBlackFontFamily } from "../../shared/typography";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
@@ -71,7 +75,7 @@ const customStyles = {
     },
   },
   titleBox: {
-    py: 2
+    py: 2,
   },
   title: {
     fontWeight: {
@@ -196,6 +200,19 @@ const generalSteps = [
   "Part 02 Questions",
 ];
 
+const evaluationSteps = [
+  "Personal Details",
+  "Part 01 Questions",
+  "Part 02 Questions",
+  "Program and Supervisor",
+  "Final",
+];
+
+type StudentAnswerUpdate = {
+  responseId: number;
+  updates: UpdateQuestionResponse[];
+};
+
 const dropdownPaperProp = {
   style: {
     maxHeight: 200,
@@ -214,7 +231,18 @@ const ResponseAccordion = (props: Props) => {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
 
-  const [maxWidth] = useState<DialogProps['maxWidth']>('md');
+  const [studentAnswerUpdate, setStudentAnswerUpdate] =
+    useState<StudentAnswerUpdate>({
+      responseId: studentResponse.id,
+      updates: [],
+    });
+
+  const [activeStep, setActiveStep] = useState(0);
+  const [completed, setCompleted] = useState<{
+    [k: number]: boolean;
+  }>({});
+
+  const [maxWidth] = useState<DialogProps["maxWidth"]>("md");
 
   const closeEditDialog = () => {
     setOpenEditDialog(false);
@@ -302,15 +330,6 @@ const ResponseAccordion = (props: Props) => {
     </Dialog>
   );
 
-  const [activeStep, setActiveStep] = useState(0);
-  const [completed, setCompleted] = useState<{
-    [k: number]: boolean;
-  }>({});
-
-  const containsText = (text: string, searchText: string) =>
-    text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
-
-  // These functions are used to handle the form step changes
   const totalSteps = () => {
     return generalSteps.length;
   };
@@ -327,19 +346,6 @@ const ResponseAccordion = (props: Props) => {
     return completedSteps() === totalSteps();
   };
 
-  const handleNext = () => {
-    const newActiveStep =
-      isLastStep() && !allStepsCompleted()
-        ? generalSteps.findIndex((step, i) => !(i in completed))
-        : activeStep + 1;
-    setActiveStep(newActiveStep);
-
-    const newCompleted = completed;
-    newCompleted[activeStep] = true;
-
-    setCompleted(newCompleted);
-  };
-
   const handleStep = (step: number) => () => {
     setActiveStep(step);
   };
@@ -349,11 +355,59 @@ const ResponseAccordion = (props: Props) => {
     setCompleted({});
   };
 
-  const handleUpdate = () => {};
+  const handleUpdate = async () => {
+    const requestBody: UpdateStudentResponse = {
+      studentDetails: studentAnswerUpdate.updates,
+    };
 
-  const personalDetailsForm = isLoading ? (
-    <ProgressSpinner />
-  ) : (
+    console.log(requestBody);
+
+    setIsLoading(true);
+
+    await updateStudentResponse(studentResponse.id, requestBody)
+      .then(() => {
+        setNotificationMsg("Form Updated Successfully...");
+
+        setDisplaySnackbarMsg(true);
+
+        closeEditDialog();
+      })
+      .catch(() => {
+        setIsError(true);
+
+        setNotificationMsg("Error when updating the form...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const handleInputChange = (questionId: number, newValue: string) => {
+    setStudentAnswerUpdate((prevUpdate) => {
+      const updateIndex = prevUpdate.updates.findIndex(
+        (update) => update.questionId === questionId
+      );
+
+      if (updateIndex !== -1) {
+        return {
+          ...prevUpdate,
+          updates: [
+            ...prevUpdate.updates.slice(0, updateIndex),
+            { questionId, answer: newValue },
+            ...prevUpdate.updates.slice(updateIndex + 1),
+          ],
+        };
+      } else {
+        return {
+          ...prevUpdate,
+          updates: [...prevUpdate.updates, { questionId, answer: newValue }],
+        };
+      }
+    });
+  };
+
+  const personalDetailsForm = (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentResponse &&
         studentResponse.studentDetails.map((item: StudentDetailsAnswer) => (
@@ -378,6 +432,7 @@ const ResponseAccordion = (props: Props) => {
                         />
                       </>
                     );
+
                   case FieldType.TextArea:
                     return (
                       <>
@@ -385,17 +440,35 @@ const ResponseAccordion = (props: Props) => {
                           aria-label={item.questionTitle}
                           multiline
                           placeholder={item.questionTitle}
-                          value={item.answer}
-                          onChange={() => {}}
+                          disabled={isLoading}
+                          value={
+                            studentAnswerUpdate.updates.find(
+                              (item_) => item_.questionId === item.questionId
+                            )?.answer
+                          }
+                          onChange={(event) =>
+                            handleInputChange(
+                              item.questionId,
+                              event.target.value
+                            )
+                          }
                         />
                       </>
                     );
+
                   default:
                     return (
                       <TextField
                         label={item.questionTitle}
-                        value={item.answer}
-                        onChange={() => {}}
+                        disabled={isLoading}
+                        value={
+                          studentAnswerUpdate.updates.find(
+                            (item_) => item_.questionId === item.questionId
+                          )?.answer
+                        }
+                        onChange={(event) =>
+                          handleInputChange(item.questionId, event.target.value)
+                        }
                       />
                     );
                 }
@@ -434,114 +507,33 @@ const ResponseAccordion = (props: Props) => {
 
           <Divider sx={{ py: 3, mb: 2 }} />
 
-          {activeStep < 3 && (
-            <Box
-              sx={{
-                width: "100%",
-                display: {
-                  xs: "flex",
-                  md: "none",
-                },
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              <CircularProgressWithLabel
-                activeStep={activeStep}
-                totalSteps={generalSteps.length}
-              />
-
-              <Box
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  sx={{ color: "#1A1A1A", fontSize: 13, fontWeight: 700 }}
-                >
-                  {generalSteps[activeStep]}
-                </Typography>
-                {/* {activeStep < 2 && (
-                  <Typography
-                    variant="caption"
-                    sx={{
-                      color: "#98989A",
-                      fontSize: 13,
-                      fontWeight: 700,
-                    }}
-                  >
-                    Next : {generalSteps[activeStep + 1]}
-                  </Typography>
-                )} */}
-              </Box>
-            </Box>
-          )}
-
           <Box sx={{ my: 2 }}>
-            {allStepsCompleted() ? (
-              <Fragment>
-                <Typography sx={{ mt: 2, mb: 1 }}>
-                  All steps completed - you&apos;re finished
-                </Typography>
+            <Fragment>
+              <Box sx={customStyles.formBox}>{personalDetailsForm}</Box>
 
-                <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-                  <Box sx={{ flex: "1 1 auto" }} />
+              <Stack pt={2} mb={-3} flexDirection="row">
+                <Button
+                  color="inherit"
+                  variant="outlined"
+                  onClick={closeEditDialog}
+                  disabled={isLoading}
+                  sx={customStyles.secondaryButton}
+                >
+                  Cancel
+                </Button>
 
-                  <Button onClick={handleReset}>Reset</Button>
-                </Box>
-              </Fragment>
-            ) : (
-              <Fragment>
-                <Box sx={customStyles.formBox}>{personalDetailsForm}</Box>
+                <Box sx={{ flex: "1 1 auto" }} />
 
-                <Box sx={{ display: "flex", flexDirection: "row", pt: 2, mb: -3 }}>
-                  {activeStep === 0 ? (
-                    <Button
-                      color="inherit"
-                      variant="outlined"
-                      onClick={closeEditDialog}
-                      sx={customStyles.secondaryButton}
-                    >
-                      Cancel
-                    </Button>
-                  ) : (
-                    <Button
-                      color="inherit"
-                      variant="outlined"
-                      onClick={() => {}}
-                      sx={customStyles.secondaryButton}
-                    >
-                      Back
-                    </Button>
-                  )}
-
-                  <Box sx={{ flex: "1 1 auto" }} />
-
-                  {isLastStep() ? (
-                    <Button
-                      variant="outlined"
-                      onClick={handleUpdate}
-                      sx={customStyles.primaryButton}
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Updating..." : "Update"}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      onClick={handleUpdate}
-                      sx={customStyles.primaryButton}
-                      // disabled
-                    >
-                      Update
-                    </Button>
-                  )}
-                </Box>
-              </Fragment>
-            )}
+                <Button
+                  variant="outlined"
+                  onClick={handleUpdate}
+                  sx={customStyles.primaryButton}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Updating..." : "Update"}
+                </Button>
+              </Stack>
+            </Fragment>
           </Box>
         </Box>
       </DialogContent>
@@ -674,6 +666,27 @@ const ResponseAccordion = (props: Props) => {
       {final}
     </AccordionDetails>
   );
+
+  const initialStudentAnswerUpdates = (): UpdateQuestionResponse[] => {
+    return studentResponse.studentDetails
+      .filter(
+        (item) =>
+          item.fieldType === FieldType.TextArea ||
+          item.fieldType === FieldType.TextField
+      )
+      .map((item) => ({
+        questionId: item.questionId,
+        answer: item.answer,
+      }));
+  };
+
+  useEffect(() => {
+    setStudentAnswerUpdate({
+      responseId: studentResponse.id,
+      updates: initialStudentAnswerUpdates(),
+    });
+  }, [studentResponse]);
+
   return (
     <>
       <Accordion>
