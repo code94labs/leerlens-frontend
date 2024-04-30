@@ -302,19 +302,53 @@ const EditEvaluationForm = () => {
   const handlePersonalDetailsQuestionUpdate = async (
     question: QuestionResponse
   ) => {
-    setPersonalDetailsQuestions((prevQuestions) => {
-      const updatedQuestionsArr = [...prevQuestions];
+    tab === 0
+      ? setPersonalDetailsQuestions((prevQuestions) => {
+          const updatedQuestionsArr = [...prevQuestions];
 
-      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
+          const index = updatedQuestionsArr.findIndex(
+            (q) => q.id === question.id
+          );
 
-      if (index !== -1) {
-        updatedQuestionsArr[index] = question;
-      } else {
-        console.error(`Question with id ${question.id} not found`);
-      }
+          if (index !== -1) {
+            updatedQuestionsArr[index] = question;
+          } else {
+            console.error(`Question with id ${question.id} not found`);
+          }
 
-      return updatedQuestionsArr;
-    });
+          return updatedQuestionsArr;
+        })
+      : tab === 3
+      ? setProgramAndSupervisorsQuestions((prevQuestions) => {
+          const updatedQuestionsArr = [...prevQuestions];
+
+          const index = updatedQuestionsArr.findIndex(
+            (q) => q.id === question.id
+          );
+
+          if (index !== -1) {
+            updatedQuestionsArr[index] = question;
+          } else {
+            console.error(`Question with id ${question.id} not found`);
+          }
+
+          return updatedQuestionsArr;
+        })
+      : setFinalQuestions((prevQuestions) => {
+          const updatedQuestionsArr = [...prevQuestions];
+
+          const index = updatedQuestionsArr.findIndex(
+            (q) => q.id === question.id
+          );
+
+          if (index !== -1) {
+            updatedQuestionsArr[index] = question;
+          } else {
+            console.error(`Question with id ${question.id} not found`);
+          }
+
+          return updatedQuestionsArr;
+        });
   };
 
   const handleEvaluationQuestionUpdate = async (question: FormQuestion) => {
@@ -368,7 +402,15 @@ const EditEvaluationForm = () => {
 
     try {
       const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
-      setPersonalDetailsQuestions(response);
+      // tab === 0
+      //   ? setPersonalDetailsQuestions(
+      //       (response as QuestionResponse[]).filter(
+      //         (q) => q.sectionType === SectionType.PersonalDetails
+      //       )
+      //     )
+      //   : tab === 3
+      //   ? setProgramAndSupervisorsQuestions(response)
+      //   : setFinalQuestions(response);
       dispatch(resetForm());
     } catch (error) {
       console.error("Error updating questions:", error);
@@ -417,7 +459,14 @@ const EditEvaluationForm = () => {
     questionText: string;
     dropdownOptions: DropDownOptions[];
   }) => {
-    const newPositionOrderId = personalDetailsQuestions.length + 1;
+    const targetArray =
+      tab === 0
+        ? personalDetailsQuestions
+        : tab === 3
+        ? programAndSupervisorsQuestions
+        : finalQuestions;
+
+    const newPositionOrderId = targetArray.length + 1;
 
     const newQuestion: Question = {
       formType: FormEvaluation.Evaluation,
@@ -439,9 +488,13 @@ const EditEvaluationForm = () => {
 
     const response = await postStudentFormInfo(newQuestion);
 
-    const updatedQuestionsArr = personalDetailsQuestions;
+    const updatedQuestionsArr = targetArray;
     updatedQuestionsArr?.push(response);
-    setPersonalDetailsQuestions(updatedQuestionsArr);
+    tab === 0
+      ? setPersonalDetailsQuestions(updatedQuestionsArr)
+      : tab === 3
+      ? setProgramAndSupervisorsQuestions(updatedQuestionsArr)
+      : setFinalQuestions(updatedQuestionsArr);
 
     setDisplayNewQuestion(false);
   };
@@ -632,7 +685,7 @@ const EditEvaluationForm = () => {
 
       <Button
         onClick={
-          tab < 1
+          tab === 0 || tab === 3 || tab === 4
             ? handleUpdateAllPersonalDetailsQuestions
             : handleUpdateAllEvaluationQuestions
         }
