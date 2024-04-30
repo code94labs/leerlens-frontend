@@ -37,8 +37,12 @@ import {
 
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
-import { getNormgroupQuestions, normgroupQuesionsUpdateBulk, normgroupQuestionFormSoftDelete, postNormgroupQuestions } from "../../services/editNormgroupQuestionSets.service";
-
+import {
+  evaluationQuesionsUpdateBulk,
+  evaluationQuestionFormSoftDelete,
+  getEvaluationQuestions,
+  postEvaluationQuestions,
+} from "../../services/editEvaluationQuestionSets.service";
 
 const customStyles = {
   snackbarAlert: {
@@ -153,7 +157,7 @@ const menuItems = [
   },
 ];
 
-const EditNormgroupForm = () => {
+const EditEvaluationForm = () => {
   const dispatch = useDispatch();
 
   const formDetails = useSelector(selectForm);
@@ -184,7 +188,7 @@ const EditNormgroupForm = () => {
           studentFormInfoQuestions.filter(
             (item: Question) =>
               item.sectionType === SectionType.PersonalDetails &&
-              item.formType === FormEvaluation.Normgroup
+              item.formType === FormEvaluation.Evaluation
           )
         );
       } catch (error) {
@@ -192,17 +196,17 @@ const EditNormgroupForm = () => {
       }
     };
 
-    const fetchNormgroupQuestions = async () => {
+    const fetchEvaluationsQuestions = async () => {
       try {
-        const normgroupQuestions = await getNormgroupQuestions();
+        const evaluationQuestions = await getEvaluationQuestions();
 
         setPartOneQuestions(
-          normgroupQuestions.filter(
+          evaluationQuestions.filter(
             (item: FormQuestion) => item.questionSection === 1
           )
         );
         setPartTwoQuestions(
-          normgroupQuestions.filter(
+          evaluationQuestions.filter(
             (item: FormQuestion) => item.questionSection === 2
           )
         );
@@ -212,7 +216,7 @@ const EditNormgroupForm = () => {
     };
 
     fetchPersonalDetailsQuestions();
-    fetchNormgroupQuestions();
+    fetchEvaluationsQuestions();
   }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
@@ -239,13 +243,8 @@ const EditNormgroupForm = () => {
     setPersonalDetailsQuestions(updatedQuestionsArr);
   };
 
-  const handleNormgroupSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: FormQuestion = await normgroupQuestionFormSoftDelete(
-      id
-    );
+  const handleEvaluationSoftDelete = async (id: number, orderId: number) => {
+    const response: FormQuestion = await evaluationQuestionFormSoftDelete(id);
 
     const newQuestionArr =
       tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
@@ -282,9 +281,7 @@ const EditNormgroupForm = () => {
     });
   };
 
-  const handleNormgroupQuestionUpdate = async (
-    question: FormQuestion
-  ) => {
+  const handleEvaluationQuestionUpdate = async (question: FormQuestion) => {
     if (tab === 1) {
       setPartOneQuestions((prevQuestions) => {
         const updatedQuestionsArr = [...prevQuestions];
@@ -335,7 +332,7 @@ const EditNormgroupForm = () => {
     }
   };
 
-  const handleUpdateAllNormgroupQuestions = async () => {
+  const handleUpdateAllEvaluationQuestions = async () => {
     const arrayToMap = tab === 1 ? partOneQuestions : partTwoQuestions;
 
     const updatedQuestions = arrayToMap.map((question) => {
@@ -344,9 +341,7 @@ const EditNormgroupForm = () => {
     });
 
     try {
-      const response = await normgroupQuesionsUpdateBulk(
-        updatedQuestions
-      );
+      const response = await evaluationQuesionsUpdateBulk(updatedQuestions);
 
       setPartOneQuestions(
         response.filter((item: FormQuestion) => item.questionSection === 1)
@@ -382,7 +377,7 @@ const EditNormgroupForm = () => {
     const newPositionOrderId = personalDetailsQuestions.length + 1;
 
     const newQuestion: Question = {
-      formType: FormEvaluation.Normgroup,
+      formType: FormEvaluation.Evaluation,
       questionText: questionText,
       fieldType: fieldType,
       sectionType: SectionType.PersonalDetails,
@@ -422,7 +417,7 @@ const EditNormgroupForm = () => {
       questionSection: tab,
     };
 
-    const response = await postNormgroupQuestions(newQuestion);
+    const response = await postEvaluationQuestions(newQuestion);
 
     const updatedQuestionsArr = tab === 1 ? partOneQuestions : partTwoQuestions;
     updatedQuestionsArr?.push(response);
@@ -561,7 +556,7 @@ const EditNormgroupForm = () => {
         onClick={
           tab < 1
             ? handleUpdateAllPersonalDetailsQuestions
-            : handleUpdateAllNormgroupQuestions
+            : handleUpdateAllEvaluationQuestions
         }
         sx={customStyles.updateButton}
         disabled={!formDetails.isModified}
@@ -627,8 +622,8 @@ const EditNormgroupForm = () => {
                 <QuestionnaireDynamicField
                   key={question.id}
                   question={question}
-                  handleQuestionUpdate={handleNormgroupQuestionUpdate}
-                  handleQuestionSoftDelete={handleNormgroupSoftDelete}
+                  handleQuestionUpdate={handleEvaluationQuestionUpdate}
+                  handleQuestionSoftDelete={handleEvaluationSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
                 />
@@ -656,8 +651,8 @@ const EditNormgroupForm = () => {
                 <QuestionnaireDynamicField
                   key={question.id}
                   question={question}
-                  handleQuestionUpdate={handleNormgroupQuestionUpdate}
-                  handleQuestionSoftDelete={handleNormgroupSoftDelete}
+                  handleQuestionUpdate={handleEvaluationQuestionUpdate}
+                  handleQuestionSoftDelete={handleEvaluationSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
                 />
@@ -721,4 +716,4 @@ const EditNormgroupForm = () => {
   );
 };
 
-export default EditNormgroupForm;
+export default EditEvaluationForm;

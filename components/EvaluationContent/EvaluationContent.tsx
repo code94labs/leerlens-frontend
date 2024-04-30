@@ -21,6 +21,7 @@ import {
   getAllEvaluationQuestions,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
+import { useRouter } from "next/navigation";
 
 const customStyles = {
   snackbarAlert: {
@@ -74,10 +75,10 @@ const customStyles = {
     borderBottom: "5px solid #E6E6E6",
   },
   scrollableList: {
-    overflowY: "auto", 
-    maxHeight: "60vh", 
+    overflowY: "auto",
+    maxHeight: "60vh",
     "&::-webkit-scrollbar": {
-      width: "0", 
+      width: "0",
     },
   },
 };
@@ -118,6 +119,8 @@ const EvaluationContent = () => {
   >([]);
   const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
 
+  const router = useRouter();
+
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -136,7 +139,7 @@ const EvaluationContent = () => {
 
       <Button
         variant="outlined"
-        onClick={() => {}}
+        onClick={() => router.push("/admin/question-set/evaluation/edit")}
         sx={customStyles.primaryButton}
       >
         Edit Question
@@ -220,7 +223,9 @@ const EvaluationContent = () => {
 
         setIsError(true);
 
-        setNotificationMsg("Error when fetching evaluation questionnaire data...");
+        setNotificationMsg(
+          "Error when fetching evaluation questionnaire data..."
+        );
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {

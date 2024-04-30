@@ -474,8 +474,8 @@ const EditPreInterventionForm = () => {
     questionnaireType: boolean
   ) => {
     if (!orderId) return;
-    if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
     if (!questionnaireType) {
+      if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
       const newQuestionArr = [...personalDetailsQuestions];
       newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
       newQuestionArr[orderId].positionOrderId = orderId;
@@ -483,12 +483,16 @@ const EditPreInterventionForm = () => {
       setPersonalDetailsQuestions(newQuestionArr);
     } else {
       if (tab === 1) {
+        if (orderId >= partOneQuestions.length) return; // Already at the bottom, can't move down
+
         const newQuestionArr = [...partOneQuestions];
         newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
         newQuestionArr[orderId].positionOrderId = orderId;
 
         setPartOneQuestions(newQuestionArr);
       } else if (tab === 2) {
+        if (orderId >= partTwoQuestions.length) return; // Already at the bottom, can't move down
+
         const newQuestionArr = [...partTwoQuestions];
         newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
         newQuestionArr[orderId].positionOrderId = orderId;
@@ -496,11 +500,6 @@ const EditPreInterventionForm = () => {
         setPartTwoQuestions(newQuestionArr);
       }
     }
-    // const newQuestionArr = [...personalDetailsQuestions];
-    // newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-    // newQuestionArr[orderId].positionOrderId = orderId;
-
-    // setPersonalDetailsQuestions(newQuestionArr);
     dispatch(setFormModified());
   };
 

@@ -234,15 +234,10 @@ type Props = {
   question?: FormQuestion;
   handleQuestionUpdate?: (question: FormQuestion) => void;
   handleQuestionSoftDelete?: (id: number, orderId: number) => void;
-  moveItemUp?: (
+  moveItemUp: (orderId: number | undefined, questionnaireType: boolean) => void;
+  moveItemDown: (
     orderId: number | undefined,
-    questionnaireType: boolean,
-    sectionType?: number
-  ) => void;
-  moveItemDown?: (
-    orderId: number | undefined,
-    questionnaireType: boolean,
-    sectionType?: number
+    questionnaireType: boolean
   ) => void;
 };
 
@@ -374,9 +369,7 @@ const QuestionnaireDynamicField = (props: Props) => {
           <Tooltip title="Move the question down the order">
             <IconButton
               sx={customStyles.button}
-              onClick={() =>
-                moveItemDown && moveItemDown(question?.positionOrderId, true)
-              }
+              onClick={() => moveItemDown(question?.positionOrderId, true)}
             >
               <KeyboardArrowDownIcon fontSize="small" />
             </IconButton>
@@ -385,9 +378,7 @@ const QuestionnaireDynamicField = (props: Props) => {
           <Tooltip title="Move the question up the order">
             <IconButton
               sx={customStyles.button}
-              onClick={() =>
-                moveItemUp && moveItemUp(question?.positionOrderId, true)
-              }
+              onClick={() => moveItemUp(question?.positionOrderId, true)}
             >
               <KeyboardArrowUpIcon fontSize="small" />
             </IconButton>

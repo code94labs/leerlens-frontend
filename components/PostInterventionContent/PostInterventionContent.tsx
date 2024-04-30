@@ -197,8 +197,6 @@ const PostInterventionContent = () => {
     await getStudentFormInfoByFormType(formType)
       .then((res) => {
         setPersonalDetails(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -217,8 +215,6 @@ const PostInterventionContent = () => {
     await getAllPostInterventionQuestions()
       .then((res) => {
         setPostQuestionnaireList(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);

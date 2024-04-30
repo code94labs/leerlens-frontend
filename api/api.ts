@@ -9,8 +9,9 @@ export const leerLensApi = {
 
   postIntervention: `${baseUrl}/questionnaire/post-intervention`,
   postInterventionSoftDelete: `${baseUrl}/questionnaire/post-intervention/soft-delete`,
-
+  
   evaluation: `${baseUrl}/questionnaire/evaluation`,
+  evaluationSoftDelete: `${baseUrl}/questionnaire/evaluation/soft-delete`,
 
   normgroup: `${baseUrl}/questionnaire/normgroup`,
   normgroupSoftDelete: `${baseUrl}/questionnaire/normgroup/soft-delete`,
