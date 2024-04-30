@@ -472,6 +472,8 @@ const DynamicField = (props: Props) => {
           >
             <MenuItem value={FieldType.TextField.toString()}>Text</MenuItem>
 
+            <MenuItem value={FieldType.TextArea.toString()}>Text Area</MenuItem>
+
             <MenuItem value={FieldType.Scale1to6.toString()}>
               Scale 1 to 6
             </MenuItem>

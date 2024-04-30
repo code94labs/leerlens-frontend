@@ -155,6 +155,14 @@ const menuItems = [
     id: 2,
     title: "Question | Part 02",
   },
+  {
+    id: 3,
+    title: "Program and the supervisors",
+  },
+  {
+    id: 4,
+    title: "Final",
+  },
 ];
 
 const EditEvaluationForm = () => {
@@ -175,6 +183,9 @@ const EditEvaluationForm = () => {
   const [personalDetailsQuestions, setPersonalDetailsQuestions] = useState<
     QuestionResponse[]
   >([]);
+  const [programAndSupervisorsQuestions, setProgramAndSupervisorsQuestions] =
+    useState<QuestionResponse[]>([]);
+  const [finalQuestions, setFinalQuestions] = useState<QuestionResponse[]>([]);
 
   const [partOneQuestions, setPartOneQuestions] = useState<FormQuestion[]>([]);
   const [partTwoQuestions, setPartTwoQuestions] = useState<FormQuestion[]>([]);
@@ -188,6 +199,20 @@ const EditEvaluationForm = () => {
           studentFormInfoQuestions.filter(
             (item: Question) =>
               item.sectionType === SectionType.PersonalDetails &&
+              item.formType === FormEvaluation.Evaluation
+          )
+        );
+        setProgramAndSupervisorsQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.ProgramAndSupervisor &&
+              item.formType === FormEvaluation.Evaluation
+          )
+        );
+        setFinalQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.Final &&
               item.formType === FormEvaluation.Evaluation
           )
         );
@@ -230,7 +255,14 @@ const EditEvaluationForm = () => {
   ) => {
     const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
 
-    const newQuestionArr = [...personalDetailsQuestions];
+    const targetArray =
+      tab === 0
+        ? personalDetailsQuestions
+        : tab === 3
+        ? programAndSupervisorsQuestions
+        : finalQuestions;
+
+    const newQuestionArr = [...targetArray];
 
     for (let i = orderId; i < newQuestionArr.length; i++) {
       newQuestionArr[i].positionOrderId--;
@@ -240,7 +272,11 @@ const EditEvaluationForm = () => {
       (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
     );
 
-    setPersonalDetailsQuestions(updatedQuestionsArr);
+    tab === 0
+      ? setPersonalDetailsQuestions(updatedQuestionsArr)
+      : tab === 3
+      ? setProgramAndSupervisorsQuestions(updatedQuestionsArr)
+      : setFinalQuestions(updatedQuestionsArr);
   };
 
   const handleEvaluationSoftDelete = async (id: number, orderId: number) => {
@@ -318,12 +354,19 @@ const EditEvaluationForm = () => {
   };
 
   const handleUpdateAllPersonalDetailsQuestions = async () => {
-    try {
-      const updatedQuestions = personalDetailsQuestions.map((question) => {
-        const { isDelete, isNewlyAdded, ...updatedQuestion } = question;
-        return updatedQuestion;
-      });
+    const arrayToMap =
+      tab === 0
+        ? personalDetailsQuestions
+        : tab === 3
+        ? programAndSupervisorsQuestions
+        : finalQuestions;
 
+    const updatedQuestions = arrayToMap.map((question) => {
+      const { isDelete, isNewlyAdded, ...updatedQuestion } = question;
+      return updatedQuestion;
+    });
+
+    try {
       const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
       setPersonalDetailsQuestions(response);
       dispatch(resetForm());
@@ -380,7 +423,12 @@ const EditEvaluationForm = () => {
       formType: FormEvaluation.Evaluation,
       questionText: questionText,
       fieldType: fieldType,
-      sectionType: SectionType.PersonalDetails,
+      sectionType:
+        tab === 0
+          ? SectionType.PersonalDetails
+          : tab === 3
+          ? SectionType.ProgramAndSupervisor
+          : SectionType.Final,
       positionOrderId: newPositionOrderId,
       dropdownOptions: dropdownOptions,
       minValue: 1,
@@ -436,11 +484,25 @@ const EditEvaluationForm = () => {
     if (!orderId) return;
     if (orderId <= 1) return; // Already at the top, can't move up
     if (!questionnaireType) {
-      const newQuestionArr = [...personalDetailsQuestions];
-      newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-      newQuestionArr[orderId - 2].positionOrderId = orderId;
+      if (tab === 0) {
+        const newQuestionArr = [...personalDetailsQuestions];
+        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
+        newQuestionArr[orderId - 2].positionOrderId = orderId;
 
-      setPersonalDetailsQuestions(newQuestionArr);
+        setPersonalDetailsQuestions(newQuestionArr);
+      } else if (tab === 3) {
+        const newQuestionArr = [...programAndSupervisorsQuestions];
+        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
+        newQuestionArr[orderId - 2].positionOrderId = orderId;
+
+        setProgramAndSupervisorsQuestions(newQuestionArr);
+      } else if (tab === 4) {
+        const newQuestionArr = [...finalQuestions];
+        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
+        newQuestionArr[orderId - 2].positionOrderId = orderId;
+
+        setFinalQuestions(newQuestionArr);
+      }
     } else {
       if (tab === 1) {
         const newQuestionArr = [...partOneQuestions];
@@ -466,12 +528,28 @@ const EditEvaluationForm = () => {
   ) => {
     if (!orderId) return;
     if (!questionnaireType) {
-      if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
-      const newQuestionArr = [...personalDetailsQuestions];
-      newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-      newQuestionArr[orderId].positionOrderId = orderId;
+      if (tab === 0) {
+        if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
+        const newQuestionArr = [...personalDetailsQuestions];
+        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
+        newQuestionArr[orderId].positionOrderId = orderId;
 
-      setPersonalDetailsQuestions(newQuestionArr);
+        setPersonalDetailsQuestions(newQuestionArr);
+      } else if (tab === 3) {
+        if (orderId >= programAndSupervisorsQuestions.length) return; // Already at the bottom, can't move down
+        const newQuestionArr = [...programAndSupervisorsQuestions];
+        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
+        newQuestionArr[orderId].positionOrderId = orderId;
+
+        setProgramAndSupervisorsQuestions(newQuestionArr);
+      } else if (tab === 4) {
+        if (orderId >= finalQuestions.length) return; // Already at the bottom, can't move down
+        const newQuestionArr = [...finalQuestions];
+        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
+        newQuestionArr[orderId].positionOrderId = orderId;
+
+        setFinalQuestions(newQuestionArr);
+      }
     } else {
       if (tab === 1) {
         if (orderId >= partOneQuestions.length) return; // Already at the bottom, can't move down
@@ -671,6 +749,66 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
+      case 3:
+        return (
+          <>
+            {programAndSupervisorsQuestions
+              .sort((a, b) => a.positionOrderId - b.positionOrderId)
+              .map((question: QuestionResponse) => (
+                <DynamicField
+                  key={question.id}
+                  fieldType={question.fieldType as FieldType}
+                  isQuestionnaireType
+                  question={question}
+                  handleQuestionUpdate={handlePersonalDetailsQuestionUpdate}
+                  handleQuestionSoftDelete={handlePersonalDetailsSoftDelete}
+                  moveItemUp={moveItemUp}
+                  moveItemDown={moveItemDown}
+                />
+              ))}
+
+            {displayNewQuestion && (
+              <AddNewField
+                handleNewQuestionDelete={handleNewQuestionDelete}
+                handleNewQuestionSave={handleNewPersonalDetailsQuestionSave}
+              />
+            )}
+
+            {addQuestionButton}
+
+            {updateButtonGroup}
+          </>
+        );
+      case 4:
+        return (
+          <>
+            {finalQuestions
+              .sort((a, b) => a.positionOrderId - b.positionOrderId)
+              .map((question: QuestionResponse) => (
+                <DynamicField
+                  key={question.id}
+                  fieldType={question.fieldType as FieldType}
+                  isQuestionnaireType
+                  question={question}
+                  handleQuestionUpdate={handlePersonalDetailsQuestionUpdate}
+                  handleQuestionSoftDelete={handlePersonalDetailsSoftDelete}
+                  moveItemUp={moveItemUp}
+                  moveItemDown={moveItemDown}
+                />
+              ))}
+
+            {displayNewQuestion && (
+              <AddNewField
+                handleNewQuestionDelete={handleNewQuestionDelete}
+                handleNewQuestionSave={handleNewPersonalDetailsQuestionSave}
+              />
+            )}
+
+            {addQuestionButton}
+
+            {updateButtonGroup}
+          </>
+        );
       default:
         return null;
     }
@@ -685,7 +823,12 @@ const EditEvaluationForm = () => {
         sx={customStyles.tabs}
       >
         {menuItems.map((item) => (
-          <Tab value={item.id} label={item.title} key={item.id} />
+          <Tab
+            value={item.id}
+            label={item.title}
+            key={item.id}
+            sx={{ textAlign: "start" }}
+          />
         ))}
       </Tabs>
     </Stack>
