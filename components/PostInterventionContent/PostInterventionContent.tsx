@@ -165,7 +165,7 @@ const PostInterventionContent = () => {
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />
@@ -176,7 +176,7 @@ const PostInterventionContent = () => {
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />

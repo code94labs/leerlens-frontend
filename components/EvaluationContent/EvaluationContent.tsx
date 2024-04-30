@@ -163,7 +163,7 @@ const EvaluationContent = () => {
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />
@@ -174,7 +174,7 @@ const EvaluationContent = () => {
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />
@@ -195,8 +195,6 @@ const EvaluationContent = () => {
     await getStudentFormInfoByFormType(formType)
       .then((res) => {
         setPersonalDetails(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -215,8 +213,6 @@ const EvaluationContent = () => {
     await getAllEvaluationQuestions()
       .then((res) => {
         setEvalQuestionnaireList(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);

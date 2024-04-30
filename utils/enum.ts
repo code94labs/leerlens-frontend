@@ -25,13 +25,13 @@ export enum UserRole {
 }
 
 export enum QuestionnaireSection {
-  QuestionPartOne = 0,
-  QuestionPartTwo = 1,
+  QuestionPartOne = 1,
+  QuestionPartTwo = 2,
 }
 
 export enum QuestionnaireSet {
-  QuestionSetOne = 0,
-  QuestionSetTwo = 1,
+  QuestionSetOne = 1,
+  QuestionSetTwo = 2,
 }
 
 /* We will be using this to differentiate the 2 sets of questions */

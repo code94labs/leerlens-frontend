@@ -139,9 +139,7 @@ const NormGroupContent = () => {
 
       <Button
         variant="outlined"
-        onClick={() =>
-          router.push("/admin/question-set/norm-group/edit")
-        }
+        onClick={() => router.push("/admin/question-set/norm-group/edit")}
         sx={customStyles.primaryButton}
       >
         Edit Question
@@ -165,7 +163,7 @@ const NormGroupContent = () => {
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />
@@ -176,7 +174,7 @@ const NormGroupContent = () => {
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />
@@ -197,8 +195,6 @@ const NormGroupContent = () => {
     await getStudentFormInfoByFormType(formType)
       .then((res) => {
         setPersonalDetails(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -217,8 +213,6 @@ const NormGroupContent = () => {
     await getAllNormGroupQuestions()
       .then((res) => {
         setNormGroupQuestionnaireList(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
