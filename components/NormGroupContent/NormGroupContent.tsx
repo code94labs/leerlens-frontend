@@ -60,7 +60,7 @@ const customStyles = {
     },
   },
   tabs: {
-    "& .Mui-selected": {
+    "& .Mui-selected.MuiTab-root": {
       color: "black",
       fontWeight: "bold",
       fontSize: 16,

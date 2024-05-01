@@ -54,7 +54,7 @@ const customStyles = {
     },
   },
   tabs: {
-    "& .Mui-selected": {
+    "& .Mui-selected.MuiTab-root": {
       color: "black",
       fontWeight: "bold",
       fontSize: 16,
@@ -129,7 +129,7 @@ const PreInterventionContent = () => {
       <Typography variant="h5" fontWeight={900} ml={1}>
         PERSONAL DETAILS
       </Typography>
-      
+
       <Button
         variant="outlined"
         onClick={() => router.push("/admin/question-set/pre-intervention/edit")}

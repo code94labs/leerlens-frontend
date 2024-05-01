@@ -12,7 +12,7 @@ type Props = {
 
 const customStyles = {
   stack: {
-    border: "3px #E6E6E6 solid",
+    border: "2px #E6E6E6 solid",
     borderRadius: 2,
     flex: 1,
   },
