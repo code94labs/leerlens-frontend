@@ -2,8 +2,8 @@ import { Stack, Typography } from "@mui/material";
 import React from "react";
 
 type Props = {
-  question: string;
-  answer: string;
+  question?: string;
+  answer?: string | number;
 };
 
 const customStyles = {

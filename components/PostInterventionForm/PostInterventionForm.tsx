@@ -1,6 +1,8 @@
 import {
+  Alert,
   Box,
   Button,
+  CircularProgress,
   Divider,
   FormControl,
   FormHelperText,
@@ -10,13 +12,13 @@ import {
   ListSubheader,
   MenuItem,
   Select,
-  SelectChangeEvent,
+  Snackbar,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { Formik, useFormik } from "formik";
 import * as yup from "yup";
@@ -27,10 +29,22 @@ import {
   getAllPostInterventionQuestions,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
-import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgress";
-import { DropDownOptions, FormQuestion, Question, QuestionResponse } from "../../utils/types";
+import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
+import {
+  CreateStudentResponse,
+  DropDownOptions,
+  FormQuestion,
+  Question,
+  QuestionResponse,
+  QuestionniareAnswer,
+  StudentDetailsAnswer,
+} from "../../utils/types";
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
+import { generateStudentDetails } from "../../utils/helper";
+import { createStudentResponse } from "../../services/response.service";
+import { loading } from "../EditPreInterventionForm/EditPreInterventionForm";
+import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
 const customStyles = {
   mainBox: {
@@ -142,6 +156,13 @@ const customStyles = {
     },
     fontFamily: champBlackFontFamily,
   },
+  snackbarAlert: {
+    width: "100%",
+    bgcolor: "white",
+    fontWeight: 600,
+    borderRadius: 2,
+    border: "none",
+  },
 };
 
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
@@ -152,6 +173,12 @@ const questionSectionTwo = 1;
 const PostInterventionForm = () => {
   const router = useRouter();
 
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>([]);
   const [questionListPartOne, setQuestionListPartOne] = useState<QuestionResponse[]>(
     []
@@ -160,11 +187,11 @@ const PostInterventionForm = () => {
     []
   );
 
-  const [answersPartOne, setAnswersPartOne] = useState<number[]>(
-    Array(questionListPartOne.length).fill(0)
+  const [answersPartOne, setAnswersPartOne] = useState<QuestionniareAnswer[]>(
+    []
   );
-  const [answersPartTwo, setAnswersPartTwo] = useState<number[]>(
-    Array(questionListPartTwo.length).fill(0)
+  const [answersPartTwo, setAnswersPartTwo] = useState<QuestionniareAnswer[]>(
+    []
   );
 
   const [allAnsweredPartOne, setAllAnsweredPartOne] = useState<boolean>(false);
@@ -182,7 +209,25 @@ const PostInterventionForm = () => {
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
       const newAnswers = [...prevAnswers];
-      newAnswers[questionId] = answer;
+      let isPresent = false;
+
+      newAnswers.map((item, index) => {
+        if (item.questionId === questionId) {
+          isPresent = true;
+
+          newAnswers[index] = {
+            questionId,
+            answer,
+          };
+        }
+      });
+
+      if (!isPresent) {
+        const appendAnswer = [...newAnswers, { questionId, answer }];
+
+        return appendAnswer;
+      }
+
       return newAnswers;
     });
   };
@@ -190,7 +235,25 @@ const PostInterventionForm = () => {
   const updateAnswerPartTwo = (questionId: number, answer: number) => {
     setAnswersPartTwo((prevAnswers) => {
       const newAnswers = [...prevAnswers];
-      newAnswers[questionId] = answer;
+      let isPresent = false;
+
+      newAnswers.map((item, index) => {
+        if (item.questionId === questionId) {
+          isPresent = true;
+
+          newAnswers[index] = {
+            questionId,
+            answer,
+          };
+        }
+      });
+
+      if (!isPresent) {
+        const appendAnswer = [...newAnswers, { questionId, answer }];
+
+        return appendAnswer;
+      }
+
       return newAnswers;
     });
   };
@@ -201,15 +264,6 @@ const PostInterventionForm = () => {
         return false;
       }
 
-      for (let i = 0; i < answersPartOne.length; i++) {
-        if (
-          answersPartOne[i] === undefined ||
-          answersPartOne[i] === null ||
-          answersPartOne[i] === 0
-        ) {
-          return false;
-        }
-      }
       return true;
     };
 
@@ -222,15 +276,6 @@ const PostInterventionForm = () => {
         return false;
       }
 
-      for (let i = 0; i < answersPartTwo.length; i++) {
-        if (
-          answersPartTwo[i] === undefined ||
-          answersPartTwo[i] === null ||
-          answersPartTwo[i] === 0
-        ) {
-          return false;
-        }
-      }
       return true;
     };
 
@@ -240,7 +285,6 @@ const PostInterventionForm = () => {
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
-  // These functions are used to handle the form step changes
   const totalSteps = () => {
     return steps.length;
   };
@@ -280,26 +324,43 @@ const PostInterventionForm = () => {
     setActiveStep(step);
   };
 
-  const handleSubmit = () => {
-    console.log('Personal detials');
-    console.log(formik.values);
+  const handleSubmit = async () => {
+    const personDetailsInfo: StudentDetailsAnswer[] = generateStudentDetails(
+      formik.values,
+      studentFormInfo
+    );
 
-    console.log('Questionnaire set 01');
-    console.log(answersPartOne);
+    const requestBody: CreateStudentResponse = {
+      formType: FormEvaluation.PostInterventions,
+      studentDetails: personDetailsInfo,
+      responses: [...answersPartOne, ...answersPartTwo],
+    };
+    setIsLoading(true);
 
-    console.log('Questionnaire set 02');
-    console.log(answersPartTwo);
+    await createStudentResponse(requestBody)
+      .then(() => {
+        setNotificationMsg("Form Submitted Successfully...");
+
+        setDisplaySnackbarMsg(true);
+
+        router.back();
+      })
+      .catch(() => {
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching personal details data...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
-
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
-  };
-  // End of form step creation
 
   useMemo(() => {
-    const fetchData = async () => {
+    const fetchingStudentInfo = async () => {
       try {
+        setIsLoading(true);
+
         const studentFormInfoQuestions: QuestionResponse[] =
           await getStudentFormInfoByFormType(FormEvaluation.PostInterventions);
 
@@ -308,17 +369,23 @@ const PostInterventionForm = () => {
             (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
           )
         );
+
+        // setStudentFormInfo(studentFormInfoPersonal);
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchData();
+    fetchingStudentInfo();
   }, []);
 
   useMemo(() => {
-    const fetchData = async () => {
+    const fetchQuestionnaireData = async () => {
       try {
+        setIsLoading(true);
+        
         const postInterventionQuestions =
           await getAllPostInterventionQuestions();
 
@@ -343,10 +410,12 @@ const PostInterventionForm = () => {
         setQuestionListPartTwo(questionSetTwo);
       } catch (error) {
         console.log(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchData();
+    fetchQuestionnaireData();
   }, []);
 
   const validationSchema = yup
@@ -368,17 +437,13 @@ const PostInterventionForm = () => {
       : {},
     validationSchema,
     onSubmit: (values) => {
-      // Handle form submission here
       // You can access form values using formik.values
     },
   });
 
-  // const handleChange = (event: any) => {
-  //   const { name, value } = event.target;
-  //   formik.setFieldValue(name, value);
-  // };
-
-  const personalDetailsForm = (
+  const personalDetailsForm = isLoading ? (
+    <ProgressSpinner />
+  ) : (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
         studentFormInfo.map((question: QuestionResponse) => (
@@ -442,6 +507,7 @@ const PostInterventionForm = () => {
                         }}
                       />
                     </ListSubheader>
+
                     {question.dropdownOptions
                       .filter((item) => !item.isDelete)
                       .filter((option) =>
@@ -471,6 +537,7 @@ const PostInterventionForm = () => {
                   }
                 />
               )}
+
               {formik.touched[question.id] && (
                 <FormHelperText sx={{ color: "red", mb: -2.5 }}>
                   {formik.errors[question.id]}
@@ -499,8 +566,9 @@ const PostInterventionForm = () => {
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
+            isDisabled={isLoading}
             updateAnswer={(answer: number) =>
-              updateAnswerPartOne(index, answer)
+              updateAnswerPartOne(questionDetails.id, answer)
             }
           />
         ))}
@@ -525,8 +593,9 @@ const PostInterventionForm = () => {
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
+            isDisabled={isLoading}
             updateAnswer={(answer: number) =>
-              updateAnswerPartTwo(index, answer)
+              updateAnswerPartTwo(questionDetails.id, answer)
             }
           />
         ))}
@@ -549,6 +618,27 @@ const PostInterventionForm = () => {
         break;
     }
   };
+
+  const snackbar = (
+    <Snackbar
+      open={displaySnackbarMsg}
+      autoHideDuration={6000}
+      onClose={() => setDisplaySnackbarMsg(false)}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "right",
+      }}
+    >
+      <Alert
+        onClose={() => setDisplaySnackbarMsg(false)}
+        severity={isError ? "error" : "success"}
+        variant="outlined"
+        sx={customStyles.snackbarAlert}
+      >
+        {notificationMsg}
+      </Alert>
+    </Snackbar>
+  );
 
   return (
     <Stack sx={customStyles.stack}>
@@ -586,6 +676,7 @@ const PostInterventionForm = () => {
             }}
           >
             <CircularProgressWithLabel activeStep={activeStep} totalSteps={3} />
+
             <Box
               sx={{
                 display: "flex",
@@ -648,9 +739,11 @@ const PostInterventionForm = () => {
                   variant="outlined"
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
-                  disabled={activeStep === 2 && !allAnsweredPartTwo}
+                  disabled={
+                    activeStep === 2 && !allAnsweredPartTwo && isLoading
+                  }
                 >
-                  Complete
+                  {isLoading ? "Submitting..." : "Complete"}
                 </Button>
               ) : (
                 <Button
@@ -670,6 +763,8 @@ const PostInterventionForm = () => {
           </Fragment>
         </Box>
       </Box>
+
+      {snackbar}
     </Stack>
   );
 };

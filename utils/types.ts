@@ -36,3 +36,44 @@ export type FormQuestion = {
   questionSection: number;
   answer?: number | string;
 };
+
+export type PersonalDetails = {
+  [key: number]: string;
+};
+
+export type QuestionniareAnswer = {
+  questionId: number;
+  answer: number;
+  questionTitle?: string;
+  answerText?: string;
+  questionSection?: number;
+};
+
+export type StudentDetailsAnswer = {
+  questionId: number;
+  answer: string | number;
+  fieldType: FieldType;
+  questionTitle?: string;
+  dropdownTitle?: string;
+};
+
+export type CreateStudentResponse = {
+  formType: FormEvaluation;
+  responses: QuestionniareAnswer[];
+  studentDetails: StudentDetailsAnswer[];
+  createdAt?: string;
+  updateAt?: string;
+};
+
+export type UpdateQuestionResponse = {
+  questionId: number;
+  answer: string | number;
+};
+
+export type UpdateStudentResponse = {
+  studentDetails: UpdateQuestionResponse[]
+}
+
+export type StudentResponse = CreateStudentResponse & {
+  id: number;
+};
