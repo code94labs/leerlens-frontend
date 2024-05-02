@@ -1,5 +1,5 @@
 import { FieldType } from "./enum";
-import { DropDownOptions, PersonalDetails, Question } from "./types";
+import { DropDownOptions, PersonalDetails, Question, QuestionResponse } from "./types";
 
 const getDropDownItem = (
   stdInfo: Question,
@@ -12,7 +12,7 @@ const getDropDownItem = (
 
 export const generateStudentDetails = (
   formDetailValues: PersonalDetails,
-  studentFormInfo: Question[]
+  studentFormInfo: QuestionResponse[]
 ): any[] => {
   const results: any[] = [];
 

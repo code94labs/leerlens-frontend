@@ -19,11 +19,7 @@ import {
 import { Input as BaseInput, InputProps } from "@mui/base/Input";
 import { styled } from "@mui/system";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import React, {
-  Fragment,
-  useMemo,
-  useState,
-} from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import {
   ageList,
   completeSentenceList,
@@ -52,6 +48,7 @@ import {
   DropDownOptions,
   FormQuestion,
   Question,
+  QuestionResponse,
   QuestionniareAnswer,
   StudentDetailsAnswer,
 } from "../../utils/types";
@@ -237,13 +234,16 @@ const PreInterventionForm = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
-  const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
+  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>(
     []
   );
-  const [questionListPartTwo, setQuestionListPartTwo] = useState<Question[]>(
-    []
-  );
+
+  const [questionListPartOne, setQuestionListPartOne] = useState<
+    QuestionResponse[]
+  >([]);
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<
+    QuestionResponse[]
+  >([]);
 
   const [answersPartOne, setAnswersPartOne] = useState<QuestionniareAnswer[]>(
     []
@@ -425,7 +425,7 @@ const PreInterventionForm = () => {
   ) : (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
-        studentFormInfo.map((question: Question) => (
+        studentFormInfo.map((question: QuestionResponse) => (
           <Grid item xs={12} md={6} key={question.id}>
             <FormControl fullWidth required>
               {(() => {
@@ -597,16 +597,18 @@ const PreInterventionForm = () => {
           },
         }}
       >
-        {questionListPartOne.map((questionDetails: Question, index: number) => (
-          <CustomScale
-            key={questionDetails.id}
-            isDisabled={isLoading}
-            {...questionDetails}
-            updateAnswer={(answer: number) =>
-              updateAnswerPartOne(questionDetails.id, answer)
-            }
-          />
-        ))}
+        {questionListPartOne.map(
+          (questionDetails: QuestionResponse, index: number) => (
+            <CustomScale
+              key={questionDetails.id}
+              isDisabled={isLoading}
+              {...questionDetails}
+              updateAnswer={(answer: number) =>
+                updateAnswerPartOne(questionDetails.id, answer)
+              }
+            />
+          )
+        )}
       </FormControl>
     </>
   );
@@ -655,16 +657,18 @@ const PreInterventionForm = () => {
           },
         }}
       >
-        {questionListPartTwo.map((questionDetails: Question, index: number) => (
-          <CustomScale
-            key={questionDetails.id}
-            {...questionDetails}
-            isDisabled={isLoading}
-            updateAnswer={(answer: number) =>
-              updateAnswerPartTwo(questionDetails.id, answer)
-            }
-          />
-        ))}
+        {questionListPartTwo.map(
+          (questionDetails: QuestionResponse, index: number) => (
+            <CustomScale
+              key={questionDetails.id}
+              {...questionDetails}
+              isDisabled={isLoading}
+              updateAnswer={(answer: number) =>
+                updateAnswerPartTwo(questionDetails.id, answer)
+              }
+            />
+          )
+        )}
       </FormControl>
     </>
   );
@@ -715,7 +719,7 @@ const PreInterventionForm = () => {
           await getAllPreInterventionQuestions();
 
         const questionsWithAnswerValue = postInterventionQuestions.map(
-          (question: FormQuestion) => ({
+          (question: QuestionResponse) => ({
             ...question,
             answerValue: 0,
           })
@@ -772,11 +776,11 @@ const PreInterventionForm = () => {
       try {
         setIsLoading(true);
 
-        const studentFormInfoQuestions: Question[] =
+        const studentFormInfoQuestions: QuestionResponse[] =
           await getStudentFormInfoByFormType(FormEvaluation.PreInterventions);
 
         const studentFormInfoPersonal = studentFormInfoQuestions.filter(
-          (item: Question) => item.sectionType === SectionType.PersonalDetails
+          (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
         );
 
         setStudentFormInfo(studentFormInfoPersonal);

@@ -47,7 +47,7 @@ const DashboardPage = () => {
       <Stack width={"100%"}>
         <AdminHeader title="Dashboard" shouldDisplayBreadcrumb />
 
-        {testComponent}
+        {/* {testComponent} */}
         {/* Content */}
       </Stack>
     </Stack>
