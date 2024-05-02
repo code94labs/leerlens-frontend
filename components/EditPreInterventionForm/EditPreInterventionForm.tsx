@@ -33,7 +33,12 @@ import {
   preInterventionQuestionFormSoftDelete,
 } from "../../services/editPreInerventionQuestionSets.service";
 
-import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
+import {
+  FieldType,
+  FormEvaluation,
+  QuestionnaireSection,
+  SectionType,
+} from "../../utils/enum";
 import {
   DropDownOptions,
   FormQuestion,
@@ -202,12 +207,14 @@ const EditPreInterventionForm = () => {
 
         setPartOneQuestions(
           preInterventionQuestions.filter(
-            (item: FormQuestion) => item.questionSection === 1
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
           )
         );
         setPartTwoQuestions(
           preInterventionQuestions.filter(
-            (item: FormQuestion) => item.questionSection === 2
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
           )
         );
       } catch (error) {
@@ -353,10 +360,16 @@ const EditPreInterventionForm = () => {
       );
 
       setPartOneQuestions(
-        response.filter((item: FormQuestion) => item.questionSection === 1)
+        response.filter(
+          (item: FormQuestion) =>
+            item.questionSection === QuestionnaireSection.QuestionPartOne
+        )
       );
       setPartTwoQuestions(
-        response.filter((item: FormQuestion) => item.questionSection === 2)
+        response.filter(
+          (item: FormQuestion) =>
+            item.questionSection === QuestionnaireSection.QuestionPartTwo
+        )
       );
 
       dispatch(resetForm());
@@ -423,7 +436,10 @@ const EditPreInterventionForm = () => {
       isDelete: false,
       isNewlyAdded: true,
       questionSetId: 1,
-      questionSection: tab,
+      questionSection:
+        tab === 1
+          ? QuestionnaireSection.QuestionPartOne
+          : QuestionnaireSection.QuestionPartTwo,
     };
 
     const response = await postPreInterventionQuestions(newQuestion);

@@ -27,7 +27,12 @@ import {
   studentFormInfoItemUpdateById,
 } from "../../services/editQuestionSets.service";
 
-import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
+import {
+  FieldType,
+  FormEvaluation,
+  QuestionnaireSection,
+  SectionType,
+} from "../../utils/enum";
 import {
   DropDownOptions,
   FormQuestion,
@@ -227,12 +232,14 @@ const EditEvaluationForm = () => {
 
         setPartOneQuestions(
           evaluationQuestions.filter(
-            (item: FormQuestion) => item.questionSection === 1
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
           )
         );
         setPartTwoQuestions(
           evaluationQuestions.filter(
-            (item: FormQuestion) => item.questionSection === 2
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
           )
         );
       } catch (error) {
@@ -515,7 +522,10 @@ const EditEvaluationForm = () => {
       isDelete: false,
       isNewlyAdded: true,
       questionSetId: 1,
-      questionSection: tab,
+      questionSection:
+        tab === 1
+          ? QuestionnaireSection.QuestionPartOne
+          : QuestionnaireSection.QuestionPartTwo,
     };
 
     const response = await postEvaluationQuestions(newQuestion);

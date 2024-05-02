@@ -27,7 +27,12 @@ import {
   studentFormInfoItemUpdateById,
 } from "../../services/editQuestionSets.service";
 
-import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
+import {
+  FieldType,
+  FormEvaluation,
+  QuestionnaireSection,
+  SectionType,
+} from "../../utils/enum";
 import {
   DropDownOptions,
   FormQuestion,
@@ -37,8 +42,12 @@ import {
 
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
-import { getNormgroupQuestions, normgroupQuesionsUpdateBulk, normgroupQuestionFormSoftDelete, postNormgroupQuestions } from "../../services/editNormgroupQuestionSets.service";
-
+import {
+  getNormgroupQuestions,
+  normgroupQuesionsUpdateBulk,
+  normgroupQuestionFormSoftDelete,
+  postNormgroupQuestions,
+} from "../../services/editNormgroupQuestionSets.service";
 
 const customStyles = {
   snackbarAlert: {
@@ -198,12 +207,14 @@ const EditNormgroupForm = () => {
 
         setPartOneQuestions(
           normgroupQuestions.filter(
-            (item: FormQuestion) => item.questionSection === 1
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
           )
         );
         setPartTwoQuestions(
           normgroupQuestions.filter(
-            (item: FormQuestion) => item.questionSection === 2
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
           )
         );
       } catch (error) {
@@ -239,13 +250,8 @@ const EditNormgroupForm = () => {
     setPersonalDetailsQuestions(updatedQuestionsArr);
   };
 
-  const handleNormgroupSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: FormQuestion = await normgroupQuestionFormSoftDelete(
-      id
-    );
+  const handleNormgroupSoftDelete = async (id: number, orderId: number) => {
+    const response: FormQuestion = await normgroupQuestionFormSoftDelete(id);
 
     const newQuestionArr =
       tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
@@ -282,9 +288,7 @@ const EditNormgroupForm = () => {
     });
   };
 
-  const handleNormgroupQuestionUpdate = async (
-    question: FormQuestion
-  ) => {
+  const handleNormgroupQuestionUpdate = async (question: FormQuestion) => {
     if (tab === 1) {
       setPartOneQuestions((prevQuestions) => {
         const updatedQuestionsArr = [...prevQuestions];
@@ -344,9 +348,7 @@ const EditNormgroupForm = () => {
     });
 
     try {
-      const response = await normgroupQuesionsUpdateBulk(
-        updatedQuestions
-      );
+      const response = await normgroupQuesionsUpdateBulk(updatedQuestions);
 
       setPartOneQuestions(
         response.filter((item: FormQuestion) => item.questionSection === 1)
@@ -419,7 +421,10 @@ const EditNormgroupForm = () => {
       isDelete: false,
       isNewlyAdded: true,
       questionSetId: 1,
-      questionSection: tab,
+      questionSection:
+        tab === 1
+          ? QuestionnaireSection.QuestionPartOne
+          : QuestionnaireSection.QuestionPartTwo,
     };
 
     const response = await postNormgroupQuestions(newQuestion);
