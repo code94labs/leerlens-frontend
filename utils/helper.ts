@@ -1,5 +1,10 @@
-import { FieldType } from "./enum";
-import { DropDownOptions, PersonalDetails, Question } from "./types";
+import { FieldType, SectionType } from "./enum";
+import {
+  DropDownOptions,
+  PersonalDetails,
+  Question,
+  StudentDetailsAnswer,
+} from "./types";
 
 const getDropDownItem = (
   stdInfo: Question,
@@ -75,4 +80,22 @@ export const formatTimeStamp = (timestamp: string): string => {
 
 export const getDateRange = (dateRangeStr: string) => {
   return dateRangeStr.split(" - ");
+};
+
+export const formContentFiltering = (
+  item: StudentDetailsAnswer,
+  activeStep: number
+) => {
+  if (activeStep === 0 && item.sectionType === SectionType.PersonalDetails) {
+    return true;
+  } else if (
+    activeStep === 3 &&
+    item.sectionType === SectionType.ProgramAndSupervisor
+  ) {
+    return true;
+  } else if (activeStep === 4 && item.sectionType === SectionType.Final) {
+    return true;
+  }
+
+  return false;
 };

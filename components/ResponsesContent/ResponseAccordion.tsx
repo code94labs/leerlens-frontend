@@ -40,11 +40,12 @@ import {
 } from "../../utils/types";
 import {
   FieldType,
+  FormEvaluation,
   QuestionnaireSection,
   SectionType,
   evaluationTypesTitles,
 } from "../../utils/enum";
-import { formatTimeStamp } from "../../utils/helper";
+import { formContentFiltering, formatTimeStamp } from "../../utils/helper";
 import { Fragment, useEffect, useState } from "react";
 import {
   deleteStudentResponseById,
@@ -54,6 +55,7 @@ import { champBlackFontFamily } from "../../shared/typography";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
+import CustomScale from "../../shared/CustomScale/CustomScale";
 
 const customStyles = {
   mainBox: {
@@ -249,6 +251,9 @@ const ResponseAccordion = (props: Props) => {
     setOpenEditDialog(false);
   };
 
+  const isEvaluationForm = () =>
+    studentResponse.formType === FormEvaluation.Evaluation;
+
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false);
   };
@@ -332,7 +337,19 @@ const ResponseAccordion = (props: Props) => {
   );
 
   const totalSteps = () => {
-    return generalSteps.length;
+    return isEvaluationForm() ? evaluationSteps.length : generalSteps.length;
+  };
+
+  const handleBack = () => {
+    if (activeStep === 0) {
+      closeEditDialog();
+    } else {
+      if (activeStep === 3) {
+        setActiveStep(0);
+      } else {
+        setActiveStep((prevActiveStep) => prevActiveStep - 1);
+      }
+    }
   };
 
   const completedSteps = () => {
@@ -340,7 +357,7 @@ const ResponseAccordion = (props: Props) => {
   };
 
   const isLastStep = () => {
-    return activeStep === totalSteps() - 1;
+    return isEvaluationForm() ? activeStep === totalSteps() - 1 : totalSteps();
   };
 
   const allStepsCompleted = () => {
@@ -349,6 +366,33 @@ const ResponseAccordion = (props: Props) => {
 
   const handleStep = (step: number) => () => {
     setActiveStep(step);
+  };
+
+  const handleNext = () => {
+    if (activeStep > 2) {
+      const newActiveStep =
+        isLastStep() && !allStepsCompleted()
+          ? evaluationSteps.findIndex((_, i) => !(i in completed))
+          : activeStep + 1;
+
+      setActiveStep(newActiveStep);
+
+      const newCompleted = completed;
+      newCompleted[activeStep] = true;
+
+      setCompleted(newCompleted);
+    } else {
+      const newCompleted = completed;
+
+      const questionnaireSectionOneIndex = 1;
+      const questionnaireSectionTwoIndex = 2;
+
+      newCompleted[questionnaireSectionOneIndex] = true;
+      newCompleted[questionnaireSectionTwoIndex] = true;
+
+      setCompleted(newCompleted);
+      setActiveStep(3);
+    }
   };
 
   const handleReset = () => {
@@ -406,39 +450,67 @@ const ResponseAccordion = (props: Props) => {
     });
   };
 
-  const personalDetailsForm = (
+  const formEditContent = (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentResponse &&
-        studentResponse.studentDetails.map((item: StudentDetailsAnswer) => (
-          <Grid item xs={12} md={6} key={item.questionId}>
-            <FormControl fullWidth required>
-              {(() => {
-                switch (item.fieldType) {
-                  case FieldType.DropDown:
-                    return (
-                      <>
-                        <InputLabel>{item.questionTitle}</InputLabel>
+        studentResponse.studentDetails
+          .filter((item) => formContentFiltering(item, activeStep))
+          .map((item: StudentDetailsAnswer) => (
+            <Grid item xs={12} md={6} key={item.questionId}>
+              <FormControl fullWidth required>
+                {(() => {
+                  switch (item.fieldType) {
+                    case FieldType.DropDown:
+                      return (
+                        <>
+                          <InputLabel>{item.questionTitle}</InputLabel>
 
-                        <Select
-                          MenuProps={{
-                            autoFocus: false,
-                            PaperProps: dropdownPaperProp,
-                          }}
-                          value={item.dropdownTitle}
+                          <Select
+                            MenuProps={{
+                              autoFocus: false,
+                              PaperProps: dropdownPaperProp,
+                            }}
+                            value={item.dropdownTitle}
+                            label={item.questionTitle}
+                            disabled={true}
+                            renderValue={() => item.dropdownTitle}
+                          />
+                        </>
+                      );
+
+                    case FieldType.Scale1to10:
+                      return;
+
+                    case FieldType.Scale1to6:
+                      return;
+
+                    // case FieldType.TextArea:
+                    //   return (
+                    //     <>
+                    //       <Input
+                    //         aria-label={item.questionTitle}
+                    //         multiline
+                    //         placeholder={item.questionTitle}
+                    //         disabled={isLoading}
+                    //         value={
+                    //           studentAnswerUpdate.updates.find(
+                    //             (item_) => item_.questionId === item.questionId
+                    //           )?.answer
+                    //         }
+                    //         onChange={(event) =>
+                    //           handleInputChange(
+                    //             item.questionId,
+                    //             event.target.value
+                    //           )
+                    //         }
+                    //       />
+                    //     </>
+                    //   );
+
+                    default:
+                      return (
+                        <TextField
                           label={item.questionTitle}
-                          disabled={true}
-                          renderValue={() => item.dropdownTitle}
-                        />
-                      </>
-                    );
-
-                  case FieldType.TextArea:
-                    return (
-                      <>
-                        <Input
-                          aria-label={item.questionTitle}
-                          multiline
-                          placeholder={item.questionTitle}
                           disabled={isLoading}
                           value={
                             studentAnswerUpdate.updates.find(
@@ -452,29 +524,12 @@ const ResponseAccordion = (props: Props) => {
                             )
                           }
                         />
-                      </>
-                    );
-
-                  default:
-                    return (
-                      <TextField
-                        label={item.questionTitle}
-                        disabled={isLoading}
-                        value={
-                          studentAnswerUpdate.updates.find(
-                            (item_) => item_.questionId === item.questionId
-                          )?.answer
-                        }
-                        onChange={(event) =>
-                          handleInputChange(item.questionId, event.target.value)
-                        }
-                      />
-                    );
-                }
-              })()}
-            </FormControl>
-          </Grid>
-        ))}
+                      );
+                  }
+                })()}
+              </FormControl>
+            </Grid>
+          ))}
     </Grid>
   );
 
@@ -499,7 +554,7 @@ const ResponseAccordion = (props: Props) => {
         <Box sx={customStyles.mainBox}>
           <CustomStepper
             activeStep={activeStep}
-            steps={generalSteps}
+            steps={isEvaluationForm() ? evaluationSteps : generalSteps}
             completed={completed}
             handleStep={handleStep}
           />
@@ -508,29 +563,49 @@ const ResponseAccordion = (props: Props) => {
 
           <Box sx={{ my: 2 }}>
             <Fragment>
-              <Box sx={customStyles.formBox}>{personalDetailsForm}</Box>
+              <Box sx={customStyles.formBox}>{formEditContent}</Box>
 
               <Stack pt={2} mb={-3} flexDirection="row">
-                <Button
-                  color="inherit"
-                  variant="outlined"
-                  onClick={closeEditDialog}
-                  disabled={isLoading}
-                  sx={customStyles.secondaryButton}
-                >
-                  Cancel
-                </Button>
+                {activeStep === 0 ? (
+                  <Button
+                    color="inherit"
+                    variant="outlined"
+                    onClick={handleBack}
+                    sx={customStyles.secondaryButton}
+                  >
+                    Cancel
+                  </Button>
+                ) : (
+                  <Button
+                    color="inherit"
+                    variant="outlined"
+                    onClick={handleBack}
+                    sx={customStyles.secondaryButton}
+                  >
+                    Back
+                  </Button>
+                )}
 
                 <Box sx={{ flex: "1 1 auto" }} />
 
-                <Button
-                  variant="outlined"
-                  onClick={handleUpdate}
-                  sx={customStyles.primaryButton}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Updating..." : "Update"}
-                </Button>
+                {isLastStep() ? (
+                  <Button
+                    variant="outlined"
+                    onClick={handleUpdate}
+                    sx={customStyles.primaryButton}
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Updating..." : "Update"}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    onClick={handleNext}
+                    sx={customStyles.primaryButton}
+                  >
+                    Next
+                  </Button>
+                )}
               </Stack>
             </Fragment>
           </Box>
