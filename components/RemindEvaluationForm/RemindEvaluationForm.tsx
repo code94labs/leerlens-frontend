@@ -39,7 +39,6 @@ import { champBlackFontFamily } from "../../shared/typography";
 
 import {
   getAllEvaluationQuestions,
-  getStudentFormInfo,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
 import { useFormik } from "formik";
@@ -323,7 +322,6 @@ const RemindEvaluationForm = () => {
   const containsText = (text: string, searchText: string) =>
     text.toLowerCase().indexOf(searchText.toLowerCase()) > -1;
 
-  // These functions are used to handle the form step changes
   const totalSteps = () => {
     return steps.length;
   };
@@ -339,13 +337,6 @@ const RemindEvaluationForm = () => {
   const allStepsCompleted = () => {
     return completedSteps() === totalSteps();
   };
-
-  // const formatQuestionnaire = (questionList: Question[], answers: number[]) => {
-  //   return questionList.map((question, index) => ({
-  //     questionnaireId: question.id,
-  //     answer: answers[index],
-  //   }));
-  // };
 
   const handleSubmit = async () => {
     const personDetailsInfo: StudentDetailsAnswer[] = generateStudentDetails(
@@ -366,34 +357,30 @@ const RemindEvaluationForm = () => {
 
     const requestBody: CreateStudentResponse = {
       formType: FormEvaluation.Evaluation,
-      studentDetails: [
-        ...personDetailsInfo,
-        ...programSupervisorInfo,
-        ...finalStudentInfo,
-      ],
+      studentDetails: [...personDetailsInfo, ...programSupervisorInfo, ...finalStudentInfo],
       responses: [...answersPartOne, ...answersPartTwo],
     };
     setIsLoading(true);
 
     console.log(requestBody);
 
-    // await createStudentResponse(requestBody)
-    //   .then(() => {
-    //     setNotificationMsg("Form Submitted Successfully...");
+    await createStudentResponse(requestBody)
+      .then(() => {
+        setNotificationMsg("Form Submitted Successfully...");
 
-    //     setDisplaySnackbarMsg(true);
+        setDisplaySnackbarMsg(true);
 
-    //     router.back();
-    //   })
-    //   .catch(() => {
-    //     setIsError(true);
+        router.replace('/success-message')
+      })
+      .catch(() => {
+        setIsError(true);
 
-    //     setNotificationMsg("Error when fetching personal details data...");
-    //     setDisplaySnackbarMsg(true);
-    //   })
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //   });
+        setNotificationMsg("Error when fetching personal details data...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const handleNext = () => {
@@ -437,16 +424,8 @@ const RemindEvaluationForm = () => {
       ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
       : {},
     validationSchema: personalDetailsValidationSchema,
-    onSubmit: () => {
-      // Handle form submission here
-      // You can access form values using formik.values
-    },
+    onSubmit: () => {},
   });
-
-  // const handleChangePersonalDetails = (event: any) => {
-  //   const { name, value } = event.target;
-  //   personalDetailsFormik.setFieldValue(name, value);
-  // };
 
   const personalDetailsForm = isLoading ? (
     <ProgressSpinner />
@@ -630,16 +609,8 @@ const RemindEvaluationForm = () => {
         )
       : {},
     validationSchema: programAndSupervisorValidationSchema,
-    onSubmit: () => {
-      // Handle form submission here
-      // You can access form values using formik.values
-    },
+    onSubmit: () => {},
   });
-
-  // const handleChangeProgramAndSupervisors = (event: any) => {
-  //   const { name, value } = event.target;
-  //   programAndSupervisorsFormik.setFieldValue(name, value);
-  // };
 
   const programAndSupervisorForm = (
     <Grid container rowSpacing={4} columnSpacing={4}>
@@ -818,15 +789,8 @@ const RemindEvaluationForm = () => {
       : {},
     validationSchema: finalQuestionsValidationSchema,
     onSubmit: () => {
-      // Handle form submission here
-      // You can access form values using formik.values
     },
   });
-
-  // const handleChangeFinalQuestions = (event: any) => {
-  //   const { name, value } = event.target;
-  //   finalQuestionsFormik.setFieldValue(name, value);
-  // };
 
   const finalContentForm = (
     <Grid container rowSpacing={4} columnSpacing={4}>

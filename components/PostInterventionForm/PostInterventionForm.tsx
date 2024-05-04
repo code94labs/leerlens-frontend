@@ -47,14 +47,12 @@ import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
 const customStyles = {
   mainBox: {
-    // width: "100%",
     border: "1px #E6E6E6 solid",
     p: 5,
     borderRadius: 2,
   },
   stack: {
     width: {
-      // xs: "100%",
       md: "90%",
     },
     maxWidth: 1200,
@@ -342,7 +340,7 @@ const PostInterventionForm = () => {
 
         setDisplaySnackbarMsg(true);
 
-        router.back();
+        router.replace('/success-message')
       })
       .catch(() => {
         setIsError(true);
@@ -434,7 +432,6 @@ const PostInterventionForm = () => {
       : {},
     validationSchema,
     onSubmit: (values) => {
-      // You can access form values using formik.values
     },
   });
 

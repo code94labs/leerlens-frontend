@@ -41,6 +41,7 @@ import {
 import {
   FieldType,
   QuestionnaireSection,
+  SectionType,
   evaluationTypesTitles,
 } from "../../utils/enum";
 import { formatTimeStamp } from "../../utils/helper";
@@ -360,8 +361,6 @@ const ResponseAccordion = (props: Props) => {
       studentDetails: studentAnswerUpdate.updates,
     };
 
-    console.log(requestBody);
-
     setIsLoading(true);
 
     await updateStudentResponse(studentResponse.id, requestBody)
@@ -593,16 +592,19 @@ const ResponseAccordion = (props: Props) => {
       <DyanmicListHeader title="Personal details" subTitle="Answers" />
 
       <Stack>
-        {studentResponse.studentDetails.map((studentInfo) => (
-          <DyanmicListContent
-            question={studentInfo.questionTitle}
-            answer={
-              studentInfo.fieldType === FieldType.DropDown
-                ? studentInfo.dropdownTitle
-                : studentInfo.answer
-            }
-          />
-        ))}
+        {studentResponse.studentDetails
+          .filter((item) => item.sectionType === SectionType.PersonalDetails)
+          .map((studentInfo) => (
+            <DyanmicListContent
+              key={studentInfo.questionId}
+              question={studentInfo.questionTitle}
+              answer={
+                studentInfo.fieldType === FieldType.DropDown
+                  ? studentInfo.dropdownTitle
+                  : studentInfo.answer
+              }
+            />
+          ))}
       </Stack>
     </Stack>
   );
@@ -617,9 +619,9 @@ const ResponseAccordion = (props: Props) => {
             (item) =>
               item.questionSection === QuestionnaireSection.QuestionPartOne
           )
-          .map((question, index) => (
+          .map((question) => (
             <DyanmicListContent
-              key={index}
+              key={question.questionId}
               question={`${question.questionId}. ${question.questionTitle}`}
               answer={question.answerText}
             />
@@ -649,9 +651,47 @@ const ResponseAccordion = (props: Props) => {
     </Stack>
   );
 
-  const supervisorEvaluation = <></>;
+  const supervisorEvaluation = (
+    <Stack mt={-3}>
+      <DyanmicListHeader title="Program and Supervisor" subTitle="Answers" />
 
-  const final = <></>;
+      <Stack>
+        {studentResponse.studentDetails
+          .filter(
+            (item) => item.sectionType === SectionType.ProgramAndSupervisor
+          )
+          .map((studentInfo) => (
+            <DyanmicListContent
+              key={studentInfo.questionId}
+              question={studentInfo.questionTitle}
+              answer={
+                studentInfo.fieldType === FieldType.DropDown
+                  ? studentInfo.dropdownTitle
+                  : studentInfo.answer
+              }
+            />
+          ))}
+      </Stack>
+    </Stack>
+  );
+
+  const final = (
+    <Stack mt={-3}>
+      <DyanmicListHeader title="Final" subTitle="Answers" />
+
+      <Stack>
+        {studentResponse.studentDetails
+          .filter((item) => item.sectionType === SectionType.Final)
+          .map((studentInfo) => (
+            <DyanmicListContent
+              key={studentInfo.questionId}
+              question={studentInfo.questionTitle}
+              answer={studentInfo.answer}
+            />
+          ))}
+      </Stack>
+    </Stack>
+  );
 
   const accordionContent = (
     <AccordionDetails>

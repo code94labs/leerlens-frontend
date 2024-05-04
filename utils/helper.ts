@@ -12,7 +12,7 @@ const getDropDownItem = (
 
 export const generateStudentDetails = (
   formDetailValues: PersonalDetails,
-  studentFormInfo: Question[]
+  formInfo: Question[]
 ): any[] => {
   const results: any[] = [];
 
@@ -21,7 +21,10 @@ export const generateStudentDetails = (
       const questionId = parseInt(key);
       const formValue = formDetailValues[key];
 
-      studentFormInfo.forEach((question) => {
+      console.log("questionId", questionId);
+      console.log("formVlaue", formValue);
+
+      formInfo.forEach((question) => {
         if (
           question.id === questionId &&
           question.fieldType === FieldType.DropDown
@@ -42,10 +45,7 @@ export const generateStudentDetails = (
 
             results.push(result);
           }
-        } else if (
-          question.id === questionId &&
-          question.fieldType === FieldType.TextField
-        ) {
+        } else if (question.id === questionId) {
           const fieldType = question.fieldType;
 
           const result = {

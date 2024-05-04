@@ -48,6 +48,7 @@ export type StudentDetailsAnswer = {
   fieldType: FieldType;
   questionTitle?: string;
   dropdownTitle?: string;
+  sectionType?: SectionType;
 };
 
 export type CreateStudentResponse = {

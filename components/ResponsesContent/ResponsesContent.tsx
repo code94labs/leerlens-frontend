@@ -139,6 +139,8 @@ const ResponsesContent = () => {
   );
 
   const filterResponsesByDate = (responses: StudentResponse[]) => {
+    if (responses.length === 0) return;
+
     const dateRangeStr = filterDate;
 
     const dateRange = getDateRange(dateRangeStr);
