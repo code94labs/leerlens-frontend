@@ -3,6 +3,7 @@ import {
   DropDownOptions,
   PersonalDetails,
   Question,
+  QuestionResponse,
   StudentDetailsAnswer,
 } from "./types";
 
@@ -17,7 +18,7 @@ const getDropDownItem = (
 
 export const generateStudentDetails = (
   formDetailValues: PersonalDetails,
-  formInfo: Question[]
+  studentFormInfo: QuestionResponse[]
 ): any[] => {
   const results: any[] = [];
 
@@ -29,7 +30,7 @@ export const generateStudentDetails = (
       console.log("questionId", questionId);
       console.log("formVlaue", formValue);
 
-      formInfo.forEach((question) => {
+      studentFormInfo.forEach((question) => {
         if (
           question.id === questionId &&
           question.fieldType === FieldType.DropDown

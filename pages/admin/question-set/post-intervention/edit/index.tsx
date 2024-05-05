@@ -1,9 +1,21 @@
-import React from 'react'
+import { Stack } from "@mui/material";
+import React from "react";
+import AdminHeader from "../../../../../shared/Header/AdminHeader";
+import Sidebar from "../../../../../shared/Sidebar/Sidebar";
+import EditPostInterventionForm from "../../../../../components/EditPostInterventionForm/EditPostInterventionForm";
 
-const index = () => {
+const EditPostIntervention = () => {
   return (
-    <div>index</div>
-  )
-}
+    <Stack direction="row">
+      <Sidebar />
 
-export default index
+      <Stack width={"100%"}>
+        <AdminHeader title="Edit Questions" shouldDisplayBreadcrumb/>
+
+        <EditPostInterventionForm />
+      </Stack>
+    </Stack>
+  );
+};
+
+export default EditPostIntervention;

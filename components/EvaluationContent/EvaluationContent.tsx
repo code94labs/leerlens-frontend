@@ -16,11 +16,13 @@ import {
   FormEvaluation,
   QuestionnaireSection,
   QuestionnaireSet,
+  SectionType,
 } from "../../utils/enum";
 import {
   getAllEvaluationQuestions,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
+import { useRouter } from "next/navigation";
 
 const customStyles = {
   snackbarAlert: {
@@ -59,7 +61,7 @@ const customStyles = {
     },
   },
   tabs: {
-    "& .Mui-selected": {
+    "& .Mui-selected.MuiTab-root": {
       color: "black",
       fontWeight: "bold",
       fontSize: 16,
@@ -74,10 +76,10 @@ const customStyles = {
     borderBottom: "5px solid #E6E6E6",
   },
   scrollableList: {
-    overflowY: "auto", 
-    maxHeight: "60vh", 
+    overflowY: "auto",
+    maxHeight: "60vh",
     "&::-webkit-scrollbar": {
-      width: "0", 
+      width: "0",
     },
   },
 };
@@ -118,6 +120,8 @@ const EvaluationContent = () => {
   >([]);
   const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
 
+  const router = useRouter();
+
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -136,7 +140,7 @@ const EvaluationContent = () => {
 
       <Button
         variant="outlined"
-        onClick={() => {}}
+        onClick={() => router.push("/admin/question-set/evaluation/edit")}
         sx={customStyles.primaryButton}
       >
         Edit Question
@@ -147,20 +151,22 @@ const EvaluationContent = () => {
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
       case 0:
-        return personalDetails.map((item, index) => (
-          <QuestionSet
-            key={item.id}
-            number={++index}
-            question={item.questionText}
-            answerType={item.fieldType}
-          />
-        ));
+        return personalDetails
+          .filter((item) => item.sectionType === SectionType.PersonalDetails)
+          .map((item, index) => (
+            <QuestionSet
+              key={item.id}
+              number={++index}
+              question={item.questionText}
+              answerType={item.fieldType}
+            />
+          ));
       case 1:
         return getQuestionList(QuestionnaireSection.QuestionPartOne).map(
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />
@@ -171,12 +177,36 @@ const EvaluationContent = () => {
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />
           )
         );
+      case 3:
+        return personalDetails
+          .filter(
+            (item) => item.sectionType === SectionType.ProgramAndSupervisor
+          )
+          .map((item, index) => (
+            <QuestionSet
+              key={item.id}
+              number={++index}
+              question={item.questionText}
+              answerType={item.fieldType}
+            />
+          ));
+      case 4:
+        return personalDetails
+          .filter((item) => item.sectionType === SectionType.Final)
+          .map((item, index) => (
+            <QuestionSet
+              key={item.id}
+              number={++index}
+              question={item.questionText}
+              answerType={item.fieldType}
+            />
+          ));
       default:
         return null;
     }
@@ -192,8 +222,6 @@ const EvaluationContent = () => {
     await getStudentFormInfoByFormType(formType)
       .then((res) => {
         setPersonalDetails(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -212,15 +240,15 @@ const EvaluationContent = () => {
     await getAllEvaluationQuestions()
       .then((res) => {
         setEvalQuestionnaireList(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
 
         setIsError(true);
 
-        setNotificationMsg("Error when fetching evaluation questionnaire data...");
+        setNotificationMsg(
+          "Error when fetching evaluation questionnaire data..."
+        );
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
@@ -257,6 +285,8 @@ const EvaluationContent = () => {
         <Tab value={0} label="Personal Details" />
         <Tab value={1} label="Questions | Part 01" />
         <Tab value={2} label="Questions | Part 02" />
+        <Tab value={3} label="Program and the supervisors" />
+        <Tab value={4} label="Final" />
       </Tabs>
 
       <QuestionSet isHeading />
