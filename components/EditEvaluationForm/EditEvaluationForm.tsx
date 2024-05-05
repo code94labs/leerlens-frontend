@@ -395,20 +395,15 @@ const EditEvaluationForm = () => {
   };
 
   const handleUpdateAllPersonalDetailsQuestions = async () => {
-    const arrayToMap =
+    const arrayToUpdate =
       tab === 0
         ? personalDetailsQuestions
         : tab === 3
         ? programAndSupervisorsQuestions
         : finalQuestions;
 
-    const updatedQuestions = arrayToMap.map((question) => {
-      const { isDelete, isNewlyAdded, ...updatedQuestion } = question;
-      return updatedQuestion;
-    });
-
     try {
-      const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
+      const response = await studentFormInfoItemUpdateBulk(arrayToUpdate);
       // tab === 0
       //   ? setPersonalDetailsQuestions(
       //       (response as QuestionResponse[]).filter(
@@ -425,22 +420,24 @@ const EditEvaluationForm = () => {
   };
 
   const handleUpdateAllEvaluationQuestions = async () => {
-    const arrayToMap = tab === 1 ? partOneQuestions : partTwoQuestions;
-
-    const updatedQuestions = arrayToMap.map((question) => {
-      const { isDelete, isNewlyAdded, answer, ...updatedQuestion } = question;
-      return updatedQuestion;
-    });
+    const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
 
     try {
-      const response = await evaluationQuesionsUpdateBulk(updatedQuestions);
+      const response = await evaluationQuesionsUpdateBulk(arrayToUpdate);
 
-      setPartOneQuestions(
-        response.filter((item: FormQuestion) => item.questionSection === 1)
-      );
-      setPartTwoQuestions(
-        response.filter((item: FormQuestion) => item.questionSection === 2)
-      );
+      tab === 1
+        ? setPartOneQuestions(
+            response.filter(
+              (item: FormQuestion) =>
+                item.questionSection === QuestionnaireSection.QuestionPartOne
+            )
+          )
+        : setPartTwoQuestions(
+            response.filter(
+              (item: FormQuestion) =>
+                item.questionSection === QuestionnaireSection.QuestionPartTwo
+            )
+          );
 
       dispatch(resetForm());
     } catch (error) {

@@ -326,12 +326,9 @@ const EditNormgroupForm = () => {
 
   const handleUpdateAllPersonalDetailsQuestions = async () => {
     try {
-      const updatedQuestions = personalDetailsQuestions.map((question) => {
-        const { isDelete, isNewlyAdded, ...updatedQuestion } = question;
-        return updatedQuestion;
-      });
-
-      const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
+      const response = await studentFormInfoItemUpdateBulk(
+        personalDetailsQuestions
+      );
       setPersonalDetailsQuestions(response);
       dispatch(resetForm());
     } catch (error) {
@@ -340,22 +337,24 @@ const EditNormgroupForm = () => {
   };
 
   const handleUpdateAllNormgroupQuestions = async () => {
-    const arrayToMap = tab === 1 ? partOneQuestions : partTwoQuestions;
-
-    const updatedQuestions = arrayToMap.map((question) => {
-      const { isDelete, isNewlyAdded, answer, ...updatedQuestion } = question;
-      return updatedQuestion;
-    });
+    const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
 
     try {
-      const response = await normgroupQuesionsUpdateBulk(updatedQuestions);
+      const response = await normgroupQuesionsUpdateBulk(arrayToUpdate);
 
-      setPartOneQuestions(
-        response.filter((item: FormQuestion) => item.questionSection === 1)
-      );
-      setPartTwoQuestions(
-        response.filter((item: FormQuestion) => item.questionSection === 2)
-      );
+      tab === 1
+        ? setPartOneQuestions(
+            response.filter(
+              (item: FormQuestion) =>
+                item.questionSection === QuestionnaireSection.QuestionPartOne
+            )
+          )
+        : setPartTwoQuestions(
+            response.filter(
+              (item: FormQuestion) =>
+                item.questionSection === QuestionnaireSection.QuestionPartTwo
+            )
+          );
 
       dispatch(resetForm());
     } catch (error) {

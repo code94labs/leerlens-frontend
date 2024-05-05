@@ -344,7 +344,9 @@ const EditPreInterventionForm = () => {
 
   const handleUpdateAllPersonalDetailsQuestions = async () => {
     try {
-      const response = await studentFormInfoItemUpdateBulk(personalDetailsQuestions);
+      const response = await studentFormInfoItemUpdateBulk(
+        personalDetailsQuestions
+      );
 
       setPersonalDetailsQuestions(response);
       dispatch(resetForm());
@@ -354,30 +356,24 @@ const EditPreInterventionForm = () => {
   };
 
   const handleUpdateAllPreInterventionQuestions = async () => {
-    const arrayToMap = tab === 1 ? partOneQuestions : partTwoQuestions;
-
-    const updatedQuestions = arrayToMap.map((question) => {
-      const { isDelete, isNewlyAdded, answer, ...updatedQuestion } = question;
-      return updatedQuestion;
-    });
+    const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
 
     try {
-      const response = await preInterventionQuesionsUpdateBulk(
-        updatedQuestions
-      );
+      const response = await preInterventionQuesionsUpdateBulk(arrayToUpdate);
 
-      setPartOneQuestions(
-        response.filter(
-          (item: FormQuestion) =>
-            item.questionSection === QuestionnaireSection.QuestionPartOne
-        )
-      );
-      setPartTwoQuestions(
-        response.filter(
-          (item: FormQuestion) =>
-            item.questionSection === QuestionnaireSection.QuestionPartTwo
-        )
-      );
+      tab === 1
+        ? setPartOneQuestions(
+            response.filter(
+              (item: FormQuestion) =>
+                item.questionSection === QuestionnaireSection.QuestionPartOne
+            )
+          )
+        : setPartTwoQuestions(
+            response.filter(
+              (item: FormQuestion) =>
+                item.questionSection === QuestionnaireSection.QuestionPartTwo
+            )
+          );
 
       dispatch(resetForm());
     } catch (error) {
