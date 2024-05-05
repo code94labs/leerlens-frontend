@@ -404,15 +404,25 @@ const EditEvaluationForm = () => {
 
     try {
       const response = await studentFormInfoItemUpdateBulk(arrayToUpdate);
-      // tab === 0
-      //   ? setPersonalDetailsQuestions(
-      //       (response as QuestionResponse[]).filter(
-      //         (q) => q.sectionType === SectionType.PersonalDetails
-      //       )
-      //     )
-      //   : tab === 3
-      //   ? setProgramAndSupervisorsQuestions(response)
-      //   : setFinalQuestions(response);
+
+      tab === 0
+        ? setPersonalDetailsQuestions(
+            (response as QuestionResponse[]).filter(
+              (q) => q.sectionType === SectionType.PersonalDetails
+            )
+          )
+        : tab === 3
+        ? setProgramAndSupervisorsQuestions(
+            (response as QuestionResponse[]).filter(
+              (q) => q.sectionType === SectionType.ProgramAndSupervisor
+            )
+          )
+        : setFinalQuestions(
+            (response as QuestionResponse[]).filter(
+              (q) => q.sectionType === SectionType.Final
+            )
+          );
+
       dispatch(resetForm());
     } catch (error) {
       console.error("Error updating questions:", error);
