@@ -344,12 +344,8 @@ const EditPreInterventionForm = () => {
 
   const handleUpdateAllPersonalDetailsQuestions = async () => {
     try {
-      const updatedQuestions = personalDetailsQuestions.map((question) => {
-        const { isDelete, isNewlyAdded, ...updatedQuestion } = question;
-        return updatedQuestion;
-      });
+      const response = await studentFormInfoItemUpdateBulk(personalDetailsQuestions);
 
-      const response = await studentFormInfoItemUpdateBulk(updatedQuestions);
       setPersonalDetailsQuestions(response);
       dispatch(resetForm());
     } catch (error) {
