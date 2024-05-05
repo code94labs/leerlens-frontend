@@ -521,7 +521,7 @@ const EditEvaluationForm = () => {
       maxValue: 6,
       isDelete: false,
       isNewlyAdded: true,
-      questionSetId: 1,
+      questionSetId: 0,
       questionSection:
         tab === 1
           ? QuestionnaireSection.QuestionPartOne
