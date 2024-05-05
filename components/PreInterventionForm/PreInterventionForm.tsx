@@ -378,7 +378,7 @@ const PreInterventionForm = () => {
 
         setDisplaySnackbarMsg(true);
 
-        router.back();
+        router.replace('/success-message')
       })
       .catch(() => {
         setIsError(true);

@@ -1,5 +1,11 @@
-import { FieldType } from "./enum";
-import { DropDownOptions, PersonalDetails, Question, QuestionResponse } from "./types";
+import { FieldType, SectionType } from "./enum";
+import {
+  DropDownOptions,
+  PersonalDetails,
+  Question,
+  QuestionResponse,
+  StudentDetailsAnswer,
+} from "./types";
 
 const getDropDownItem = (
   stdInfo: Question,
@@ -20,6 +26,9 @@ export const generateStudentDetails = (
     if (Object.prototype.hasOwnProperty.call(formDetailValues, key)) {
       const questionId = parseInt(key);
       const formValue = formDetailValues[key];
+
+      console.log("questionId", questionId);
+      console.log("formVlaue", formValue);
 
       studentFormInfo.forEach((question) => {
         if (
@@ -42,10 +51,7 @@ export const generateStudentDetails = (
 
             results.push(result);
           }
-        } else if (
-          question.id === questionId &&
-          question.fieldType === FieldType.TextField
-        ) {
+        } else if (question.id === questionId) {
           const fieldType = question.fieldType;
 
           const result = {
@@ -75,4 +81,22 @@ export const formatTimeStamp = (timestamp: string): string => {
 
 export const getDateRange = (dateRangeStr: string) => {
   return dateRangeStr.split(" - ");
+};
+
+export const formContentFiltering = (
+  item: StudentDetailsAnswer,
+  activeStep: number
+) => {
+  if (activeStep === 0 && item.sectionType === SectionType.PersonalDetails) {
+    return true;
+  } else if (
+    activeStep === 3 &&
+    item.sectionType === SectionType.ProgramAndSupervisor
+  ) {
+    return true;
+  } else if (activeStep === 4 && item.sectionType === SectionType.Final) {
+    return true;
+  }
+
+  return false;
 };

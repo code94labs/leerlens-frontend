@@ -17,8 +17,8 @@ import {
   Typography,
 } from "@mui/material";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import React, { ChangeEvent, Fragment, useMemo, useState } from "react";
-import { Formik, useFormik } from "formik";
+import React, { Fragment, useMemo, useState } from "react";
+import { useFormik } from "formik";
 import * as yup from "yup";
 import { useRouter } from "next/router";
 import CustomScale from "../../shared/CustomScale/CustomScale";
@@ -34,7 +34,6 @@ import {
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import {
   getAllNormGroupQuestions,
-  getStudentFormInfo,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
 import { champBlackFontFamily } from "../../shared/typography";
@@ -292,7 +291,7 @@ const NormGroupForm = () => {
 
         setDisplaySnackbarMsg(true);
 
-        router.back();
+        router.replace('/success-message')
       })
       .catch(() => {
         setIsError(true);
