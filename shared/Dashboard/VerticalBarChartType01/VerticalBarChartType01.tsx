@@ -1,22 +1,8 @@
+import { Grid, Stack, Typography } from "@mui/material";
 import React from "react";
+
 import { Bar } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  elements,
-} from "chart.js";
-import ChartDataLabels from "chartjs-plugin-datalabels";
-
-import { Button, Grid, Stack, Typography } from "@mui/material";
-
-import Sidebar from "../../../../shared/Sidebar/Sidebar";
-import AdminHeader from "../../../../shared/Header/AdminHeader";
-
+import { champBlackFontFamily } from "../../typography";
 import { Livvic } from "next/font/google";
 
 export const livvic = Livvic({
@@ -25,17 +11,26 @@ export const livvic = Livvic({
   display: "swap",
 });
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend,
-  ChartDataLabels
-);
+const customStyles = {
+  title: {
+    fontWeight: 400,
+    fontFamily: champBlackFontFamily,
+    fontSize: 24,
+  },
+  label: {
+    fontSize: 50,
+    fontWeight: 500,
+    color: "#333333",
+    my: 6,
+  },
+  stack: {
+    border: "2px #E6E6E6 solid",
+    borderRadius: 2,
+    p: 3,
+  },
+};
 
-export const options = {
+const options = {
   responsive: true,
   plugins: {
     legend: {
@@ -115,7 +110,7 @@ export const options = {
 
 const labels = ["Voor", "NA"];
 
-export const data = {
+const data = {
   labels,
   datasets: [
     {
@@ -130,26 +125,17 @@ export const data = {
   ],
 };
 
-const ChartPage = () => {
+const VerticalBarChartType01 = () => {
   return (
-    <Stack direction="row">
-      <Sidebar />
-
-      <Stack width={"100%"}>
-        <AdminHeader title="Dashboard" shouldDisplayBreadcrumb />
-
-        <Typography variant="h4" gutterBottom m={2}>
-          Vertical bar chart - Type 01
-        </Typography>
-
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <Bar options={options} data={data} height={200} />
-          </Grid>
+    <Stack sx={customStyles.stack}>
+      {/* <Typography sx={customStyles.title}>ABSOLUTE DIFFERENCE</Typography> */}
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <Bar options={options} data={data} height={200} />
         </Grid>
-      </Stack>
+      </Grid>
     </Stack>
   );
 };
 
-export default ChartPage;
+export default VerticalBarChartType01;

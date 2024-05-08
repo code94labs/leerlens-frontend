@@ -2,6 +2,7 @@ import { Divider, Stack, Typography } from "@mui/material";
 import React from "react";
 import NumericalDigit from "../../shared/Dashboard/NumericalDigit/NumericalDigit";
 import HorizontalBarChart from "../../shared/Dashboard/HorizontalBarChart/HorizontalBarChart";
+import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
 
 import {
   Chart as ChartJS,
@@ -11,7 +12,8 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(
   CategoryScale,
@@ -19,7 +21,8 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartDataLabels
 );
 
 const SharedDashboardPage = () => {
@@ -55,6 +58,18 @@ const SharedDashboardPage = () => {
     </Stack>
   );
 
+  const verticalBarChartType01 = (
+    <Stack>
+      <Typography>
+        <Typography variant="h4">
+          Shared UI component vertical bar chart - type 01
+        </Typography>
+
+        <VerticalBarChartType01 />
+      </Typography>
+    </Stack>
+  );
+
   const linebreak = <Divider sx={{ border: 3, my: 5 }} />;
 
   return (
@@ -64,6 +79,7 @@ const SharedDashboardPage = () => {
       {linebreak}
 
       {horizontalBarChart}
+      {verticalBarChartType01}
     </Stack>
   );
 };
