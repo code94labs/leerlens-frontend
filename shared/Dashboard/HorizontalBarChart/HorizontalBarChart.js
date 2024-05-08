@@ -35,9 +35,9 @@ const HorizontalBarChart = () => {
     responsive: true,
     scales: {
       x: {
-        display: false, 
+        display: false,
         ticks: {
-          display: false, 
+          display: false,
         },
         grid: {
           display: false,
@@ -49,7 +49,7 @@ const HorizontalBarChart = () => {
           display: false,
         },
         grid: {
-          display: false, 
+          display: false,
         },
       },
     },
@@ -104,7 +104,7 @@ const HorizontalBarChart = () => {
   return (
     <Stack sx={customStyles.stack}>
       <Typography sx={customStyles.title}>ABSOLUTE DIFFERENCE</Typography>
-      <Bar options={options} data={data} />;
+      <Bar options={options} data={data} />
     </Stack>
   );
 };

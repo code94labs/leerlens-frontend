@@ -162,11 +162,38 @@ const menuItems = [
   },
 ];
 
+const indexNotFound = -1;
+const topMostIndex = 1;
+
 /* 
- 
+  Before the main component definition, 
 
+  1. Constants.
 
+  2. Custom styles
+
+  3. Style components
+
+  ======
+
+  1). Define the hooks and selectors.
+
+  2). Define states.
+
+  3). Functions 
+
+  4). Functional components / structures
+
+  5). Useffects, usememo
+
+  6). return main component
 */
+
+const questionTabs = {
+  quesitonSetOne: 1,
+  quesitonSetTwo: 2,
+  Final: 3,
+};
 
 const EditPostInterventionForm = () => {
   const dispatch = useDispatch();
@@ -234,6 +261,7 @@ const EditPostInterventionForm = () => {
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     dispatch(resetForm());
+
     setTab(newValue);
   };
 
@@ -245,6 +273,7 @@ const EditPostInterventionForm = () => {
 
     const newQuestionArr = [...personalDetailsQuestions];
 
+    // move to backend
     for (let i = orderId; i < newQuestionArr.length; i++) {
       newQuestionArr[i].positionOrderId--;
     }
@@ -256,6 +285,14 @@ const EditPostInterventionForm = () => {
     setPersonalDetailsQuestions(updatedQuestionsArr);
   };
 
+  const updatedQuestionList = () => {
+    if (tab === questionTabs.quesitonSetOne) {
+      return [...partOneQuestions];
+    } else {
+      return [...partTwoQuestions];
+    }
+  };
+
   const handlePostInterventionSoftDelete = async (
     id: number,
     orderId: number
@@ -264,9 +301,9 @@ const EditPostInterventionForm = () => {
       id
     );
 
-    const newQuestionArr =
-      tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
+    const newQuestionArr = updatedQuestionList();
 
+    // check if loops can be moved to the backend
     for (let i = orderId; i < newQuestionArr.length; i++) {
       newQuestionArr[i].positionOrderId--;
     }
@@ -275,9 +312,11 @@ const EditPostInterventionForm = () => {
       (item: FormQuestion) => item.id !== (response as FormQuestion).id
     );
 
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+    if (tab === questionTabs.quesitonSetOne) {
+      setPartOneQuestions(updatedQuestionsArr);
+    } else {
+      setPartTwoQuestions(updatedQuestionsArr);
+    }
   };
 
   // function to update the state of this(parent) component
@@ -287,12 +326,12 @@ const EditPostInterventionForm = () => {
     setPersonalDetailsQuestions((prevQuestions) => {
       const updatedQuestionsArr = [...prevQuestions];
 
-      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
+      const index = updatedQuestionsArr.findIndex(
+        (item) => item.id === question.id
+      );
 
-      if (index !== -1) {
+      if (index !== indexNotFound) {
         updatedQuestionsArr[index] = question;
-      } else {
-        console.error(`Question with id ${question.id} not found`);
       }
 
       return updatedQuestionsArr;
@@ -302,18 +341,18 @@ const EditPostInterventionForm = () => {
   const handlePostInterventionQuestionUpdate = async (
     question: FormQuestion
   ) => {
-    if (tab === 1) {
+    // similar code logic detected, please use new functions and move common logic.
+
+    if (tab === questionTabs.quesitonSetOne) {
       setPartOneQuestions((prevQuestions) => {
         const updatedQuestionsArr = [...prevQuestions];
 
         const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
+          (item) => item.id === question.id
         );
 
-        if (index !== -1) {
+        if (index !== indexNotFound) {
           updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
         }
 
         return updatedQuestionsArr;
@@ -323,13 +362,11 @@ const EditPostInterventionForm = () => {
         const updatedQuestionsArr = [...prevQuestions];
 
         const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
+          (item) => item.id === question.id
         );
 
-        if (index !== -1) {
+        if (index !== indexNotFound) {
           updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
         }
 
         return updatedQuestionsArr;
@@ -342,10 +379,12 @@ const EditPostInterventionForm = () => {
       const response = await studentFormInfoItemUpdateBulk(
         personalDetailsQuestions
       );
+
       setPersonalDetailsQuestions(response);
+
       dispatch(resetForm());
-    } catch (error) {
-      console.error("Error updating questions:", error);
+    } catch (_) {
+      // remove console log and use alert
     }
   };
 
@@ -372,6 +411,8 @@ const EditPostInterventionForm = () => {
       dispatch(resetForm());
     } catch (error) {
       console.error("Error updating questions:", error);
+
+      // remove console log and use alert
     }
   };
 
@@ -393,7 +434,7 @@ const EditPostInterventionForm = () => {
     questionText: string;
     dropdownOptions: DropDownOptions[];
   }) => {
-    const newPositionOrderId = personalDetailsQuestions.length + 1;
+    const newPositionOrderId = personalDetailsQuestions.length++;
 
     const newQuestion: Question = {
       formType: FormEvaluation.PostInterventions,
@@ -411,7 +452,9 @@ const EditPostInterventionForm = () => {
     const response = await postStudentFormInfo(newQuestion);
 
     const updatedQuestionsArr = personalDetailsQuestions;
+
     updatedQuestionsArr?.push(response);
+
     setPersonalDetailsQuestions(updatedQuestionsArr);
 
     setDisplayNewQuestion(false);
@@ -434,7 +477,7 @@ const EditPostInterventionForm = () => {
       isNewlyAdded: true,
       questionSetId: 0,
       questionSection:
-        tab === 1
+        tab === questionTabs.quesitonSetOne
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
     };
@@ -442,8 +485,10 @@ const EditPostInterventionForm = () => {
     const response = await postPostInterventionQuestions(newQuestion);
 
     const updatedQuestionsArr = tab === 1 ? partOneQuestions : partTwoQuestions;
+
     updatedQuestionsArr?.push(response);
-    tab === 1
+
+    tab === questionTabs.quesitonSetOne
       ? setPartOneQuestions(updatedQuestionsArr)
       : setPartTwoQuestions(updatedQuestionsArr);
 
@@ -456,9 +501,13 @@ const EditPostInterventionForm = () => {
     questionnaireType: boolean
   ) => {
     if (!orderId) return;
-    if (orderId <= 1) return; // Already at the top, can't move up
+
+    if (orderId <= topMostIndex) return; // Already at the top, can't move up
+
     if (!questionnaireType) {
       const newQuestionArr = [...personalDetailsQuestions];
+
+      // create a shared function for this
       newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
       newQuestionArr[orderId - 2].positionOrderId = orderId;
 
@@ -466,12 +515,14 @@ const EditPostInterventionForm = () => {
     } else {
       if (tab === 1) {
         const newQuestionArr = [...partOneQuestions];
+
         newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
         newQuestionArr[orderId - 2].positionOrderId = orderId;
 
         setPartOneQuestions(newQuestionArr);
       } else if (tab === 2) {
         const newQuestionArr = [...partTwoQuestions];
+
         newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
         newQuestionArr[orderId - 2].positionOrderId = orderId;
 
@@ -576,7 +627,8 @@ const EditPostInterventionForm = () => {
 
       <Button
         onClick={
-          tab < 1
+          // create another function and use a if retrun
+          tab < questionTabs.quesitonSetOne
             ? handleUpdateAllPersonalDetailsQuestions
             : handleUpdateAllPostInterventionQuestions
         }

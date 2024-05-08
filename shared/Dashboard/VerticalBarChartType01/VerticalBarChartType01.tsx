@@ -30,110 +30,115 @@ const customStyles = {
   },
 };
 
-const options = {
-  responsive: true,
-  plugins: {
-    legend: {
-      display: false,
-    },
-    title: {
-      display: true,
-      text: "EIGENAARSCHAP",
-      font: {
-        size: 15,
-        weight: 700,
-        family: livvic.style.fontFamily,
+interface VerticalBarChartType01Props {
+  title: string;
+  labels: string[];
+  datasets: {
+    data: number[];
+    backgroundColor: string[];
+  }[];
+}
+
+const VerticalBarChartType01 = ({
+  title,
+  labels,
+  datasets,
+}: VerticalBarChartType01Props) => {
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: false,
       },
-      color: "#1A1A1A",
-      padding: {
-        bottom: 50,
-      },
-    },
-    datalabels: {
-      backgroundColor: "black",
-      anchor: "end" as "center" | "start" | "end",
-      offset: -30,
-      align: "start" as
-        | "center"
-        | "start"
-        | "end"
-        | "right"
-        | "bottom"
-        | "left"
-        | "top",
-      borderRadius: 7,
-      color: "white",
-      padding: {
-        top: 6,
-        bottom: 6,
-        left: 16,
-        right: 16,
-      },
-      font: {
-        size: 12,
-        weight: 700,
-      },
-    },
-  },
-  scales: {
-    x: {
-      grid: { display: false },
-      color: "#333333",
-      border: {
-        width: 3,
-        color: "black",
-        z: 1,
-      },
-      // barPercentage: 1.0,
-      // categoryPercentage: 1.0,
-      ticks: {
+      title: {
+        display: true,
+        text: title.toLocaleUpperCase(),
         font: {
-          size: 13,
-          weight: 800,
+          size: 15,
+          weight: 700,
+          family: livvic.style.fontFamily,
+        },
+        color: "#1A1A1A",
+        padding: {
+          bottom: 50,
+        },
+      },
+      datalabels: {
+        backgroundColor: "black",
+        anchor: "end" as "center" | "start" | "end",
+        offset: -30,
+        align: "start" as
+          | "center"
+          | "start"
+          | "end"
+          | "right"
+          | "bottom"
+          | "left"
+          | "top",
+        borderRadius: 7,
+        color: "white",
+        padding: {
+          top: 6,
+          bottom: 6,
+          left: 16,
+          right: 16,
+        },
+        font: {
+          size: 12,
+          weight: 700,
         },
       },
     },
-    y: {
-      display: false,
-      grid: { display: false },
+    scales: {
+      x: {
+        grid: { display: false },
+        color: "#333333",
+        border: {
+          width: 2,
+          color: "black",
+          z: 1,
+        },
+        // barPercentage: 1.0,
+        // categoryPercentage: 1.0,
+        ticks: {
+          font: {
+            size: 13,
+            weight: 800,
+          },
+        },
+      },
+      y: {
+        display: false,
+        grid: { display: false },
+      },
     },
-  },
-  layout: {
-    padding: {
-      left: 120,
-      right: 120,
-      top: 0,
-      bottom: 0,
+    layout: {
+      padding: {
+        left: 120,
+        right: 120,
+        top: 0,
+        bottom: 0,
+      },
     },
-  },
-};
-
-const labels = ["Voor", "NA"];
-
-const data = {
-  labels,
-  datasets: [
-    {
-      label: "Dataset 1",
-      data: [3.1, 4.1],
-      backgroundColor: ["#F9C8A6", "#EB7200"],
-      borderRadius: 10,
-      barPercentage: 1.0,
-      categoryPercentage: 1.0,
-      // maxBarThickness: 80,
+    elements: {
+      bar: {
+        borderRadius: 10,
+      },
     },
-  ],
-};
+    barPercentage: 1.0,
+    categoryPercentage: 1.0,
+  };
 
-const VerticalBarChartType01 = () => {
+  const data = {
+    labels,
+    datasets,
+  };
+
   return (
     <Stack sx={customStyles.stack}>
       {/* <Typography sx={customStyles.title}>ABSOLUTE DIFFERENCE</Typography> */}
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-          <Bar options={options} data={data} height={200} />
-        </Grid>
-      </Grid>
+
+      <Bar options={options} data={data} height={200} />
     </Stack>
   );
 };
