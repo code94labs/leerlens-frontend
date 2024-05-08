@@ -1,23 +1,21 @@
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import React from "react";
-import { useRouter } from "next/navigation";
 import Sidebar from "../../../shared/Sidebar/Sidebar";
 import AdminHeader from "../../../shared/Header/AdminHeader";
+import DynamicDropdown from "../../../shared/DynamicDropdown";
 
-const DashboardPage = () => {
-  const router = useRouter();
-
+const ComponentsPage = () => {
   return (
     <Stack direction="row">
       <Sidebar />
 
       <Stack width={"100%"}>
-        <AdminHeader title="Dashboard" shouldDisplayBreadcrumb />
+        <AdminHeader title="Component Test" />
 
-        {/* Content */}
+        {/* <DynamicDropdown /> */}
       </Stack>
     </Stack>
   );
 };
 
-export default DashboardPage;
+export default ComponentsPage;

@@ -26,12 +26,6 @@ import {
   studentFormInfoItemUpdateBulk,
   studentFormInfoItemUpdateById,
 } from "../../services/editQuestionSets.service";
-import {
-  getPreInterventionQuestions,
-  postPreInterventionQuestions,
-  preInterventionQuesionsUpdateBulk,
-  preInterventionQuestionFormSoftDelete,
-} from "../../services/editPreInerventionQuestionSets.service";
 
 import {
   FieldType,
@@ -48,6 +42,12 @@ import {
 
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
+import {
+  getPostInterventionQuestions,
+  postInterventionQuesionsUpdateBulk,
+  postInterventionQuestionFormSoftDelete,
+  postPostInterventionQuestions,
+} from "../../services/editPostInerventionQuestionSets.service";
 
 const customStyles = {
   snackbarAlert: {
@@ -162,18 +162,40 @@ const menuItems = [
   },
 ];
 
-export const loading = (
-  <Stack
-    flexDirection="row"
-    alignItems="center"
-    justifyContent="center"
-    height="50vh"
-  >
-    <CircularProgress sx={{ color: "#A879FF" }} />
-  </Stack>
-);
+const indexNotFound = -1;
+const topMostIndex = 1;
 
-const EditPreInterventionForm = () => {
+/* 
+  Before the main component definition, 
+
+  1. Constants.
+
+  2. Custom styles
+
+  3. Style components
+
+  ======
+
+  1). Define the hooks and selectors.
+
+  2). Define states.
+
+  3). Functions 
+
+  4). Functional components / structures
+
+  5). Useffects, usememo
+
+  6). return main component
+*/
+
+const questionTabs = {
+  quesitonSetOne: 1,
+  quesitonSetTwo: 2,
+  Final: 3,
+};
+
+const EditPostInterventionForm = () => {
   const dispatch = useDispatch();
 
   const formDetails = useSelector(selectForm);
@@ -204,7 +226,7 @@ const EditPreInterventionForm = () => {
           studentFormInfoQuestions.filter(
             (item: Question) =>
               item.sectionType === SectionType.PersonalDetails &&
-              item.formType === FormEvaluation.PreInterventions
+              item.formType === FormEvaluation.PostInterventions
           )
         );
       } catch (error) {
@@ -212,18 +234,18 @@ const EditPreInterventionForm = () => {
       }
     };
 
-    const fetchPreInterventionsQuestions = async () => {
+    const fetchPostInterventionsQuestions = async () => {
       try {
-        const preInterventionQuestions = await getPreInterventionQuestions();
+        const postInterventionQuestions = await getPostInterventionQuestions();
 
         setPartOneQuestions(
-          preInterventionQuestions.filter(
+          postInterventionQuestions.filter(
             (item: FormQuestion) =>
               item.questionSection === QuestionnaireSection.QuestionPartOne
           )
         );
         setPartTwoQuestions(
-          preInterventionQuestions.filter(
+          postInterventionQuestions.filter(
             (item: FormQuestion) =>
               item.questionSection === QuestionnaireSection.QuestionPartTwo
           )
@@ -234,11 +256,12 @@ const EditPreInterventionForm = () => {
     };
 
     fetchPersonalDetailsQuestions();
-    fetchPreInterventionsQuestions();
+    fetchPostInterventionsQuestions();
   }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     dispatch(resetForm());
+
     setTab(newValue);
   };
 
@@ -250,6 +273,7 @@ const EditPreInterventionForm = () => {
 
     const newQuestionArr = [...personalDetailsQuestions];
 
+    // move to backend
     for (let i = orderId; i < newQuestionArr.length; i++) {
       newQuestionArr[i].positionOrderId--;
     }
@@ -261,17 +285,25 @@ const EditPreInterventionForm = () => {
     setPersonalDetailsQuestions(updatedQuestionsArr);
   };
 
-  const handlePreInterventionSoftDelete = async (
+  const updatedQuestionList = () => {
+    if (tab === questionTabs.quesitonSetOne) {
+      return [...partOneQuestions];
+    } else {
+      return [...partTwoQuestions];
+    }
+  };
+
+  const handlePostInterventionSoftDelete = async (
     id: number,
     orderId: number
   ) => {
-    const response: FormQuestion = await preInterventionQuestionFormSoftDelete(
+    const response: FormQuestion = await postInterventionQuestionFormSoftDelete(
       id
     );
 
-    const newQuestionArr =
-      tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
+    const newQuestionArr = updatedQuestionList();
 
+    // check if loops can be moved to the backend
     for (let i = orderId; i < newQuestionArr.length; i++) {
       newQuestionArr[i].positionOrderId--;
     }
@@ -280,9 +312,11 @@ const EditPreInterventionForm = () => {
       (item: FormQuestion) => item.id !== (response as FormQuestion).id
     );
 
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+    if (tab === questionTabs.quesitonSetOne) {
+      setPartOneQuestions(updatedQuestionsArr);
+    } else {
+      setPartTwoQuestions(updatedQuestionsArr);
+    }
   };
 
   // function to update the state of this(parent) component
@@ -292,33 +326,33 @@ const EditPreInterventionForm = () => {
     setPersonalDetailsQuestions((prevQuestions) => {
       const updatedQuestionsArr = [...prevQuestions];
 
-      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
+      const index = updatedQuestionsArr.findIndex(
+        (item) => item.id === question.id
+      );
 
-      if (index !== -1) {
+      if (index !== indexNotFound) {
         updatedQuestionsArr[index] = question;
-      } else {
-        console.error(`Question with id ${question.id} not found`);
       }
 
       return updatedQuestionsArr;
     });
   };
 
-  const handlePreInterventionQuestionUpdate = async (
+  const handlePostInterventionQuestionUpdate = async (
     question: FormQuestion
   ) => {
-    if (tab === 1) {
+    // similar code logic detected, please use new functions and move common logic.
+
+    if (tab === questionTabs.quesitonSetOne) {
       setPartOneQuestions((prevQuestions) => {
         const updatedQuestionsArr = [...prevQuestions];
 
         const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
+          (item) => item.id === question.id
         );
 
-        if (index !== -1) {
+        if (index !== indexNotFound) {
           updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
         }
 
         return updatedQuestionsArr;
@@ -328,13 +362,11 @@ const EditPreInterventionForm = () => {
         const updatedQuestionsArr = [...prevQuestions];
 
         const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
+          (item) => item.id === question.id
         );
 
-        if (index !== -1) {
+        if (index !== indexNotFound) {
           updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
         }
 
         return updatedQuestionsArr;
@@ -349,17 +381,18 @@ const EditPreInterventionForm = () => {
       );
 
       setPersonalDetailsQuestions(response);
+
       dispatch(resetForm());
-    } catch (error) {
-      console.error("Error updating questions:", error);
+    } catch (_) {
+      // remove console log and use alert
     }
   };
 
-  const handleUpdateAllPreInterventionQuestions = async () => {
+  const handleUpdateAllPostInterventionQuestions = async () => {
     const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
 
     try {
-      const response = await preInterventionQuesionsUpdateBulk(arrayToUpdate);
+      const response = await postInterventionQuesionsUpdateBulk(arrayToUpdate);
 
       tab === 1
         ? setPartOneQuestions(
@@ -378,6 +411,8 @@ const EditPreInterventionForm = () => {
       dispatch(resetForm());
     } catch (error) {
       console.error("Error updating questions:", error);
+
+      // remove console log and use alert
     }
   };
 
@@ -399,10 +434,10 @@ const EditPreInterventionForm = () => {
     questionText: string;
     dropdownOptions: DropDownOptions[];
   }) => {
-    const newPositionOrderId = personalDetailsQuestions.length + 1;
+    const newPositionOrderId = personalDetailsQuestions.length++;
 
     const newQuestion: Question = {
-      formType: FormEvaluation.PreInterventions,
+      formType: FormEvaluation.PostInterventions,
       questionText: questionText,
       fieldType: fieldType,
       sectionType: SectionType.PersonalDetails,
@@ -417,7 +452,9 @@ const EditPreInterventionForm = () => {
     const response = await postStudentFormInfo(newQuestion);
 
     const updatedQuestionsArr = personalDetailsQuestions;
+
     updatedQuestionsArr?.push(response);
+
     setPersonalDetailsQuestions(updatedQuestionsArr);
 
     setDisplayNewQuestion(false);
@@ -440,16 +477,18 @@ const EditPreInterventionForm = () => {
       isNewlyAdded: true,
       questionSetId: 0,
       questionSection:
-        tab === 1
+        tab === questionTabs.quesitonSetOne
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
     };
 
-    const response = await postPreInterventionQuestions(newQuestion);
+    const response = await postPostInterventionQuestions(newQuestion);
 
     const updatedQuestionsArr = tab === 1 ? partOneQuestions : partTwoQuestions;
+
     updatedQuestionsArr?.push(response);
-    tab === 1
+
+    tab === questionTabs.quesitonSetOne
       ? setPartOneQuestions(updatedQuestionsArr)
       : setPartTwoQuestions(updatedQuestionsArr);
 
@@ -462,9 +501,13 @@ const EditPreInterventionForm = () => {
     questionnaireType: boolean
   ) => {
     if (!orderId) return;
-    if (orderId <= 1) return; // Already at the top, can't move up
+
+    if (orderId <= topMostIndex) return; // Already at the top, can't move up
+
     if (!questionnaireType) {
       const newQuestionArr = [...personalDetailsQuestions];
+
+      // create a shared function for this
       newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
       newQuestionArr[orderId - 2].positionOrderId = orderId;
 
@@ -472,12 +515,14 @@ const EditPreInterventionForm = () => {
     } else {
       if (tab === 1) {
         const newQuestionArr = [...partOneQuestions];
+
         newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
         newQuestionArr[orderId - 2].positionOrderId = orderId;
 
         setPartOneQuestions(newQuestionArr);
       } else if (tab === 2) {
         const newQuestionArr = [...partTwoQuestions];
+
         newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
         newQuestionArr[orderId - 2].positionOrderId = orderId;
 
@@ -543,6 +588,17 @@ const EditPreInterventionForm = () => {
     </Snackbar>
   );
 
+  const loading = (
+    <Stack
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="center"
+      height="50vh"
+    >
+      <CircularProgress sx={{ color: "#A879FF" }} />
+    </Stack>
+  );
+
   const addQuestionButton = (
     <Stack flexDirection="row" alignItems="center" my={5} mx={3}>
       <Button
@@ -571,9 +627,10 @@ const EditPreInterventionForm = () => {
 
       <Button
         onClick={
-          tab < 1
+          // create another function and use a if retrun
+          tab < questionTabs.quesitonSetOne
             ? handleUpdateAllPersonalDetailsQuestions
-            : handleUpdateAllPreInterventionQuestions
+            : handleUpdateAllPostInterventionQuestions
         }
         sx={customStyles.updateButton}
         disabled={!formDetails.isModified}
@@ -639,8 +696,8 @@ const EditPreInterventionForm = () => {
                 <QuestionnaireDynamicField
                   key={question.id}
                   question={question}
-                  handleQuestionUpdate={handlePreInterventionQuestionUpdate}
-                  handleQuestionSoftDelete={handlePreInterventionSoftDelete}
+                  handleQuestionUpdate={handlePostInterventionQuestionUpdate}
+                  handleQuestionSoftDelete={handlePostInterventionSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
                 />
@@ -668,8 +725,8 @@ const EditPreInterventionForm = () => {
                 <QuestionnaireDynamicField
                   key={question.id}
                   question={question}
-                  handleQuestionUpdate={handlePreInterventionQuestionUpdate}
-                  handleQuestionSoftDelete={handlePreInterventionSoftDelete}
+                  handleQuestionUpdate={handlePostInterventionQuestionUpdate}
+                  handleQuestionSoftDelete={handlePostInterventionSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
                 />
@@ -733,4 +790,4 @@ const EditPreInterventionForm = () => {
   );
 };
 
-export default EditPreInterventionForm;
+export default EditPostInterventionForm;

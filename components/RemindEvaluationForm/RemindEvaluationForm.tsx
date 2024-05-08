@@ -32,6 +32,7 @@ import {
   DropDownOptions,
   FormQuestion,
   Question,
+  QuestionResponse,
   QuestionniareAnswer,
   StudentDetailsAnswer,
 } from "../../utils/types";
@@ -234,17 +235,17 @@ const RemindEvaluationForm = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
+  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>([]);
 
   const [programAndSupervisorsQuestions, setProgramAndSupervisorsQuestions] =
-    useState<Question[]>([]);
+    useState<QuestionResponse[]>([]);
 
-  const [finalQuestions, setFinalQuestions] = useState<Question[]>([]);
+  const [finalQuestions, setFinalQuestions] = useState<QuestionResponse[]>([]);
 
-  const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
+  const [questionListPartOne, setQuestionListPartOne] = useState<QuestionResponse[]>(
     []
   );
-  const [questionListPartTwo, setQuestionListPartTwo] = useState<Question[]>(
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<QuestionResponse[]>(
     []
   );
 
@@ -432,7 +433,7 @@ const RemindEvaluationForm = () => {
   ) : (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
-        studentFormInfo.map((question: Question) => (
+        studentFormInfo.map((question: QuestionResponse) => (
           <Grid item xs={12} md={6} key={question.id}>
             <FormControl fullWidth required>
               {question.fieldType === FieldType.DropDown ? (
@@ -548,7 +549,7 @@ const RemindEvaluationForm = () => {
       </Typography>
 
       <FormControl>
-        {questionListPartOne.map((questionDetails: Question, index: number) => (
+        {questionListPartOne.map((questionDetails: QuestionResponse, index: number) => (
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
@@ -575,7 +576,7 @@ const RemindEvaluationForm = () => {
       </Typography>
 
       <FormControl>
-        {questionListPartTwo.map((questionDetails: Question, index: number) => (
+        {questionListPartTwo.map((questionDetails: QuestionResponse, index: number) => (
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
@@ -615,7 +616,7 @@ const RemindEvaluationForm = () => {
   const programAndSupervisorForm = (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {programAndSupervisorsQuestions &&
-        programAndSupervisorsQuestions.map((question: Question) => (
+        programAndSupervisorsQuestions.map((question: QuestionResponse) => (
           <Grid
             item
             xs={12}
@@ -795,7 +796,7 @@ const RemindEvaluationForm = () => {
   const finalContentForm = (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {finalQuestions &&
-        finalQuestions.map((question: Question) => (
+        finalQuestions.map((question: QuestionResponse) => (
           <Grid
             item
             xs={12}
@@ -985,20 +986,20 @@ const RemindEvaluationForm = () => {
       try {
         setIsLoading(true);
 
-        const studentFormInfoQuestions: Question[] =
+        const studentFormInfoQuestions: QuestionResponse[] =
           await getStudentFormInfoByFormType(FormEvaluation.Evaluation);
 
         const studentFormInfoPersonal = studentFormInfoQuestions.filter(
-          (item: Question) => item.sectionType === SectionType.PersonalDetails
+          (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
         );
 
         const studentFormInfoProgram = studentFormInfoQuestions.filter(
-          (item: Question) =>
+          (item: QuestionResponse) =>
             item.sectionType === SectionType.ProgramAndSupervisor
         );
 
         const studentFormInfoFinal = studentFormInfoQuestions.filter(
-          (item: Question) => item.sectionType === SectionType.Final
+          (item: QuestionResponse) => item.sectionType === SectionType.Final
         );
 
         setStudentFormInfo(studentFormInfoPersonal);

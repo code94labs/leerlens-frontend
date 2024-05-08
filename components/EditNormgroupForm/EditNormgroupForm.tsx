@@ -26,12 +26,6 @@ import {
   studentFormInfoItemUpdateBulk,
   studentFormInfoItemUpdateById,
 } from "../../services/editQuestionSets.service";
-import {
-  getPreInterventionQuestions,
-  postPreInterventionQuestions,
-  preInterventionQuesionsUpdateBulk,
-  preInterventionQuestionFormSoftDelete,
-} from "../../services/editPreInerventionQuestionSets.service";
 
 import {
   FieldType,
@@ -48,6 +42,12 @@ import {
 
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
+import {
+  getNormgroupQuestions,
+  normgroupQuesionsUpdateBulk,
+  normgroupQuestionFormSoftDelete,
+  postNormgroupQuestions,
+} from "../../services/editNormgroupQuestionSets.service";
 
 const customStyles = {
   snackbarAlert: {
@@ -162,18 +162,7 @@ const menuItems = [
   },
 ];
 
-export const loading = (
-  <Stack
-    flexDirection="row"
-    alignItems="center"
-    justifyContent="center"
-    height="50vh"
-  >
-    <CircularProgress sx={{ color: "#A879FF" }} />
-  </Stack>
-);
-
-const EditPreInterventionForm = () => {
+const EditNormgroupForm = () => {
   const dispatch = useDispatch();
 
   const formDetails = useSelector(selectForm);
@@ -204,7 +193,7 @@ const EditPreInterventionForm = () => {
           studentFormInfoQuestions.filter(
             (item: Question) =>
               item.sectionType === SectionType.PersonalDetails &&
-              item.formType === FormEvaluation.PreInterventions
+              item.formType === FormEvaluation.Normgroup
           )
         );
       } catch (error) {
@@ -212,18 +201,18 @@ const EditPreInterventionForm = () => {
       }
     };
 
-    const fetchPreInterventionsQuestions = async () => {
+    const fetchNormgroupQuestions = async () => {
       try {
-        const preInterventionQuestions = await getPreInterventionQuestions();
+        const normgroupQuestions = await getNormgroupQuestions();
 
         setPartOneQuestions(
-          preInterventionQuestions.filter(
+          normgroupQuestions.filter(
             (item: FormQuestion) =>
               item.questionSection === QuestionnaireSection.QuestionPartOne
           )
         );
         setPartTwoQuestions(
-          preInterventionQuestions.filter(
+          normgroupQuestions.filter(
             (item: FormQuestion) =>
               item.questionSection === QuestionnaireSection.QuestionPartTwo
           )
@@ -234,7 +223,7 @@ const EditPreInterventionForm = () => {
     };
 
     fetchPersonalDetailsQuestions();
-    fetchPreInterventionsQuestions();
+    fetchNormgroupQuestions();
   }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
@@ -261,13 +250,8 @@ const EditPreInterventionForm = () => {
     setPersonalDetailsQuestions(updatedQuestionsArr);
   };
 
-  const handlePreInterventionSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: FormQuestion = await preInterventionQuestionFormSoftDelete(
-      id
-    );
+  const handleNormgroupSoftDelete = async (id: number, orderId: number) => {
+    const response: FormQuestion = await normgroupQuestionFormSoftDelete(id);
 
     const newQuestionArr =
       tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
@@ -304,9 +288,7 @@ const EditPreInterventionForm = () => {
     });
   };
 
-  const handlePreInterventionQuestionUpdate = async (
-    question: FormQuestion
-  ) => {
+  const handleNormgroupQuestionUpdate = async (question: FormQuestion) => {
     if (tab === 1) {
       setPartOneQuestions((prevQuestions) => {
         const updatedQuestionsArr = [...prevQuestions];
@@ -347,7 +329,6 @@ const EditPreInterventionForm = () => {
       const response = await studentFormInfoItemUpdateBulk(
         personalDetailsQuestions
       );
-
       setPersonalDetailsQuestions(response);
       dispatch(resetForm());
     } catch (error) {
@@ -355,11 +336,11 @@ const EditPreInterventionForm = () => {
     }
   };
 
-  const handleUpdateAllPreInterventionQuestions = async () => {
+  const handleUpdateAllNormgroupQuestions = async () => {
     const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
 
     try {
-      const response = await preInterventionQuesionsUpdateBulk(arrayToUpdate);
+      const response = await normgroupQuesionsUpdateBulk(arrayToUpdate);
 
       tab === 1
         ? setPartOneQuestions(
@@ -402,7 +383,7 @@ const EditPreInterventionForm = () => {
     const newPositionOrderId = personalDetailsQuestions.length + 1;
 
     const newQuestion: Question = {
-      formType: FormEvaluation.PreInterventions,
+      formType: FormEvaluation.Normgroup,
       questionText: questionText,
       fieldType: fieldType,
       sectionType: SectionType.PersonalDetails,
@@ -445,7 +426,7 @@ const EditPreInterventionForm = () => {
           : QuestionnaireSection.QuestionPartTwo,
     };
 
-    const response = await postPreInterventionQuestions(newQuestion);
+    const response = await postNormgroupQuestions(newQuestion);
 
     const updatedQuestionsArr = tab === 1 ? partOneQuestions : partTwoQuestions;
     updatedQuestionsArr?.push(response);
@@ -543,6 +524,17 @@ const EditPreInterventionForm = () => {
     </Snackbar>
   );
 
+  const loading = (
+    <Stack
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="center"
+      height="50vh"
+    >
+      <CircularProgress sx={{ color: "#A879FF" }} />
+    </Stack>
+  );
+
   const addQuestionButton = (
     <Stack flexDirection="row" alignItems="center" my={5} mx={3}>
       <Button
@@ -573,7 +565,7 @@ const EditPreInterventionForm = () => {
         onClick={
           tab < 1
             ? handleUpdateAllPersonalDetailsQuestions
-            : handleUpdateAllPreInterventionQuestions
+            : handleUpdateAllNormgroupQuestions
         }
         sx={customStyles.updateButton}
         disabled={!formDetails.isModified}
@@ -639,8 +631,8 @@ const EditPreInterventionForm = () => {
                 <QuestionnaireDynamicField
                   key={question.id}
                   question={question}
-                  handleQuestionUpdate={handlePreInterventionQuestionUpdate}
-                  handleQuestionSoftDelete={handlePreInterventionSoftDelete}
+                  handleQuestionUpdate={handleNormgroupQuestionUpdate}
+                  handleQuestionSoftDelete={handleNormgroupSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
                 />
@@ -668,8 +660,8 @@ const EditPreInterventionForm = () => {
                 <QuestionnaireDynamicField
                   key={question.id}
                   question={question}
-                  handleQuestionUpdate={handlePreInterventionQuestionUpdate}
-                  handleQuestionSoftDelete={handlePreInterventionSoftDelete}
+                  handleQuestionUpdate={handleNormgroupQuestionUpdate}
+                  handleQuestionSoftDelete={handleNormgroupSoftDelete}
                   moveItemUp={moveItemUp}
                   moveItemDown={moveItemDown}
                 />
@@ -733,4 +725,4 @@ const EditPreInterventionForm = () => {
   );
 };
 
-export default EditPreInterventionForm;
+export default EditNormgroupForm;

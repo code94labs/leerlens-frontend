@@ -1,7 +1,8 @@
-import { Divider, Stack, Typography } from "@mui/material";
+import { Divider, Grid, Stack, Typography } from "@mui/material";
 import React from "react";
 import NumericalDigit from "../../shared/Dashboard/NumericalDigit/NumericalDigit";
 import HorizontalBarChart from "../../shared/Dashboard/HorizontalBarChart/HorizontalBarChart";
+import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
 
 import {
   Chart as ChartJS,
@@ -11,7 +12,8 @@ import {
   Title,
   Tooltip,
   Legend,
-} from 'chart.js';
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(
   CategoryScale,
@@ -19,7 +21,8 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ChartDataLabels
 );
 
 const SharedDashboardPage = () => {
@@ -55,6 +58,67 @@ const SharedDashboardPage = () => {
     </Stack>
   );
 
+  const verticalBarChartType01 = (
+    <Stack>
+      <Typography>
+        <Typography variant="h4">
+          Shared UI component vertical bar chart - type 01
+        </Typography>
+
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <VerticalBarChartType01
+              title="Eigenaarschap"
+              labels={["Voor", "NA"]}
+              datasets={[
+                {
+                  data: [3.1, 4.1],
+                  backgroundColor: ["#F9C8A6", "#EB7200"],
+                },
+              ]}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <VerticalBarChartType01
+              title="Experimenteren met leren"
+              labels={["Voor", "NA"]}
+              datasets={[
+                {
+                  data: [3.1, 4.1],
+                  backgroundColor: ["#DCC9FF", "#A879FF"],
+                },
+              ]}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <VerticalBarChartType01
+              title="mindset"
+              labels={["Voor", "NA"]}
+              datasets={[
+                {
+                  data: [3.1, 4.1],
+                  backgroundColor: ["#FDB8CB", "#F5477C"],
+                },
+              ]}
+            />
+          </Grid>
+          <Grid item xs={4}>
+            <VerticalBarChartType01
+              title="zelfregulatie"
+              labels={["Voor", "NA"]}
+              datasets={[
+                {
+                  data: [3.1, 4.1],
+                  backgroundColor: ["#AEDCD1", "#05A88D"],
+                },
+              ]}
+            />
+          </Grid>
+        </Grid>
+      </Typography>
+    </Stack>
+  );
+
   const linebreak = <Divider sx={{ border: 3, my: 5 }} />;
 
   return (
@@ -64,6 +128,10 @@ const SharedDashboardPage = () => {
       {linebreak}
 
       {horizontalBarChart}
+
+      {linebreak}
+
+      {verticalBarChartType01}
     </Stack>
   );
 };

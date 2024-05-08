@@ -21,6 +21,7 @@ import {
   getAllNormGroupQuestions,
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
+import { useRouter } from "next/navigation";
 
 const customStyles = {
   snackbarAlert: {
@@ -59,7 +60,7 @@ const customStyles = {
     },
   },
   tabs: {
-    "& .Mui-selected": {
+    "& .Mui-selected.MuiTab-root": {
       color: "black",
       fontWeight: "bold",
       fontSize: 16,
@@ -74,10 +75,10 @@ const customStyles = {
     borderBottom: "5px solid #E6E6E6",
   },
   scrollableList: {
-    overflowY: "auto", 
-    maxHeight: "60vh", 
+    overflowY: "auto",
+    maxHeight: "60vh",
     "&::-webkit-scrollbar": {
-      width: "0", 
+      width: "0",
     },
   },
 };
@@ -118,6 +119,8 @@ const NormGroupContent = () => {
   >([]);
   const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
 
+  const router = useRouter();
+
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
@@ -136,7 +139,7 @@ const NormGroupContent = () => {
 
       <Button
         variant="outlined"
-        onClick={() => {}}
+        onClick={() => router.push("/admin/question-set/norm-group/edit")}
         sx={customStyles.primaryButton}
       >
         Edit Question
@@ -160,7 +163,7 @@ const NormGroupContent = () => {
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />
@@ -171,7 +174,7 @@ const NormGroupContent = () => {
           (item) => (
             <QuestionSet
               key={item.id}
-              number={item.id}
+              number={item.positionOrderId}
               question={item.questionText}
               answerType={FieldType.Scale1to6}
             />
@@ -192,8 +195,6 @@ const NormGroupContent = () => {
     await getStudentFormInfoByFormType(formType)
       .then((res) => {
         setPersonalDetails(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -212,15 +213,15 @@ const NormGroupContent = () => {
     await getAllNormGroupQuestions()
       .then((res) => {
         setNormGroupQuestionnaireList(res);
-
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
 
         setIsError(true);
 
-        setNotificationMsg("Error when fetching normgroup questionnaire data...");
+        setNotificationMsg(
+          "Error when fetching normgroup questionnaire data..."
+        );
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {

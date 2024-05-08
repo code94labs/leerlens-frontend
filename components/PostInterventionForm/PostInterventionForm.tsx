@@ -35,6 +35,7 @@ import {
   DropDownOptions,
   FormQuestion,
   Question,
+  QuestionResponse,
   QuestionniareAnswer,
   StudentDetailsAnswer,
 } from "../../utils/types";
@@ -176,11 +177,11 @@ const PostInterventionForm = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [studentFormInfo, setStudentFormInfo] = useState<Question[]>([]);
-  const [questionListPartOne, setQuestionListPartOne] = useState<Question[]>(
+  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>([]);
+  const [questionListPartOne, setQuestionListPartOne] = useState<QuestionResponse[]>(
     []
   );
-  const [questionListPartTwo, setQuestionListPartTwo] = useState<Question[]>(
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<QuestionResponse[]>(
     []
   );
 
@@ -358,14 +359,16 @@ const PostInterventionForm = () => {
       try {
         setIsLoading(true);
 
-        const studentFormInfoQuestions: Question[] =
+        const studentFormInfoQuestions: QuestionResponse[] =
           await getStudentFormInfoByFormType(FormEvaluation.PostInterventions);
 
-        const studentFormInfoPersonal = studentFormInfoQuestions.filter(
-          (item: Question) => item.sectionType === SectionType.PersonalDetails
+        setStudentFormInfo(
+          studentFormInfoQuestions.filter(
+            (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
+          )
         );
 
-        setStudentFormInfo(studentFormInfoPersonal);
+        // setStudentFormInfo(studentFormInfoPersonal);
       } catch (error) {
         console.log(error);
       } finally {
@@ -440,7 +443,7 @@ const PostInterventionForm = () => {
   ) : (
     <Grid container rowSpacing={4} columnSpacing={4}>
       {studentFormInfo &&
-        studentFormInfo.map((question: Question) => (
+        studentFormInfo.map((question: QuestionResponse) => (
           <Grid item xs={12} md={6} key={question.id}>
             <FormControl fullWidth required>
               {question.fieldType === FieldType.DropDown ? (
@@ -556,7 +559,7 @@ const PostInterventionForm = () => {
       </Typography>
 
       <FormControl>
-        {questionListPartOne.map((questionDetails: Question) => (
+        {questionListPartOne.map((questionDetails: QuestionResponse, index: number) => (
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}
@@ -583,7 +586,7 @@ const PostInterventionForm = () => {
       </Typography>
 
       <FormControl>
-        {questionListPartTwo.map((questionDetails: Question) => (
+        {questionListPartTwo.map((questionDetails: QuestionResponse, index: number) => (
           <CustomScale
             key={questionDetails.id}
             {...questionDetails}

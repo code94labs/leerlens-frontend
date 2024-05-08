@@ -25,7 +25,7 @@ const Sidebar = () => {
     }
   };
 
-  const generateMenuItem = (route: RoutePath) => {
+  const generateMenuItem = (route: RoutePath, index: number) => {
     const handleSubItemClick = (path: string | undefined) => {
       if (path) {
         router.push(path);
@@ -33,7 +33,7 @@ const Sidebar = () => {
     };
 
     return (
-      <div key={route.path}>
+      <div key={index}>
         {route.sub ? (
           <Accordion expanded={isOpen} onChange={() => setIsOpen(!isOpen)}>
             <AccordionSummary sx={customStyles.accordionSummary}>
@@ -61,9 +61,9 @@ const Sidebar = () => {
 
             <AccordionDetails sx={customStyles.accordionDetails}>
               <Stack flexDirection="column" alignItems="left">
-                {route.sub.map((subRoute) => (
+                {route.sub.map((subRoute, index: number) => (
                   <Button
-                    key={subRoute.path}
+                    key={index}
                     sx={{
                       ...customStyles.accordionMenuItem,
                       ...(router.pathname === subRoute.path &&
@@ -113,7 +113,9 @@ const Sidebar = () => {
 
       <Divider sx={customStyles.dividerMain} />
 
-      <Stack spacing={1}>{pages.map((item) => generateMenuItem(item))}</Stack>
+      <Stack spacing={1}>
+        {pages.map((item, index: number) => generateMenuItem(item, index))}
+      </Stack>
     </Stack>
   );
 };
