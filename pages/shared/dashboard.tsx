@@ -1,6 +1,26 @@
 import { Divider, Stack, Typography } from "@mui/material";
 import React from "react";
 import NumericalDigit from "../../shared/Dashboard/NumericalDigit/NumericalDigit";
+import HorizontalBarChart from "../../shared/Dashboard/HorizontalBarChart/HorizontalBarChart";
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const SharedDashboardPage = () => {
   const numericalDigits = (
@@ -29,6 +49,8 @@ const SharedDashboardPage = () => {
         <Typography variant="h4">
           Shared UI component horizontal bar chart
         </Typography>
+
+        <HorizontalBarChart />
       </Typography>
     </Stack>
   );
