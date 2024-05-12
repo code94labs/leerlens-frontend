@@ -199,7 +199,7 @@ const SharedDashboardPage = () => {
         <ProgressIndicator
           title="To what extent have you learned to be smarter and more motivated to learn?"
           color="#EB7200"
-          type={FieldType.Scale1to6}
+          type={FieldType.Scale1to10}
           value={5.6}
         />
 
@@ -232,6 +232,8 @@ const SharedDashboardPage = () => {
       {linebreak}
 
       {progressIndicator}
+
+      {linebreak}
     </Stack>
   );
 };
