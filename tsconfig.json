@@ -16,6 +16,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/HomePage/FormCard.js", "shared/Dashboard/HorizontalBarChart/HorizontalBarChart.js", "shared/Dashboard/HorizontalBarChart/HorizontalBarChart.js"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "components/HomePage/FormCard.js", "shared/Dashboard/HorizontalBarChart/HorizontalBarChart.tsx", "shared/Dashboard/HorizontalBarChart/HorizontalBarChart.tsx"],
   "exclude": ["node_modules"]
 }

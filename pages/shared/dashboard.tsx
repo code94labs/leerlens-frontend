@@ -14,6 +14,9 @@ import {
   Legend,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import ProgressBar from "../../shared/Dashboard/ProgressBar/ProgressBar";
+import { FieldType } from "../../utils/enum";
+import ProgressIndicator from "../../shared/Dashboard/ProgressIndicator/ProgressIndicator";
 
 ChartJS.register(
   CategoryScale,
@@ -53,7 +56,11 @@ const SharedDashboardPage = () => {
           Shared UI component horizontal bar chart
         </Typography>
 
-        <HorizontalBarChart />
+        <Stack flexDirection="row" justifyContent="space-evenly" my={5}>
+          <HorizontalBarChart />
+
+          <HorizontalBarChart />
+        </Stack>
       </Typography>
     </Stack>
   );
@@ -121,6 +128,91 @@ const SharedDashboardPage = () => {
 
   const linebreak = <Divider sx={{ border: 3, my: 5 }} />;
 
+  const progressBar = (
+    <Stack>
+      <Typography variant="h4">Shared UI Component - Progress bar</Typography>
+
+      {/* NOTE: the 'color' prop should be in HEX code */}
+      <Stack
+        flexDirection="row"
+        justifyContent="space-evenly"
+        my={5}
+        flexWrap="wrap"
+      >
+        <ProgressBar
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#05A88D"
+          type={FieldType.Scale1to6}
+          value={5}
+        />
+
+        <ProgressBar
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#A879FF"
+          type={FieldType.Scale1to6}
+          value={3}
+        />
+
+        <ProgressBar
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#FF1D61"
+          type={FieldType.Scale1to10}
+          value={5}
+        />
+
+        <ProgressBar
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#EB7200"
+          type={FieldType.Scale1to6}
+          value={4.2}
+        />
+
+        <ProgressBar
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#0F0F0F"
+          type={FieldType.Scale1to10}
+          value={1}
+        />
+      </Stack>
+    </Stack>
+  );
+
+  const progressIndicator = (
+    <Stack>
+      <Typography variant="h4">
+        Shared UI Component - Progress Indicator
+      </Typography>
+
+      <Stack
+        my={5}
+        flexDirection="row"
+        justifyContent="space-evenly"
+        flexWrap="wrap"
+      >
+        <ProgressIndicator
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#05A88D"
+          type={FieldType.Scale1to6}
+          value={2.2}
+        />
+
+        <ProgressIndicator
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#EB7200"
+          type={FieldType.Scale1to10}
+          value={5.6}
+        />
+
+        <ProgressIndicator
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#A879FF"
+          type={FieldType.Scale1to6}
+          value={3.8}
+        />
+      </Stack>
+    </Stack>
+  );
+
   return (
     <Stack direction="row" p={5} flexDirection="column">
       {numericalDigits}
@@ -132,6 +224,16 @@ const SharedDashboardPage = () => {
       {linebreak}
 
       {verticalBarChartType01}
+
+      {linebreak}
+
+      {progressBar}
+
+      {linebreak}
+
+      {progressIndicator}
+
+      {linebreak}
     </Stack>
   );
 };
