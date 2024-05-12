@@ -9,6 +9,7 @@ const nextConfig = {
   env: {
     BASE_URL: process.env.BASE_URL,
   },
+  transpilePackages: ['@mui/x-charts']
 };
 
 export default nextConfig;

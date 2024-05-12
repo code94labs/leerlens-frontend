@@ -16,6 +16,7 @@ import {
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import ProgressBar from "../../shared/Dashboard/ProgressBar/ProgressBar";
 import { FieldType } from "../../utils/enum";
+import ProgressIndicator from "../../shared/Dashboard/ProgressIndicator/ProgressIndicator";
 
 ChartJS.register(
   CategoryScale,
@@ -176,6 +177,42 @@ const SharedDashboardPage = () => {
     </Stack>
   );
 
+  const progressIndicator = (
+    <Stack>
+      <Typography variant="h4">
+        Shared UI Component - Progress Indicator
+      </Typography>
+
+      <Stack
+        my={5}
+        flexDirection="row"
+        justifyContent="space-evenly"
+        flexWrap="wrap"
+      >
+        <ProgressIndicator
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#05A88D"
+          type={FieldType.Scale1to6}
+          value={2.2}
+        />
+
+        <ProgressIndicator
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#EB7200"
+          type={FieldType.Scale1to6}
+          value={5.6}
+        />
+
+        <ProgressIndicator
+          title="To what extent have you learned to be smarter and more motivated to learn?"
+          color="#A879FF"
+          type={FieldType.Scale1to6}
+          value={3.8}
+        />
+      </Stack>
+    </Stack>
+  );
+
   return (
     <Stack direction="row" p={5} flexDirection="column">
       {numericalDigits}
@@ -191,6 +228,10 @@ const SharedDashboardPage = () => {
       {linebreak}
 
       {progressBar}
+
+      {linebreak}
+
+      {progressIndicator}
     </Stack>
   );
 };
