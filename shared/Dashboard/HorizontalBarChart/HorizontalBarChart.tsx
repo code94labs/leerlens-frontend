@@ -9,6 +9,7 @@ const customStyles = {
     fontWeight: 400,
     fontFamily: champBlackFontFamily,
     fontSize: 24,
+    mb: 3
   },
   label: {
     fontSize: 50,
@@ -17,84 +18,117 @@ const customStyles = {
     my: 6,
   },
   stack: {
+    alignItems: 'center',
     border: "2px #E6E6E6 solid",
     borderRadius: 2,
     p: 3,
+    width: 800
   },
 };
 
 const HorizontalBarChart = () => {
   const options = {
-    indexAxis: "y",
-    elements: {
-      bar: {
-        borderWidth: 2,
-        borderRadius: 10,
+    indexAxis: "y" as "y" | "x" | undefined,
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        labels: {
+          usePointStyle: true,
+        },
+      },
+      datalabels: {
+        anchor: (context: any) => {
+          const value = context.dataset.data[context.dataIndex];
+
+          return value < 0 ? "start" : "end";
+        },
+
+        align: (context: any) => {
+          const value = context.dataset.data[context.dataIndex];
+
+          return value < 0 ? "start" : "end";
+        },
+
+        formatter: (value: any) => {
+          return value >= 0 ? `+${value}` : `${value}`;
+        },
+
+        color: "black",
+        borderRadius: 3,
+        padding: {
+          top: 6,
+          bottom: 6,
+          left: 16,
+          right: 16,
+        },
+        font: {
+          size: 13,
+          weight: 900,
+        },
       },
     },
-    responsive: true,
     scales: {
       x: {
-        display: false,
-        ticks: {
-          display: false,
-        },
         grid: {
+          display: true,
+          color: (context: any) =>
+            context.tick.value === 0 ? "black" : "transparent",
+          lineWidth: (context: any) => (context.tick.value === 0 ? 3 : 0),
+          drawBorder: false,
+        },
+        ticks: {
           display: false,
         },
       },
       y: {
         display: false,
-        ticks: {
-          display: false,
-        },
         grid: {
           display: false,
         },
       },
     },
-    plugins: {
-      legend: {
-        position: "top",
-        labels: {
-          usePointStyle: true, // This line makes the legend shapes circles
-        },
-      },
-      tooltip: {
-        // ... (your tooltip customization)
+    layout: {
+      padding: {
+        left: 120,
+        right: 120,
       },
     },
+    elements: {
+      bar: {
+        borderRadius: 10,
+      },
+    },
+    barPercentage: 1.0,
+    categoryPercentage: 1.0,
   };
 
   const labels = ["January", "February", "March"];
-
-  const dataset1Data = [200, 400, 600, 800, 1000, 1200, 1400];
-  const dataset2Data = [-200, -400, -600, -800, -1000, -1200, -1400];
 
   const data = {
     labels,
     datasets: [
       {
         label: "Dataset 1",
-        data: dataset1Data,
+        data: [100, 50],
         borderColor: "#EB7200",
         backgroundColor: "#EB7200",
       },
       {
         label: "Dataset 2",
-        data: dataset1Data,
+        data: [-150, -30],
         borderColor: "#A879FF",
         backgroundColor: "#A879FF",
       },
       {
         label: "Dataset 3",
-        data: dataset2Data,
+        data: [150, 45],
         borderColor: "#00A88D",
         backgroundColor: "#00A88D",
       },
       {
         label: "Dataset 4",
-        data: dataset2Data,
+        data: [-170, -80],
         borderColor: "#F5477C",
         backgroundColor: "#F5477C",
       },
@@ -104,6 +138,7 @@ const HorizontalBarChart = () => {
   return (
     <Stack sx={customStyles.stack}>
       <Typography sx={customStyles.title}>ABSOLUTE DIFFERENCE</Typography>
+
       <Bar options={options} data={data} />
     </Stack>
   );

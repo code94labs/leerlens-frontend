@@ -91,7 +91,9 @@ const VerticalBarChartType01 = ({
     },
     scales: {
       x: {
-        grid: { display: false },
+        grid: {
+          display: false,
+        },
         color: "#333333",
         border: {
           width: 2,
