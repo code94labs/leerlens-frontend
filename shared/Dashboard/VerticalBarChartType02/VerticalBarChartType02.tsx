@@ -51,7 +51,7 @@ const VerticalBarChartType02 = ({
 }: VerticalBarChartType02Props) => {
   const options = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false,

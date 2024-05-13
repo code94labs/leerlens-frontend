@@ -17,6 +17,7 @@ import NumericalDigit from "../../shared/Dashboard/NumericalDigit/NumericalDigit
 import HorizontalBarChart from "../../shared/Dashboard/HorizontalBarChart/HorizontalBarChart";
 import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
 import VerticalBarChartType02 from "../../shared/Dashboard/VerticalBarChartType02/VerticalBarChartType02";
+import HorizontalBarChartType02 from "../../shared/Dashboard/HorizontalBarChartType02/HorizontalBarChartType02";
 
 ChartJS.register(
   CategoryScale,
@@ -61,6 +62,44 @@ const SharedDashboardPage = () => {
 
           <HorizontalBarChart />
         </Stack>
+      </Typography>
+    </Stack>
+  );
+
+  const horizontalBarChartType02 = (
+    <Stack>
+      <Typography>
+        <Typography variant="h4">
+          Shared UI component horizontal bar chart Type 02
+        </Typography>
+
+        <Grid container spacing={2}>
+          <Grid item xs={6}>
+            <HorizontalBarChartType02
+              title={"ABSOLUTE DIFFERENCE"}
+              labels={["1", "2", "3", "4"]}
+              datasets={[
+                {
+                  data: [1.5, 0.4, 0.9, 1.2],
+                  backgroundColor: ["#EB7200"],
+                },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={6}>
+            <HorizontalBarChartType02
+              title={"ABSOLUTE DIFFERENCE"}
+              labels={["1", "2", "3", "4"]}
+              datasets={[
+                {
+                  data: [0.4, 0.7, 0.9, 1.2],
+                  backgroundColor: ["#A879FF"],
+                },
+              ]}
+            />
+          </Grid>
+        </Grid>
       </Typography>
     </Stack>
   );
@@ -359,6 +398,10 @@ const SharedDashboardPage = () => {
       {linebreak}
 
       {horizontalBarChart}
+
+      {linebreak}
+
+      {horizontalBarChartType02}
 
       {linebreak}
 
