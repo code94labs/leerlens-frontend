@@ -1,4 +1,4 @@
-import { Grid, Stack, Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import React from "react";
 
 import { Bar } from "react-chartjs-2";
@@ -26,55 +26,38 @@ const customStyles = {
     my: 6,
   },
   stack: {
+    alignItems: "center",
     border: "2px #E6E6E6 solid",
     borderRadius: 2,
     p: 3,
-    maxHeight: 300,
+    // width: 800,
   },
 };
 
-interface VerticalBarChartType02Props {
+interface HorizontalBarChartType02Props {
   title: string;
   labels: string[];
-  dataLabelsVisible?: boolean; // give a better variable name
   datasets: {
     data: number[];
     backgroundColor: string[];
   }[];
 }
 
-const VerticalBarChartType02 = ({
+const HorizontalBarChartType02 = ({
   title,
   labels,
-  dataLabelsVisible = false,
   datasets,
-}: VerticalBarChartType02Props) => {
+}: HorizontalBarChartType02Props) => {
   const options = {
+    indexAxis: "y" as "y" | "x" | undefined,
     responsive: true,
-    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false,
       },
-      title: {
-        display: true,
-        text: title.toLocaleUpperCase(),
-        font: {
-          size: 15,
-          weight: 700,
-          family: livvic.style.fontFamily,
-        },
-        color: "#1A1A1A",
-        padding: {
-          bottom: 50,
-        },
-      },
       datalabels: {
-        display: dataLabelsVisible,
-        backgroundColor: "black",
         anchor: "end" as "center" | "start" | "end",
-        offset: -30,
-        align: "start" as
+        align: "end" as
           | "center"
           | "start"
           | "end"
@@ -82,57 +65,65 @@ const VerticalBarChartType02 = ({
           | "bottom"
           | "left"
           | "top",
-        borderRadius: 7,
-        color: "white",
+        formatter: (value: any) => {
+          return `+${value}`;
+        },
+        color: "black",
+        borderRadius: 3,
         padding: {
           top: 6,
           bottom: 6,
-          left: 10,
-          right: 10,
+          left: 16,
+          right: 16,
         },
         font: {
-          size: 10,
-          weight: 700,
+          size: 13,
+          weight: 900,
         },
       },
     },
     scales: {
       x: {
-        grid: { display: false },
-        color: "#000",
+        display: false,
+        grid: {
+          display: false,
+        },
+        ticks: {
+          display: false,
+        },
+      },
+      y: {
+        display: true,
         border: {
-          width: 2,
+          width: 3,
           color: "black",
           z: 1,
         },
         ticks: {
+          display: true,
           font: {
-            size: dataLabelsVisible ? 12 : 25,
-            weight: dataLabelsVisible ? 400 : 900,
-            family: champBlackFontFamily,
+            size: 25,
+            weight: 900,
           },
         },
-      },
-      y: {
-        display: false,
-        grid: { display: false },
+        grid: {
+          display: false,
+        },
       },
     },
-    // layout: {
-    //   padding: {
-    //     left: 120,
-    //     right: 120,
-    //     top: 0,
-    //     bottom: 0,
-    //   },
-    // },
+    layout: {
+      padding: {
+        left: 60,
+        right: 60,
+      },
+    },
     elements: {
       bar: {
         borderRadius: 10,
       },
     },
     barPercentage: 1.0,
-    categoryPercentage: dataLabelsVisible ? 0.8 : 0.9,
+    categoryPercentage: 0.7,
   };
 
   const data = {
@@ -142,13 +133,11 @@ const VerticalBarChartType02 = ({
 
   return (
     <Stack sx={customStyles.stack}>
-      {/* <Typography mb={3} sx={customStyles.title}>
-        {title}
-      </Typography> */}
+      <Typography sx={customStyles.title}>{title}</Typography>
 
-      <Bar options={options} data={data} height={200} />
+      <Bar options={options} data={data} />
     </Stack>
   );
 };
 
-export default VerticalBarChartType02;
+export default HorizontalBarChartType02;
