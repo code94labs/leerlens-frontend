@@ -1,9 +1,5 @@
-import { Divider, Grid, Stack, Typography } from "@mui/material";
 import React from "react";
-import NumericalDigit from "../../shared/Dashboard/NumericalDigit/NumericalDigit";
-import HorizontalBarChart from "../../shared/Dashboard/HorizontalBarChart/HorizontalBarChart";
-import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
-
+import { Divider, Grid, Stack, Typography } from "@mui/material";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,6 +13,10 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import ProgressBar from "../../shared/Dashboard/ProgressBar/ProgressBar";
 import { FieldType } from "../../utils/enum";
 import ProgressIndicator from "../../shared/Dashboard/ProgressIndicator/ProgressIndicator";
+import NumericalDigit from "../../shared/Dashboard/NumericalDigit/NumericalDigit";
+import HorizontalBarChart from "../../shared/Dashboard/HorizontalBarChart/HorizontalBarChart";
+import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
+import VerticalBarChartType02 from "../../shared/Dashboard/VerticalBarChartType02/VerticalBarChartType02";
 
 ChartJS.register(
   CategoryScale,
@@ -126,6 +126,145 @@ const SharedDashboardPage = () => {
     </Stack>
   );
 
+  const verticalBarChartType02 = (
+    <Stack>
+      <Typography>
+        <Typography variant="h4">
+          Shared UI component vertical bar chart - type 02
+        </Typography>
+
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <VerticalBarChartType02
+              title="verdelng van de scores"
+              labels={["1", "2", "3", "4", "5", "6"]}
+              datasets={[
+                {
+                  data: [4, 10, 4, 7, 6, 8],
+                  backgroundColor: ["#A879FF"],
+                },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={4}>
+            <VerticalBarChartType02
+              title="verdelng van de scores"
+              labels={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
+              datasets={[
+                {
+                  data: [4, 10, 4, 7, 6, 8, 8, 8, 8, 8],
+                  backgroundColor: ["#A879FF"],
+                },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={4}>
+            <VerticalBarChartType02
+              title="verdelng van de scores"
+              labels={["1", "2", "3", "4", "5", "6"]}
+              datasets={[
+                {
+                  data: [4, 10, 4, 7, 6, 8],
+                  backgroundColor: ["#E85D67"],
+                },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={4}>
+            <VerticalBarChartType02
+              title="verdelng van de scores"
+              labels={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
+              datasets={[
+                {
+                  data: [4, 10, 4, 7, 6, 8, 8, 8, 8, 8],
+                  backgroundColor: ["#E85D67"],
+                },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={4}>
+            <VerticalBarChartType02
+              title="verdelng van de scores"
+              labels={[
+                "1VC",
+                "1VA",
+                "2VB",
+                "2VC",
+                "3VA",
+                "3VA",
+                "3VC",
+                "1VQ",
+                "1VP",
+                "1VD",
+              ]}
+              dataLabelsVisible
+              datasets={[
+                {
+                  data: [6.1, 4.1, 5.1, 6.1, 8.1, 4.1, 6.1, 8.1, 4.1, 6.5],
+                  backgroundColor: ["#EB7200"],
+                },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={4}>
+            <VerticalBarChartType02
+              title="verdelng van de scores"
+              labels={[
+                "1VC",
+                "1VA",
+                "2VB",
+                "2VC",
+                "3VA",
+                "3VA",
+                "3VC",
+                "1VQ",
+                "1VP",
+                "1VD",
+              ]}
+              dataLabelsVisible
+              datasets={[
+                {
+                  data: [6.1, 4.1, 5.1, 6.1, 8.1, 4.1, 6.1, 8.1, 4.1, 6.5],
+                  backgroundColor: ["#E85D67"],
+                },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={8}>
+            <VerticalBarChartType02
+              title="verdelng van de scores"
+              labels={[
+                "1VC",
+                "1VA",
+                "2VB",
+                "2VC",
+                "3VA",
+                "3VA",
+                "3VC",
+                "1VQ",
+                "1VP",
+                "1VD",
+              ]}
+              dataLabelsVisible
+              datasets={[
+                {
+                  data: [6.1, 4.1, 5.1, 6.1, 8.1, 4.1, 6.1, 8.1, 4.1, 6.5],
+                  backgroundColor: ["#E85D67"],
+                },
+              ]}
+            />
+          </Grid>
+        </Grid>
+      </Typography>
+    </Stack>
+  );
+
   const linebreak = <Divider sx={{ border: 3, my: 5 }} />;
 
   const progressBar = (
@@ -223,10 +362,6 @@ const SharedDashboardPage = () => {
 
       {linebreak}
 
-      {verticalBarChartType01}
-
-      {linebreak}
-
       {progressBar}
 
       {linebreak}
@@ -234,6 +369,12 @@ const SharedDashboardPage = () => {
       {progressIndicator}
 
       {linebreak}
+
+      {verticalBarChartType01}
+
+      {linebreak}
+
+      {verticalBarChartType02}
     </Stack>
   );
 };
