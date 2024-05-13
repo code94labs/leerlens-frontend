@@ -146,6 +146,7 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
+
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -158,6 +159,7 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
+
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -170,6 +172,7 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
+
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -182,6 +185,7 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
+
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -206,7 +210,33 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
+
           <Grid item xs={4}>
+            <VerticalBarChartType02
+              title="verdelng van de scores"
+              labels={[
+                "1VC",
+                "1VA",
+                "2VB",
+                "2VC",
+                "3VA",
+                "3VA",
+                "3VC",
+                "1VQ",
+                "1VP",
+                "1VD",
+              ]}
+              dataLabelsVisible
+              datasets={[
+                {
+                  data: [6.1, 4.1, 5.1, 6.1, 8.1, 4.1, 6.1, 8.1, 4.1, 6.5],
+                  backgroundColor: ["#E85D67"],
+                },
+              ]}
+            />
+          </Grid>
+
+          <Grid item xs={8}>
             <VerticalBarChartType02
               title="verdelng van de scores"
               labels={[
@@ -332,10 +362,6 @@ const SharedDashboardPage = () => {
 
       {linebreak}
 
-      {verticalBarChartType01}
-
-      {linebreak}
-
       {progressBar}
 
       {linebreak}
@@ -344,9 +370,7 @@ const SharedDashboardPage = () => {
 
       {linebreak}
 
-      {linebreak}
-
-      {verticalBarChartType02}
+      {verticalBarChartType01}
 
       {linebreak}
 

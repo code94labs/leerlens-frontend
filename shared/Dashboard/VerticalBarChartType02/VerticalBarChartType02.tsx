@@ -13,9 +13,11 @@ export const livvic = Livvic({
 
 const customStyles = {
   title: {
-    fontWeight: 400,
-    fontFamily: champBlackFontFamily,
-    fontSize: 24,
+    fontWeight: "bold",
+    fontFamily: livvic.style.fontFamily,
+    fontSize: 18,
+    textTransform: "uppercase",
+    textAlign: "center",
   },
   label: {
     fontSize: 50,
@@ -27,13 +29,14 @@ const customStyles = {
     border: "2px #E6E6E6 solid",
     borderRadius: 2,
     p: 3,
+    maxHeight: 300,
   },
 };
 
 interface VerticalBarChartType02Props {
   title: string;
   labels: string[];
-  dataLabelsVisible?: boolean;
+  dataLabelsVisible?: boolean; // give a better variable name
   datasets: {
     data: number[];
     backgroundColor: string[];
@@ -48,6 +51,7 @@ const VerticalBarChartType02 = ({
 }: VerticalBarChartType02Props) => {
   const options = {
     responsive: true,
+    maintainAspectRatio: true,
     plugins: {
       legend: {
         display: false,
@@ -101,8 +105,6 @@ const VerticalBarChartType02 = ({
           color: "black",
           z: 1,
         },
-        // barPercentage: 1.0,
-        // categoryPercentage: 1.0,
         ticks: {
           font: {
             size: dataLabelsVisible ? 12 : 25,
@@ -140,7 +142,9 @@ const VerticalBarChartType02 = ({
 
   return (
     <Stack sx={customStyles.stack}>
-      {/* <Typography sx={customStyles.title}>ABSOLUTE DIFFERENCE</Typography> */}
+      {/* <Typography mb={3} sx={customStyles.title}>
+        {title}
+      </Typography> */}
 
       <Bar options={options} data={data} height={200} />
     </Stack>
