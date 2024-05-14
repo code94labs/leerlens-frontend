@@ -128,11 +128,12 @@ const VerticalBarChartType02 = ({
     // },
     elements: {
       bar: {
-        borderRadius: 10,
+        borderRadius: dataLabelsVisible ? 5 : 10,
       },
     },
     barPercentage: 1.0,
     categoryPercentage: dataLabelsVisible ? 0.8 : 0.9,
+    maxBarThickness: dataLabelsVisible ? 40 : 100,
   };
 
   const data = {
