@@ -111,62 +111,60 @@ const SharedDashboardPage = () => {
 
   const verticalBarChartType01 = (
     <Stack>
-      <Typography>
-        <Typography variant="h4">
-          Shared UI component vertical bar chart - type 01
-        </Typography>
-
-        <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <VerticalBarChartType01
-              title="Eigenaarschap"
-              labels={["Voor", "NA"]}
-              datasets={[
-                {
-                  data: [3.1, 4.1],
-                  backgroundColor: ["#F9C8A6", "#EB7200"],
-                },
-              ]}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <VerticalBarChartType01
-              title="Experimenteren met leren"
-              labels={["Voor", "NA"]}
-              datasets={[
-                {
-                  data: [3.1, 4.1],
-                  backgroundColor: ["#DCC9FF", "#A879FF"],
-                },
-              ]}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <VerticalBarChartType01
-              title="mindset"
-              labels={["Voor", "NA"]}
-              datasets={[
-                {
-                  data: [3.1, 4.1],
-                  backgroundColor: ["#FDB8CB", "#F5477C"],
-                },
-              ]}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <VerticalBarChartType01
-              title="zelfregulatie"
-              labels={["Voor", "NA"]}
-              datasets={[
-                {
-                  data: [3.1, 4.1],
-                  backgroundColor: ["#AEDCD1", "#05A88D"],
-                },
-              ]}
-            />
-          </Grid>
-        </Grid>
+      <Typography variant="h4">
+        Shared UI component vertical bar chart - type 01
       </Typography>
+
+      <Grid container spacing={2}>
+        <Grid item xs={4}>
+          <VerticalBarChartType01
+            title="Eigenaarschap"
+            labels={["Voor", "NA"]}
+            datasets={[
+              {
+                data: [3.1, 4.1],
+                backgroundColor: ["#F9C8A6", "#EB7200"],
+              },
+            ]}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <VerticalBarChartType01
+            title="Experimenteren met leren"
+            labels={["Voor", "NA"]}
+            datasets={[
+              {
+                data: [3.1, 4.1],
+                backgroundColor: ["#DCC9FF", "#A879FF"],
+              },
+            ]}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <VerticalBarChartType01
+            title="mindset"
+            labels={["Voor", "NA"]}
+            datasets={[
+              {
+                data: [3.1, 4.1],
+                backgroundColor: ["#FDB8CB", "#F5477C"],
+              },
+            ]}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <VerticalBarChartType01
+            title="zelfregulatie"
+            labels={["Voor", "NA"]}
+            datasets={[
+              {
+                data: [3.1, 4.1],
+                backgroundColor: ["#AEDCD1", "#05A88D"],
+              },
+            ]}
+          />
+        </Grid>
+      </Grid>
     </Stack>
   );
 
@@ -177,7 +175,7 @@ const SharedDashboardPage = () => {
           Shared UI component vertical bar chart - type 02
         </Typography>
 
-        <Grid container spacing={2}>
+        <Grid container spacing={2} mt={2}>
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -190,7 +188,6 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
-
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -203,7 +200,6 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
-
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -216,7 +212,6 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
-
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -229,7 +224,6 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
-
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -254,7 +248,6 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
-
           <Grid item xs={4}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -279,7 +272,6 @@ const SharedDashboardPage = () => {
               ]}
             />
           </Grid>
-
           <Grid item xs={8}>
             <VerticalBarChartType02
               title="verdelng van de scores"
@@ -471,6 +463,55 @@ const SharedDashboardPage = () => {
     </Stack>
   );
 
+  const verticalCustomBarChart = (
+    <Stack>
+      <Typography variant="h4">
+        Shared UI Component - Individual Vertical Bar Chart
+      </Typography>
+
+      <Grid container spacing={2} mt={2}>
+        <Grid item xs={4}>
+          <VerticalBarChartType01
+            removeBarGaps
+            height={350}
+            datasets={[
+              {
+                data: [9.1, 16.1, 10.1],
+                backgroundColor: ["#8B63A2", "#FDCD00", "#EF804A"],
+              },
+            ]}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <VerticalBarChartType01
+            removeBarGaps
+            height={350}
+            datasets={[
+              {
+                data: [9.1, 16.1, 10.1],
+                backgroundColor: ["#8B63A2", "#FDCD00", "#EF804A"],
+              },
+            ]}
+          />
+        </Grid>
+
+        <Grid item xs={4}>
+          <VerticalBarChartType01
+            removeBarGaps
+            height={350}
+            datasets={[
+              {
+                data: [9.1, 16.1, 10.1],
+                backgroundColor: ["#8B63A2", "#FDCD00", "#EF804A"],
+              },
+            ]}
+          />
+        </Grid>
+      </Grid>
+    </Stack>
+  );
+
   return (
     <Stack direction="row" p={5} flexDirection="column">
       {numericalDigits}
@@ -499,7 +540,13 @@ const SharedDashboardPage = () => {
 
       {verticalBarChartType02}
 
+      {linebreak}
+
       {lineGraph}
+
+      {linebreak}
+
+      {verticalCustomBarChart}
     </Stack>
   );
 };

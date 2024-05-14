@@ -4,6 +4,7 @@ import React from "react";
 import { Bar } from "react-chartjs-2";
 import { champBlackFontFamily } from "../../typography";
 import { Livvic } from "next/font/google";
+import { generateEmptyLabels } from "../../../utils/helper";
 
 export const livvic = Livvic({
   weight: ["300", "400", "500", "700"],
@@ -30,20 +31,22 @@ const customStyles = {
   },
 };
 
+type Dataset = {
+  data: number[];
+  backgroundColor: string[];
+};
+
 interface VerticalBarChartType01Props {
-  title: string;
-  labels: string[];
-  datasets: {
-    data: number[];
-    backgroundColor: string[];
-  }[];
+  title?: string;
+  labels?: string[];
+  datasets: Dataset[];
+  removeBarGaps?: boolean;
+  height?: number;
 }
 
-const VerticalBarChartType01 = ({
-  title,
-  labels,
-  datasets,
-}: VerticalBarChartType01Props) => {
+const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
+  const { title, labels, datasets, removeBarGaps, height } = props;
+
   const options = {
     responsive: true,
     plugins: {
@@ -52,7 +55,7 @@ const VerticalBarChartType01 = ({
       },
       title: {
         display: true,
-        text: title.toLocaleUpperCase(),
+        text: title?.toLocaleUpperCase(),
         font: {
           size: 15,
           weight: 700,
@@ -100,8 +103,6 @@ const VerticalBarChartType01 = ({
           color: "black",
           z: 1,
         },
-        // barPercentage: 1.0,
-        // categoryPercentage: 1.0,
         ticks: {
           font: {
             size: 13,
@@ -127,12 +128,12 @@ const VerticalBarChartType01 = ({
         borderRadius: 10,
       },
     },
-    barPercentage: 1.0,
-    categoryPercentage: 1.0,
+    barPercentage: removeBarGaps ? 0.95 : 1.0,
+    categoryPercentage: removeBarGaps ? 0.95 : 1.0,
   };
 
   const data = {
-    labels,
+    labels: labels ?? generateEmptyLabels(datasets[0].data.length),
     datasets,
   };
 
@@ -140,7 +141,7 @@ const VerticalBarChartType01 = ({
     <Stack sx={customStyles.stack}>
       {/* <Typography sx={customStyles.title}>ABSOLUTE DIFFERENCE</Typography> */}
 
-      <Bar options={options} data={data} height={200} />
+      <Bar options={options} data={data} height={height ?? 200} />
     </Stack>
   );
 };

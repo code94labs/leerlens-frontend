@@ -100,3 +100,7 @@ export const formContentFiltering = (
 
   return false;
 };
+
+export const generateEmptyLabels = (count: number): string[] => {
+  return Array.from({ length: count }, () => "");
+};
