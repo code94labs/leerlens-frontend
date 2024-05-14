@@ -43,13 +43,19 @@ const gaugeSettings = {
   cornerRadius: "10%",
 };
 
+const maxValueForQuestionnScale = 6;
+const maxValueForEvaluationScale = 10;
+
 const ProgressIndicator = (props: Props) => {
   const { title, color, type, value } = props;
 
   const gaugeData = {
     value,
     valueMin: 1,
-    valueMax: type === FieldType.Scale1to6 ? 6 : 10,
+    valueMax:
+      type === FieldType.Scale1to6
+        ? maxValueForQuestionnScale
+        : maxValueForEvaluationScale,
   };
 
   const gaugeIndicator = (

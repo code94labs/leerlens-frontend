@@ -6,6 +6,8 @@ import {
   LinearScale,
   BarElement,
   Title,
+  PointElement,
+  LineElement,
   Tooltip,
   Legend,
 } from "chart.js";
@@ -13,6 +15,7 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import ProgressBar from "../../shared/Dashboard/ProgressBar/ProgressBar";
 import { FieldType } from "../../utils/enum";
 import ProgressIndicator from "../../shared/Dashboard/ProgressIndicator/ProgressIndicator";
+import LineChart from "../../shared/Dashboard/LineChart/LineChart";
 import NumericalDigit from "../../shared/Dashboard/NumericalDigit/NumericalDigit";
 import HorizontalBarChart from "../../shared/Dashboard/HorizontalBarChart/HorizontalBarChart";
 import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
@@ -23,10 +26,12 @@ ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
-  ChartDataLabels
+  ChartDataLabels,
+  PointElement
 );
 
 const SharedDashboardPage = () => {
@@ -391,6 +396,81 @@ const SharedDashboardPage = () => {
     </Stack>
   );
 
+  const lineGraph = (
+    <Stack>
+      <Typography variant="h4">Shared UI Component - Line Graph</Typography>
+
+      <Stack
+        my={5}
+        flexDirection="row"
+        justifyContent="space-evenly"
+        flexWrap="wrap"
+      >
+        <LineChart
+          minWidth={650}
+          labels={["January", "February", "March", "April"]}
+          datasets={[
+            {
+              label: "Dataset 1",
+              data: [65, 59, 80, 81, 56, 55, 40],
+              borderColor: "#EB7200",
+              backgroundColor: "#EB7200",
+            },
+            {
+              label: "Dataset 2",
+              data: [45, 70, 55, 90, 65, 75, 60],
+              borderColor: "#A879FF",
+              backgroundColor: "#A879FF",
+            },
+            {
+              label: "Dataset 3",
+              data: [30, 45, 60, 55, 70, 50, 65],
+              borderColor: "#00A88D",
+              backgroundColor: "#00A88D",
+            },
+            {
+              label: "Dataset 4",
+              data: [80, 75, 85, 60, 75, 70, 85],
+              borderColor: "#F5477C",
+              backgroundColor: "#F5477C",
+            },
+          ]}
+        />
+
+        <LineChart
+          minWidth={650}
+          labels={["January", "February", "March", "April"]}
+          datasets={[
+            {
+              label: "Dataset 1",
+              data: [65, 59, 80, 81, 56, 55, 40],
+              borderColor: "#EB7200",
+              backgroundColor: "#EB7200",
+            },
+            {
+              label: "Dataset 2",
+              data: [45, 70, 55, 90, 65, 75, 60],
+              borderColor: "#A879FF",
+              backgroundColor: "#A879FF",
+            },
+            {
+              label: "Dataset 3",
+              data: [30, 45, 60, 55, 70, 50, 65],
+              borderColor: "#00A88D",
+              backgroundColor: "#00A88D",
+            },
+            {
+              label: "Dataset 4",
+              data: [80, 75, 85, 60, 75, 70, 85],
+              borderColor: "#F5477C",
+              backgroundColor: "#F5477C",
+            },
+          ]}
+        />
+      </Stack>
+    </Stack>
+  );
+
   return (
     <Stack direction="row" p={5} flexDirection="column">
       {numericalDigits}
@@ -418,6 +498,8 @@ const SharedDashboardPage = () => {
       {linebreak}
 
       {verticalBarChartType02}
+
+      {lineGraph}
     </Stack>
   );
 };
