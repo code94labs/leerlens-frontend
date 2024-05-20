@@ -49,6 +49,8 @@ import {
   postPostInterventionQuestions,
 } from "../../services/editPostInerventionQuestionSets.service";
 
+// constants
+
 const indexNotFound = -1;
 
 const topMostIndex = 1;
@@ -58,8 +60,10 @@ const tabs = {
   quesitonSetOne: 1,
   quesitonSetTwo: 2,
   programAndSupervisor: 3,
-  Final: 4,
+  final: 4,
 };
+
+// custom styles
 
 const customStyles = {
   snackbarAlert: {
@@ -226,24 +230,12 @@ const EditPostInterventionForm = () => {
     setTab(newValue);
   };
 
-  const handlePersonalDetailsSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
-
-    const newQuestionArr = [...personalDetailsQuestions];
-
-    // move to backend
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
+  const handlePersonalDetailsSoftDelete = async (id: number) => {
+    const response: QuestionResponse[] = await studentFormInfoItemSoftDelete(
+      id
     );
 
-    setPersonalDetailsQuestions(updatedQuestionsArr);
+    setPersonalDetailsQuestions(response);
   };
 
   const updatedQuestionList = () => {

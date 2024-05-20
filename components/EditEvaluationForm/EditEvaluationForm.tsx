@@ -49,6 +49,22 @@ import {
   postEvaluationQuestions,
 } from "../../services/editEvaluationQuestionSets.service";
 
+// constants
+
+const indexNotFound = -1;
+
+const topMostIndex = 1;
+
+const tabs = {
+  personalDetails: 0,
+  quesitonSetOne: 1,
+  quesitonSetTwo: 2,
+  programAndSupervisor: 3,
+  final: 4,
+};
+
+// custom styles
+
 const customStyles = {
   snackbarAlert: {
     width: "100%",
@@ -256,34 +272,35 @@ const EditEvaluationForm = () => {
     setTab(newValue);
   };
 
-  const handlePersonalDetailsSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
-
-    const targetArray =
-      tab === 0
-        ? personalDetailsQuestions
-        : tab === 3
-        ? programAndSupervisorsQuestions
-        : finalQuestions;
-
-    const newQuestionArr = [...targetArray];
-
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
+  const handlePersonalDetailsSoftDelete = async (id: number) => {
+    const response: QuestionResponse[] = await studentFormInfoItemSoftDelete(
+      id
     );
 
-    tab === 0
-      ? setPersonalDetailsQuestions(updatedQuestionsArr)
-      : tab === 3
-      ? setProgramAndSupervisorsQuestions(updatedQuestionsArr)
-      : setFinalQuestions(updatedQuestionsArr);
+    // const targetArray =
+    //   tab === 0
+    //     ? personalDetailsQuestions
+    //     : tab === 3
+    //     ? programAndSupervisorsQuestions
+    //     : finalQuestions;
+
+    // const newQuestionArr = [...targetArray];
+
+    // for (let i = orderId; i < newQuestionArr.length; i++) {
+    //   newQuestionArr[i].positionOrderId--;
+    // }
+
+    // const updatedQuestionsArr = newQuestionArr.filter(
+    //   (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
+    // );
+
+    if (tab === tabs.personalDetails) {
+      setPersonalDetailsQuestions(response);
+    } else if (tab === tabs.programAndSupervisor) {
+      setProgramAndSupervisorsQuestions(response);
+    } else if (tab === tabs.final) {
+      setFinalQuestions(response);
+    }
   };
 
   const handleEvaluationSoftDelete = async (id: number, orderId: number) => {

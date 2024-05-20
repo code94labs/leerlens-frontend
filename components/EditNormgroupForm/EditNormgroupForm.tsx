@@ -49,6 +49,22 @@ import {
   postNormgroupQuestions,
 } from "../../services/editNormgroupQuestionSets.service";
 
+// constants
+
+const indexNotFound = -1;
+
+const topMostIndex = 1;
+
+const tabs = {
+  personalDetails: 0,
+  quesitonSetOne: 1,
+  quesitonSetTwo: 2,
+  programAndSupervisor: 3,
+  final: 4,
+};
+
+// custom styles
+
 const customStyles = {
   snackbarAlert: {
     width: "100%",
@@ -231,23 +247,12 @@ const EditNormgroupForm = () => {
     setTab(newValue);
   };
 
-  const handlePersonalDetailsSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
-
-    const newQuestionArr = [...personalDetailsQuestions];
-
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
+  const handlePersonalDetailsSoftDelete = async (id: number) => {
+    const response: QuestionResponse[] = await studentFormInfoItemSoftDelete(
+      id
     );
 
-    setPersonalDetailsQuestions(updatedQuestionsArr);
+    setPersonalDetailsQuestions(response);
   };
 
   const handleNormgroupSoftDelete = async (id: number, orderId: number) => {

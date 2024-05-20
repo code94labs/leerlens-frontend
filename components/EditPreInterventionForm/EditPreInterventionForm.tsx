@@ -49,6 +49,22 @@ import {
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
 
+// constants
+
+const indexNotFound = -1;
+
+const topMostIndex = 1;
+
+const tabs = {
+  personalDetails: 0,
+  quesitonSetOne: 1,
+  quesitonSetTwo: 2,
+  programAndSupervisor: 3,
+  final: 4,
+};
+
+// styles
+
 const customStyles = {
   snackbarAlert: {
     width: "100%",
@@ -162,23 +178,12 @@ const menuItems = [
   },
 ];
 
-export const loading = (
-  <Stack
-    flexDirection="row"
-    alignItems="center"
-    justifyContent="center"
-    height="50vh"
-  >
-    <CircularProgress sx={{ color: "#A879FF" }} />
-  </Stack>
-);
-
 const EditPreInterventionForm = () => {
   const dispatch = useDispatch();
 
   const formDetails = useSelector(selectForm);
 
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(tabs.personalDetails);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
@@ -195,70 +200,17 @@ const EditPreInterventionForm = () => {
   const [partOneQuestions, setPartOneQuestions] = useState<FormQuestion[]>([]);
   const [partTwoQuestions, setPartTwoQuestions] = useState<FormQuestion[]>([]);
 
-  useMemo(() => {
-    const fetchPersonalDetailsQuestions = async () => {
-      try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
-
-        setPersonalDetailsQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.PersonalDetails &&
-              item.formType === FormEvaluation.PreInterventions
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchPreInterventionsQuestions = async () => {
-      try {
-        const preInterventionQuestions = await getPreInterventionQuestions();
-
-        setPartOneQuestions(
-          preInterventionQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartOne
-          )
-        );
-        setPartTwoQuestions(
-          preInterventionQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartTwo
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchPersonalDetailsQuestions();
-    fetchPreInterventionsQuestions();
-  }, []);
-
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     dispatch(resetForm());
     setTab(newValue);
   };
 
-  const handlePersonalDetailsSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
-
-    const newQuestionArr = [...personalDetailsQuestions];
-
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
+  const handlePersonalDetailsSoftDelete = async (id: number) => {
+    const response: QuestionResponse[] = await studentFormInfoItemSoftDelete(
+      id
     );
 
-    setPersonalDetailsQuestions(updatedQuestionsArr);
+    setPersonalDetailsQuestions(response);
   };
 
   const handlePreInterventionSoftDelete = async (
@@ -708,6 +660,17 @@ const EditPreInterventionForm = () => {
     </Stack>
   );
 
+  const loading = (
+    <Stack
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="center"
+      height="50vh"
+    >
+      <CircularProgress sx={{ color: "#A879FF" }} />
+    </Stack>
+  );
+
   const formContent = (
     <Stack flex={0.83}>
       {isLoading ? (
@@ -719,6 +682,48 @@ const EditPreInterventionForm = () => {
       )}
     </Stack>
   );
+
+  useMemo(() => {
+    const fetchPersonalDetailsQuestions = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setPersonalDetailsQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.PersonalDetails &&
+              item.formType === FormEvaluation.PreInterventions
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const fetchPreInterventionsQuestions = async () => {
+      try {
+        const preInterventionQuestions = await getPreInterventionQuestions();
+
+        setPartOneQuestions(
+          preInterventionQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
+          )
+        );
+        setPartTwoQuestions(
+          preInterventionQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchPersonalDetailsQuestions();
+    fetchPreInterventionsQuestions();
+  }, []);
 
   return (
     <>
