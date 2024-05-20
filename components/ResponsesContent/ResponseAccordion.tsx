@@ -5,6 +5,7 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -16,10 +17,7 @@ import {
   FormControl,
   Grid,
   IconButton,
-  Input,
-  InputAdornment,
   InputLabel,
-  ListSubheader,
   Select,
   Snackbar,
   Stack,
@@ -46,16 +44,13 @@ import {
   evaluationTypesTitles,
 } from "../../utils/enum";
 import { formContentFiltering, formatTimeStamp } from "../../utils/helper";
-import { Fragment, useEffect, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import {
   deleteStudentResponseById,
   updateStudentResponse,
 } from "../../services/response.service";
 import { champBlackFontFamily } from "../../shared/typography";
-import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
-import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
-import CustomScale from "../../shared/CustomScale/CustomScale";
 
 const customStyles = {
   mainBox: {
@@ -190,11 +185,15 @@ const customStyles = {
     borderRadius: 2,
     border: "none",
   },
+  checkBox: {
+    mr: 2,
+  },
 };
 
 type Props = {
   response: StudentResponse;
   setFilteredStudentResponses: any;
+  isSelectAllChecked: boolean;
 };
 
 const generalSteps = [
@@ -223,13 +222,19 @@ const dropdownPaperProp = {
 };
 
 const ResponseAccordion = (props: Props) => {
-  const { response: studentResponse, setFilteredStudentResponses } = props;
+  const {
+    response: studentResponse,
+    setFilteredStudentResponses,
+    isSelectAllChecked,
+  } = props;
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
 
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isChecked, setIsChecked] = useState(false);
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -297,45 +302,6 @@ const ResponseAccordion = (props: Props) => {
     }
   };
 
-  const deleteResponseDialog = (
-    <Dialog
-      open={openDeleteDialog}
-      keepMounted
-      onClose={handleCloseDeleteDialog}
-    >
-      <DialogTitle>Are you sure?</DialogTitle>
-
-      <DialogContent>
-        <DialogContentText color="black">
-          The response item will be delete completely, however it can be
-          recovered when needed.
-        </DialogContentText>
-      </DialogContent>
-
-      <DialogActions>
-        <Button
-          onClick={handleCloseDeleteDialog}
-          sx={customStyles.cancelBtn}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-
-        <Button
-          onClick={handleDeleteConfirmation}
-          sx={customStyles.deleteBtn}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <CircularProgress size={25} sx={{ color: "white" }} />
-          ) : (
-            "Delete"
-          )}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-
   const totalSteps = () => {
     return isEvaluationForm() ? evaluationSteps.length : generalSteps.length;
   };
@@ -343,12 +309,10 @@ const ResponseAccordion = (props: Props) => {
   const handleBack = () => {
     if (activeStep === 0) {
       closeEditDialog();
+    } else if (activeStep === 3) {
+      setActiveStep(0);
     } else {
-      if (activeStep === 3) {
-        setActiveStep(0);
-      } else {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-      }
+      setActiveStep((prevActiveStep) => prevActiveStep - 1);
     }
   };
 
@@ -395,9 +359,12 @@ const ResponseAccordion = (props: Props) => {
     }
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
+  const handleCheckBox = (event: ChangeEvent<HTMLInputElement>) => {
+    setIsChecked(event.target.checked);
+  };
+
+  const disableExpand = (event: any) => {
+    event.stopPropagation();
   };
 
   const handleUpdate = async () => {
@@ -449,6 +416,45 @@ const ResponseAccordion = (props: Props) => {
       }
     });
   };
+
+  const deleteResponseDialog = (
+    <Dialog
+      open={openDeleteDialog}
+      keepMounted
+      onClose={handleCloseDeleteDialog}
+    >
+      <DialogTitle>Are you sure?</DialogTitle>
+
+      <DialogContent>
+        <DialogContentText color="black">
+          The response item will be delete completely, however it can be
+          recovered when needed.
+        </DialogContentText>
+      </DialogContent>
+
+      <DialogActions>
+        <Button
+          onClick={handleCloseDeleteDialog}
+          sx={customStyles.cancelBtn}
+          disabled={isLoading}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          onClick={handleDeleteConfirmation}
+          sx={customStyles.deleteBtn}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <CircularProgress size={25} sx={{ color: "white" }} />
+          ) : (
+            "Delete"
+          )}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 
   const formEditContent = (
     <Grid container rowSpacing={4} columnSpacing={4}>
@@ -637,12 +643,19 @@ const ResponseAccordion = (props: Props) => {
 
   const accordionSummary = (
     <AccordionSummary sx={customStyles.accordionSummary}>
-      <Typography sx={{ width: 200 }}>
+      <Checkbox
+        onChange={handleCheckBox}
+        onClick={disableExpand}
+        sx={customStyles.checkBox}
+        checked={isChecked}
+      />
+
+      <Typography sx={{ width: 200, pt: 1 }}>
         {studentResponse.createdAt &&
           formatTimeStamp(new Date(studentResponse.createdAt).toDateString())}
       </Typography>
 
-      <Typography sx={{ flex: 1 }}>
+      <Typography sx={{ flex: 1, pt: 1 }}>
         {evaluationTypesTitles[studentResponse.formType]}
       </Typography>
 
@@ -801,6 +814,10 @@ const ResponseAccordion = (props: Props) => {
       updates: initialStudentAnswerUpdates(),
     });
   }, [studentResponse]);
+
+  useEffect(() => {
+    setIsChecked(isSelectAllChecked);
+  }, [isSelectAllChecked]);
 
   return (
     <>

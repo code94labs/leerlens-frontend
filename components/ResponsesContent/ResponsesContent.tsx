@@ -1,9 +1,9 @@
 import {
   Alert,
-  FormControl,
-  InputLabel,
+  Box,
+  Button,
+  Menu,
   MenuItem,
-  Select,
   SelectChangeEvent,
   Snackbar,
   Stack,
@@ -11,18 +11,48 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
-import React, { SyntheticEvent, useEffect, useMemo, useState } from "react";
+import React, { SyntheticEvent, useEffect, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
+
 import DyanmicListHeader from "./DyanmicListHeader";
 import ResponseAccordion from "./ResponseAccordion";
 import { getAllStudentResponses } from "../../services/response.service";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
+import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
+
 import { StudentResponse } from "../../utils/types";
 import { FormEvaluation } from "../../utils/enum";
 import { dateFilterList } from "../../utils/constant";
 import { getDateRange } from "../../utils/helper";
+import FilterAltSharpIcon from "@mui/icons-material/FilterAltSharp";
+import EditContentDialog from "./EditContentDialog";
 
 const customStyles = {
+  primaryButton: {
+    backgroundColor: "#A879FF",
+    color: "white",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 100,
+    border: "2px #A879FF solid",
+    px: 8,
+    py: 2,
+    fontSize: 16,
+    fontFamily: champBlackFontFamily,
+    fontWeight: 400,
+    mx: 1.5,
+
+    "&:hover": {
+      backgroundColor: "#C4B0EB",
+      color: "white",
+      border: "2px #C4B0EB solid",
+    },
+    "&:disabled": {
+      backgroundColor: "#E6E6E6",
+      color: "#98989A",
+      border: "2px #E6E6E6 solid",
+    },
+  },
   dropdown: {
     mb: 2,
     mr: 2,
@@ -78,9 +108,17 @@ const customStyles = {
   },
 };
 
+const editTypeDropdown = ["Edit class name", "Edit course name"];
+
 const ResponsesContent = () => {
   const [value, setValue] = useState(0);
   const [filterDate, setFilterDate] = useState(dateFilterList[0]);
+  const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
+
+  const [open, setOpen] = useState(false);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
@@ -96,29 +134,96 @@ const ResponsesContent = () => {
     StudentResponse[]
   >([]);
 
+  const isClassEditType = selectedEditType === editTypeDropdown[0];
+  const isCourceEditType = selectedEditType === editTypeDropdown[1];
+
   const handleChangeDate = (event: SelectChangeEvent) => {
     setFilterDate(event.target.value);
+  };
+
+  const handleChangeSelectedEditType = (item: string) => {
+    setSelectedEditType(item);
+
+    setOpen(true);
+
+    setIsDropdownOpen(false);
+  };
+
+  const handleEditClick = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   const handleChangeTabs = (_: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
-  const dateDropdown = (
-    <FormControl sx={customStyles.dropdown}>
-      <InputLabel>Date</InputLabel>
+  // const dateDropdown = (
+  //   <FormControl sx={customStyles.dropdown}>
+  //     <InputLabel>Date</InputLabel>
 
-      <Select value={filterDate} label="Date" onChange={handleChangeDate}>
-        {dateFilterList.map((date) => (
-          <MenuItem value={date} key={date}>
-            {date}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
+  //     <Select value={filterDate} label="Date" onChange={handleChangeDate}>
+  //       {dateFilterList.map((date) => (
+  //         <MenuItem value={date} key={date}>
+  //           {date}
+  //         </MenuItem>
+  //       ))}
+  //     </Select>
+  //   </FormControl>
+  // );
+
+  const filterEditButtons = (
+    <Stack
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="space-between"
+    >
+      <Button
+        variant="outlined"
+        onClick={() => {}}
+        sx={customStyles.primaryButton}
+      >
+        <FilterAltSharpIcon />
+
+        <Typography fontWeight={800} mx={0.8}>
+          Filter
+        </Typography>
+      </Button>
+
+      <Box>
+        <Button
+          variant="outlined"
+          onClick={handleEditClick}
+          sx={customStyles.primaryButton}
+        >
+          <Typography fontWeight={800} mx={0.8}>
+            Edit
+          </Typography>
+
+          <ExpandMoreOutlinedIcon />
+        </Button>
+
+        <Menu
+          open={isDropdownOpen}
+          onClose={() => setIsDropdownOpen(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          style={{ marginTop: 170, marginLeft: -10 }}
+        >
+          {editTypeDropdown.map((item) => (
+            <MenuItem
+              value={item}
+              key={item}
+              onClick={() => handleChangeSelectedEditType(item)}
+            >
+              {item}
+            </MenuItem>
+          ))}
+        </Menu>
+      </Box>
+    </Stack>
   );
 
-  const titleContentSection = (
+  const titleFilterSection = (
     <Stack
       flexDirection="row"
       justifyContent="space-between"
@@ -134,12 +239,16 @@ const ResponsesContent = () => {
         All
       </Typography>
 
-      {dateDropdown}
+      {/* {dateDropdown} */}
+
+      {filterEditButtons}
     </Stack>
   );
 
   const filterResponsesByDate = (responses: StudentResponse[]) => {
-    if (responses.length === 0) return;
+    if (!responses) return [];
+
+    if (responses.length === 0) return [];
 
     const dateRangeStr = filterDate;
 
@@ -180,6 +289,7 @@ const ResponsesContent = () => {
               <ResponseAccordion
                 key={response?.id}
                 response={response}
+                isSelectAllChecked={isSelectAllChecked}
                 setFilteredStudentResponses={setFilteredStudentResponses}
               />
             ))}
@@ -195,6 +305,7 @@ const ResponsesContent = () => {
                   <ResponseAccordion
                     key={response.id}
                     response={response}
+                    isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setFilteredStudentResponses}
                   />
                 )
@@ -211,6 +322,7 @@ const ResponsesContent = () => {
                   <ResponseAccordion
                     key={response.id}
                     response={response}
+                    isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setFilteredStudentResponses}
                   />
                 )
@@ -227,6 +339,7 @@ const ResponsesContent = () => {
                   <ResponseAccordion
                     key={response.id}
                     response={response}
+                    isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setFilteredStudentResponses}
                   />
                 )
@@ -243,6 +356,7 @@ const ResponsesContent = () => {
                   <ResponseAccordion
                     key={response.id}
                     response={response}
+                    isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setFilteredStudentResponses}
                   />
                 )
@@ -273,6 +387,8 @@ const ResponsesContent = () => {
         title="Recorded date"
         subTitle="Question types"
         isMainTitle
+        isSelectAllChecked={isSelectAllChecked}
+        setIsSelectAllChecked={setIsSelectAllChecked}
       />
 
       {isLoading ? (
@@ -344,12 +460,19 @@ const ResponsesContent = () => {
   return (
     <>
       <Stack sx={customStyles.stack}>
-        {titleContentSection}
+        {titleFilterSection}
 
         {tabSection}
       </Stack>
 
       {snackbar}
+
+      <EditContentDialog
+        open={open}
+        setOpen={setOpen}
+        isClassEdit={isClassEditType}
+        isCourseEdit={isCourceEditType}
+      />
     </>
   );
 };
