@@ -49,6 +49,18 @@ import {
   postPostInterventionQuestions,
 } from "../../services/editPostInerventionQuestionSets.service";
 
+const indexNotFound = -1;
+
+const topMostIndex = 1;
+
+const tabs = {
+  personalDetails: 0,
+  quesitonSetOne: 1,
+  quesitonSetTwo: 2,
+  programAndSupervisor: 3,
+  Final: 4,
+};
+
 const customStyles = {
   snackbarAlert: {
     width: "100%",
@@ -162,9 +174,6 @@ const menuItems = [
   },
 ];
 
-const indexNotFound = -1;
-const topMostIndex = 1;
-
 /* 
   Before the main component definition, 
 
@@ -189,18 +198,12 @@ const topMostIndex = 1;
   6). return main component
 */
 
-const questionTabs = {
-  quesitonSetOne: 1,
-  quesitonSetTwo: 2,
-  Final: 3,
-};
-
 const EditPostInterventionForm = () => {
   const dispatch = useDispatch();
 
   const formDetails = useSelector(selectForm);
 
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(tabs.personalDetails);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
@@ -216,48 +219,6 @@ const EditPostInterventionForm = () => {
 
   const [partOneQuestions, setPartOneQuestions] = useState<FormQuestion[]>([]);
   const [partTwoQuestions, setPartTwoQuestions] = useState<FormQuestion[]>([]);
-
-  useMemo(() => {
-    const fetchPersonalDetailsQuestions = async () => {
-      try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
-
-        setPersonalDetailsQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.PersonalDetails &&
-              item.formType === FormEvaluation.PostInterventions
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchPostInterventionsQuestions = async () => {
-      try {
-        const postInterventionQuestions = await getPostInterventionQuestions();
-
-        setPartOneQuestions(
-          postInterventionQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartOne
-          )
-        );
-        setPartTwoQuestions(
-          postInterventionQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartTwo
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchPersonalDetailsQuestions();
-    fetchPostInterventionsQuestions();
-  }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     dispatch(resetForm());
@@ -286,7 +247,7 @@ const EditPostInterventionForm = () => {
   };
 
   const updatedQuestionList = () => {
-    if (tab === questionTabs.quesitonSetOne) {
+    if (tab === tabs.quesitonSetOne) {
       return [...partOneQuestions];
     } else {
       return [...partTwoQuestions];
@@ -312,7 +273,7 @@ const EditPostInterventionForm = () => {
       (item: FormQuestion) => item.id !== (response as FormQuestion).id
     );
 
-    if (tab === questionTabs.quesitonSetOne) {
+    if (tab === tabs.quesitonSetOne) {
       setPartOneQuestions(updatedQuestionsArr);
     } else {
       setPartTwoQuestions(updatedQuestionsArr);
@@ -343,7 +304,7 @@ const EditPostInterventionForm = () => {
   ) => {
     // similar code logic detected, please use new functions and move common logic.
 
-    if (tab === questionTabs.quesitonSetOne) {
+    if (tab === tabs.quesitonSetOne) {
       setPartOneQuestions((prevQuestions) => {
         const updatedQuestionsArr = [...prevQuestions];
 
@@ -389,12 +350,13 @@ const EditPostInterventionForm = () => {
   };
 
   const handleUpdateAllPostInterventionQuestions = async () => {
-    const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const arrayToUpdate =
+      tab === tabs.quesitonSetOne ? partOneQuestions : partTwoQuestions;
 
     try {
       const response = await postInterventionQuesionsUpdateBulk(arrayToUpdate);
 
-      tab === 1
+      tab === tabs.quesitonSetOne
         ? setPartOneQuestions(
             response.filter(
               (item: FormQuestion) =>
@@ -449,15 +411,17 @@ const EditPostInterventionForm = () => {
       isNewlyAdded: true,
     };
 
-    const response = await postStudentFormInfo(newQuestion);
+    await postStudentFormInfo(newQuestion).then(
+      (response: QuestionResponse) => {
+        const updatedQuestionsArr = [...personalDetailsQuestions];
 
-    const updatedQuestionsArr = personalDetailsQuestions;
+        updatedQuestionsArr?.push(response);
 
-    updatedQuestionsArr?.push(response);
+        setPersonalDetailsQuestions(updatedQuestionsArr as QuestionResponse[]);
 
-    setPersonalDetailsQuestions(updatedQuestionsArr);
-
-    setDisplayNewQuestion(false);
+        setDisplayNewQuestion(false);
+      }
+    );
   };
 
   const handleNewQuestionnaireQuestionSave = async ({
@@ -466,7 +430,9 @@ const EditPostInterventionForm = () => {
     questionText: string;
   }) => {
     const newPositionOrderId =
-      tab === 1 ? partOneQuestions.length + 1 : partTwoQuestions.length + 1;
+      tab === tabs.quesitonSetOne
+        ? partOneQuestions.length + 1
+        : partTwoQuestions.length + 1;
 
     const newQuestion: FormQuestion = {
       questionText: questionText,
@@ -477,18 +443,19 @@ const EditPostInterventionForm = () => {
       isNewlyAdded: true,
       questionSetId: 0,
       questionSection:
-        tab === questionTabs.quesitonSetOne
+        tab === tabs.quesitonSetOne
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
     };
 
     const response = await postPostInterventionQuestions(newQuestion);
 
-    const updatedQuestionsArr = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const updatedQuestionsArr =
+      tab === tabs.quesitonSetOne ? partOneQuestions : partTwoQuestions;
 
     updatedQuestionsArr?.push(response);
 
-    tab === questionTabs.quesitonSetOne
+    tab === tabs.quesitonSetOne
       ? setPartOneQuestions(updatedQuestionsArr)
       : setPartTwoQuestions(updatedQuestionsArr);
 
@@ -513,14 +480,14 @@ const EditPostInterventionForm = () => {
 
       setPersonalDetailsQuestions(newQuestionArr);
     } else {
-      if (tab === 1) {
+      if (tab === tabs.quesitonSetOne) {
         const newQuestionArr = [...partOneQuestions];
 
         newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
         newQuestionArr[orderId - 2].positionOrderId = orderId;
 
         setPartOneQuestions(newQuestionArr);
-      } else if (tab === 2) {
+      } else if (tab === tabs.quesitonSetTwo) {
         const newQuestionArr = [...partTwoQuestions];
 
         newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
@@ -546,7 +513,7 @@ const EditPostInterventionForm = () => {
 
       setPersonalDetailsQuestions(newQuestionArr);
     } else {
-      if (tab === 1) {
+      if (tab === tabs.quesitonSetOne) {
         if (orderId >= partOneQuestions.length) return; // Already at the bottom, can't move down
 
         const newQuestionArr = [...partOneQuestions];
@@ -554,7 +521,7 @@ const EditPostInterventionForm = () => {
         newQuestionArr[orderId].positionOrderId = orderId;
 
         setPartOneQuestions(newQuestionArr);
-      } else if (tab === 2) {
+      } else if (tab === tabs.quesitonSetOne) {
         if (orderId >= partTwoQuestions.length) return; // Already at the bottom, can't move down
 
         const newQuestionArr = [...partTwoQuestions];
@@ -628,7 +595,7 @@ const EditPostInterventionForm = () => {
       <Button
         onClick={
           // create another function and use a if retrun
-          tab < questionTabs.quesitonSetOne
+          tab < tabs.quesitonSetOne
             ? handleUpdateAllPersonalDetailsQuestions
             : handleUpdateAllPostInterventionQuestions
         }
@@ -642,7 +609,7 @@ const EditPostInterventionForm = () => {
 
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
-      case 0:
+      case tabs.personalDetails:
         return (
           <>
             <DynamicField
@@ -687,7 +654,7 @@ const EditPostInterventionForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 1:
+      case tabs.quesitonSetOne:
         return (
           <>
             {partOneQuestions
@@ -716,7 +683,7 @@ const EditPostInterventionForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 2:
+      case tabs.quesitonSetTwo:
         return (
           <>
             {partTwoQuestions
@@ -776,6 +743,48 @@ const EditPostInterventionForm = () => {
       )}
     </Stack>
   );
+
+  useMemo(() => {
+    const fetchPersonalDetailsQuestions = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setPersonalDetailsQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.PersonalDetails &&
+              item.formType === FormEvaluation.PostInterventions
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const fetchPostInterventionsQuestions = async () => {
+      try {
+        const postInterventionQuestions = await getPostInterventionQuestions();
+
+        setPartOneQuestions(
+          postInterventionQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
+          )
+        );
+        setPartTwoQuestions(
+          postInterventionQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchPersonalDetailsQuestions();
+    fetchPostInterventionsQuestions();
+  }, []);
 
   return (
     <>
