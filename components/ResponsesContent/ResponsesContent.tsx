@@ -2,8 +2,11 @@ import {
   Alert,
   Box,
   Button,
+  FormControl,
+  InputLabel,
   Menu,
   MenuItem,
+  Select,
   SelectChangeEvent,
   Snackbar,
   Stack,
@@ -11,6 +14,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 
@@ -35,8 +39,8 @@ const customStyles = {
     textTransform: "initial",
     width: 100,
     border: "2px #A879FF solid",
-    px: 8,
-    py: 2,
+    px: 1.25,
+    py: 1.25,
     fontSize: 16,
     fontFamily: champBlackFontFamily,
     fontWeight: 400,
@@ -54,6 +58,7 @@ const customStyles = {
     },
   },
   dropdown: {
+    width: "100%",
     mb: 2,
     mr: 2,
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
@@ -112,6 +117,12 @@ const editTypeDropdown = ["Edit class name", "Edit course name"];
 
 const ResponsesContent = () => {
   const [value, setValue] = useState(0);
+  const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
+  const [filterSchool, setFilterSchool] = useState<string>("");
+  const [filterGrade, setFilterGrade] = useState<string>("");
+  const [filterCourse, setFilterCourse] = useState<string>("");
+  const [filterAge, setFilterAge] = useState<string>("");
+  const [filterStudy, setFilterStudy] = useState<string>("");
   const [filterDate, setFilterDate] = useState(dateFilterList[0]);
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
@@ -137,10 +148,6 @@ const ResponsesContent = () => {
   const isClassEditType = selectedEditType === editTypeDropdown[0];
   const isCourceEditType = selectedEditType === editTypeDropdown[1];
 
-  const handleChangeDate = (event: SelectChangeEvent) => {
-    setFilterDate(event.target.value);
-  };
-
   const handleChangeSelectedEditType = (item: string) => {
     setSelectedEditType(item);
 
@@ -157,19 +164,93 @@ const ResponsesContent = () => {
     setValue(newValue);
   };
 
-  // const dateDropdown = (
-  //   <FormControl sx={customStyles.dropdown}>
-  //     <InputLabel>Date</InputLabel>
+  const CustomDropdown = ({
+    label,
+    selectArray,
+    filterValue,
+    setFilterValue,
+  }: {
+    label: string;
+    selectArray: string[];
+    filterValue: string;
+    setFilterValue: (value: string) => void;
+  }) => (
+    <FormControl sx={customStyles.dropdown}>
+      <InputLabel>{label}</InputLabel>
 
-  //     <Select value={filterDate} label="Date" onChange={handleChangeDate}>
-  //       {dateFilterList.map((date) => (
-  //         <MenuItem value={date} key={date}>
-  //           {date}
-  //         </MenuItem>
-  //       ))}
-  //     </Select>
-  //   </FormControl>
-  // );
+      <Select
+        value={filterValue}
+        label={label}
+        onChange={(event: SelectChangeEvent) => {
+          setFilterValue(event.target.value);
+        }}
+      >
+        {selectArray.map((item) => (
+          <MenuItem value={item} key={item}>
+            {item}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
+  );
+
+  const filtersDiv = (
+    <Grid container spacing={1}>
+      <Grid item xs={4}>
+        <CustomDropdown
+          label="School"
+          selectArray={["All", "school 1", "school 2", "school 3"]}
+          filterValue={filterSchool}
+          setFilterValue={setFilterSchool}
+        />
+      </Grid>
+
+      <Grid item xs={2}>
+        <CustomDropdown
+          label="Grade"
+          selectArray={["All", "grade 1", "grade 2", "grade 3"]}
+          filterValue={filterGrade}
+          setFilterValue={setFilterGrade}
+        />
+      </Grid>
+
+      <Grid item xs={2}>
+        <CustomDropdown
+          label="Course"
+          selectArray={["All", "course 1", "course 2", "course 3"]}
+          filterValue={filterCourse}
+          setFilterValue={setFilterCourse}
+        />
+      </Grid>
+
+      <Grid item xs={4}>
+        <CustomDropdown
+          label="What do you study"
+          selectArray={["All", "study 1", "study 2", "study 3"]}
+          filterValue={filterStudy}
+          setFilterValue={setFilterStudy}
+        />
+      </Grid>
+
+      <Grid item xs={1}>
+        <CustomDropdown
+          label="Age"
+          selectArray={["All", "age 1", "age 2", "age 3"]}
+          filterValue={filterAge}
+          setFilterValue={setFilterAge}
+        />
+      </Grid>
+
+      <Grid item xs={3}>
+        <CustomDropdown
+          label="Date"
+          selectArray={dateFilterList}
+          filterValue={filterDate}
+          setFilterValue={setFilterDate}
+        />
+      </Grid>
+    </Grid>
+  );
 
   const filterEditButtons = (
     <Stack
@@ -179,7 +260,9 @@ const ResponsesContent = () => {
     >
       <Button
         variant="outlined"
-        onClick={() => {}}
+        onClick={() => {
+          setDisplayFiltersDiv((prev) => !prev);
+        }}
         sx={customStyles.primaryButton}
       >
         <FilterAltSharpIcon />
@@ -224,24 +307,26 @@ const ResponsesContent = () => {
   );
 
   const titleFilterSection = (
-    <Stack
-      flexDirection="row"
-      justifyContent="space-between"
-      alignItems="center"
-      px={2}
-      py={3}
-    >
-      <Typography
-        fontSize={20}
-        fontFamily={champBlackFontFamily}
-        textTransform="uppercase"
+    <Stack px={2} py={3} gap={2}>
+      <Stack
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+        // px={2}
+        // py={3}
       >
-        All
-      </Typography>
+        <Typography
+          fontSize={20}
+          fontFamily={champBlackFontFamily}
+          textTransform="uppercase"
+        >
+          All
+        </Typography>
 
-      {/* {dateDropdown} */}
+        {filterEditButtons}
+      </Stack>
 
-      {filterEditButtons}
+      {displayFiltersDiv && filtersDiv}
     </Stack>
   );
 
