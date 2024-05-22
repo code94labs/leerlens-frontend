@@ -115,14 +115,21 @@ const customStyles = {
 
 const editTypeDropdown = ["Edit class name", "Edit course name"];
 
+// test arrays
+const schoolArray = ["All", "school 1", "school 2", "school 3"];
+const gradeArray = ["All", "grade 1", "grade 2", "grade 3"];
+const courseArray = ["All", "course 1", "course 2", "course 3"];
+const studyArray = ["All", "study 1", "study 2", "study 3"];
+const ageArray = ["All", "age 1", "age 2", "age 3"];
+
 const ResponsesContent = () => {
   const [value, setValue] = useState(0);
   const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
-  const [filterSchool, setFilterSchool] = useState<string>("");
-  const [filterGrade, setFilterGrade] = useState<string>("");
-  const [filterCourse, setFilterCourse] = useState<string>("");
-  const [filterAge, setFilterAge] = useState<string>("");
-  const [filterStudy, setFilterStudy] = useState<string>("");
+  const [filterSchool, setFilterSchool] = useState<string>(schoolArray[0]);
+  const [filterGrade, setFilterGrade] = useState<string>(gradeArray[0]);
+  const [filterCourse, setFilterCourse] = useState<string>(courseArray[0]);
+  const [filterAge, setFilterAge] = useState<string>(studyArray[0]);
+  const [filterStudy, setFilterStudy] = useState<string>(ageArray[0]);
   const [filterDate, setFilterDate] = useState(dateFilterList[0]);
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
@@ -199,7 +206,7 @@ const ResponsesContent = () => {
       <Grid item xs={4}>
         <CustomDropdown
           label="School"
-          selectArray={["All", "school 1", "school 2", "school 3"]}
+          selectArray={schoolArray}
           filterValue={filterSchool}
           setFilterValue={setFilterSchool}
         />
@@ -208,7 +215,7 @@ const ResponsesContent = () => {
       <Grid item xs={2}>
         <CustomDropdown
           label="Grade"
-          selectArray={["All", "grade 1", "grade 2", "grade 3"]}
+          selectArray={gradeArray}
           filterValue={filterGrade}
           setFilterValue={setFilterGrade}
         />
@@ -217,7 +224,7 @@ const ResponsesContent = () => {
       <Grid item xs={2}>
         <CustomDropdown
           label="Course"
-          selectArray={["All", "course 1", "course 2", "course 3"]}
+          selectArray={courseArray}
           filterValue={filterCourse}
           setFilterValue={setFilterCourse}
         />
@@ -226,7 +233,7 @@ const ResponsesContent = () => {
       <Grid item xs={4}>
         <CustomDropdown
           label="What do you study"
-          selectArray={["All", "study 1", "study 2", "study 3"]}
+          selectArray={studyArray}
           filterValue={filterStudy}
           setFilterValue={setFilterStudy}
         />
@@ -235,7 +242,7 @@ const ResponsesContent = () => {
       <Grid item xs={1}>
         <CustomDropdown
           label="Age"
-          selectArray={["All", "age 1", "age 2", "age 3"]}
+          selectArray={ageArray}
           filterValue={filterAge}
           setFilterValue={setFilterAge}
         />
@@ -541,6 +548,24 @@ const ResponsesContent = () => {
   useEffect(() => {
     filterResponsesByDate(studentResponses);
   }, [filterDate, studentResponses]);
+
+  useEffect(() => {
+    console.log({
+      school: filterSchool,
+      course: filterCourse,
+      grade: filterGrade,
+      study: filterStudy,
+      age: filterAge,
+      dateRange: filterDate,
+    });
+  }, [
+    filterSchool,
+    filterCourse,
+    filterGrade,
+    filterStudy,
+    filterAge,
+    filterDate,
+  ]);
 
   return (
     <>
