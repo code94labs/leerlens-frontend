@@ -39,6 +39,7 @@ import {
   Question,
   QuestionResponse,
 } from "../../utils/types";
+import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
@@ -54,14 +55,6 @@ import {
 const indexNotFound = -1;
 
 const topMostIndex = 1;
-
-const tabs = {
-  personalDetails: 0,
-  quesitonSetOne: 1,
-  quesitonSetTwo: 2,
-  programAndSupervisor: 3,
-  final: 4,
-};
 
 // custom styles
 
@@ -163,29 +156,6 @@ const customStyles = {
   },
 };
 
-const menuItems = [
-  {
-    id: 0,
-    title: "Personal Details",
-  },
-  {
-    id: 1,
-    title: "Question | Part 01",
-  },
-  {
-    id: 2,
-    title: "Question | Part 02",
-  },
-  {
-    id: 3,
-    title: "Program and the supervisors",
-  },
-  {
-    id: 4,
-    title: "Final",
-  },
-];
-
 const EditEvaluationForm = () => {
   const dispatch = useDispatch();
 
@@ -210,62 +180,6 @@ const EditEvaluationForm = () => {
 
   const [partOneQuestions, setPartOneQuestions] = useState<FormQuestion[]>([]);
   const [partTwoQuestions, setPartTwoQuestions] = useState<FormQuestion[]>([]);
-
-  useMemo(() => {
-    const fetchPersonalDetailsQuestions = async () => {
-      try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
-
-        setPersonalDetailsQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.PersonalDetails &&
-              item.formType === FormEvaluation.Evaluation
-          )
-        );
-        setProgramAndSupervisorsQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.ProgramAndSupervisor &&
-              item.formType === FormEvaluation.Evaluation
-          )
-        );
-        setFinalQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.Final &&
-              item.formType === FormEvaluation.Evaluation
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchEvaluationsQuestions = async () => {
-      try {
-        const evaluationQuestions = await getEvaluationQuestions();
-
-        setPartOneQuestions(
-          evaluationQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartOne
-          )
-        );
-        setPartTwoQuestions(
-          evaluationQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartTwo
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchPersonalDetailsQuestions();
-    fetchEvaluationsQuestions();
-  }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     dispatch(resetForm());
@@ -294,32 +208,21 @@ const EditEvaluationForm = () => {
     //   (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
     // );
 
-    if (tab === tabs.personalDetails) {
+    if (tab === questionSetTabs.personalDetails) {
       setPersonalDetailsQuestions(response);
-    } else if (tab === tabs.programAndSupervisor) {
+    } else if (tab === questionSetTabs.programAndSupervisor) {
       setProgramAndSupervisorsQuestions(response);
-    } else if (tab === tabs.final) {
+    } else if (tab === questionSetTabs.final) {
       setFinalQuestions(response);
     }
   };
 
-  const handleEvaluationSoftDelete = async (id: number, orderId: number) => {
-    const response: FormQuestion = await evaluationQuestionFormSoftDelete(id);
+  const handleEvaluationSoftDelete = async (id: number) => {
+    const response: FormQuestion[] = await evaluationQuestionFormSoftDelete(id);
 
-    const newQuestionArr =
-      tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
-
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: FormQuestion) => item.id !== (response as FormQuestion).id
-    );
-
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+    tab === questionSetTabs.quesitonSetOne
+      ? setPartOneQuestions(response)
+      : setPartTwoQuestions(response);
   };
 
   // function to update the state of this(parent) component
@@ -909,7 +812,7 @@ const EditEvaluationForm = () => {
         orientation="vertical"
         sx={customStyles.tabs}
       >
-        {menuItems.map((item) => (
+        {QuestionSetMenuItems.map((item) => (
           <Tab
             value={item.id}
             label={item.title}
@@ -932,6 +835,62 @@ const EditEvaluationForm = () => {
       )}
     </Stack>
   );
+
+  useMemo(() => {
+    const fetchPersonalDetailsQuestions = async () => {
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setPersonalDetailsQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.PersonalDetails &&
+              item.formType === FormEvaluation.Evaluation
+          )
+        );
+        setProgramAndSupervisorsQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.ProgramAndSupervisor &&
+              item.formType === FormEvaluation.Evaluation
+          )
+        );
+        setFinalQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.Final &&
+              item.formType === FormEvaluation.Evaluation
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    const fetchEvaluationsQuestions = async () => {
+      try {
+        const evaluationQuestions = await getEvaluationQuestions();
+
+        setPartOneQuestions(
+          evaluationQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
+          )
+        );
+        setPartTwoQuestions(
+          evaluationQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchPersonalDetailsQuestions();
+    fetchEvaluationsQuestions();
+  }, []);
 
   return (
     <>

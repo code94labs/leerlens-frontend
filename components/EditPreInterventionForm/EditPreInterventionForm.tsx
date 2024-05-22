@@ -48,20 +48,13 @@ import {
 
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
+import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
 
 // constants
 
 const indexNotFound = -1;
 
 const topMostIndex = 1;
-
-const tabs = {
-  personalDetails: 0,
-  quesitonSetOne: 1,
-  quesitonSetTwo: 2,
-  programAndSupervisor: 3,
-  final: 4,
-};
 
 // styles
 
@@ -163,27 +156,12 @@ const customStyles = {
   },
 };
 
-const menuItems = [
-  {
-    id: 0,
-    title: "Personal Details",
-  },
-  {
-    id: 1,
-    title: "Question | Part 01",
-  },
-  {
-    id: 2,
-    title: "Question | Part 02",
-  },
-];
-
 const EditPreInterventionForm = () => {
   const dispatch = useDispatch();
 
   const formDetails = useSelector(selectForm);
 
-  const [tab, setTab] = useState(tabs.personalDetails);
+  const [tab, setTab] = useState(questionSetTabs.personalDetails);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
@@ -213,28 +191,13 @@ const EditPreInterventionForm = () => {
     setPersonalDetailsQuestions(response);
   };
 
-  const handlePreInterventionSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: FormQuestion = await preInterventionQuestionFormSoftDelete(
-      id
-    );
+  const handlePreInterventionSoftDelete = async (id: number) => {
+    const response: FormQuestion[] =
+      await preInterventionQuestionFormSoftDelete(id);
 
-    const newQuestionArr =
-      tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
-
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: FormQuestion) => item.id !== (response as FormQuestion).id
-    );
-
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+    tab === questionSetTabs.quesitonSetOne
+      ? setPartOneQuestions(response)
+      : setPartTwoQuestions(response);
   };
 
   // function to update the state of this(parent) component
@@ -653,7 +616,7 @@ const EditPreInterventionForm = () => {
         orientation="vertical"
         sx={customStyles.tabs}
       >
-        {menuItems.map((item) => (
+        {QuestionSetMenuItems.slice(0, 3).map((item) => (
           <Tab value={item.id} label={item.title} key={item.id} />
         ))}
       </Tabs>

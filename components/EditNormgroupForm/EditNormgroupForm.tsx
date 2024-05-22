@@ -48,20 +48,13 @@ import {
   normgroupQuestionFormSoftDelete,
   postNormgroupQuestions,
 } from "../../services/editNormgroupQuestionSets.service";
+import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
 
 // constants
 
 const indexNotFound = -1;
 
 const topMostIndex = 1;
-
-const tabs = {
-  personalDetails: 0,
-  quesitonSetOne: 1,
-  quesitonSetTwo: 2,
-  programAndSupervisor: 3,
-  final: 4,
-};
 
 // custom styles
 
@@ -163,21 +156,6 @@ const customStyles = {
   },
 };
 
-const menuItems = [
-  {
-    id: 0,
-    title: "Personal Details",
-  },
-  {
-    id: 1,
-    title: "Question | Part 01",
-  },
-  {
-    id: 2,
-    title: "Question | Part 02",
-  },
-];
-
 const EditNormgroupForm = () => {
   const dispatch = useDispatch();
 
@@ -255,23 +233,12 @@ const EditNormgroupForm = () => {
     setPersonalDetailsQuestions(response);
   };
 
-  const handleNormgroupSoftDelete = async (id: number, orderId: number) => {
-    const response: FormQuestion = await normgroupQuestionFormSoftDelete(id);
+  const handleNormgroupSoftDelete = async (id: number) => {
+    const response: FormQuestion[] = await normgroupQuestionFormSoftDelete(id);
 
-    const newQuestionArr =
-      tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
-
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: FormQuestion) => item.id !== (response as FormQuestion).id
-    );
-
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+    tab === questionSetTabs.quesitonSetOne
+      ? setPartOneQuestions(response)
+      : setPartTwoQuestions(response);
   };
 
   // function to update the state of this(parent) component
@@ -698,7 +665,7 @@ const EditNormgroupForm = () => {
         orientation="vertical"
         sx={customStyles.tabs}
       >
-        {menuItems.map((item) => (
+        {QuestionSetMenuItems.slice(0, 3).map((item) => (
           <Tab value={item.id} label={item.title} key={item.id} />
         ))}
       </Tabs>

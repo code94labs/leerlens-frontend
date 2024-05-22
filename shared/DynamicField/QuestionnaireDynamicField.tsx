@@ -233,7 +233,7 @@ type Props = {
   label?: string;
   question?: FormQuestion;
   handleQuestionUpdate?: (question: FormQuestion) => void;
-  handleQuestionSoftDelete?: (id: number, orderId: number) => void;
+  handleQuestionSoftDelete?: (id: number) => void;
   moveItemUp: (orderId: number | undefined, questionnaireType: boolean) => void;
   moveItemDown: (
     orderId: number | undefined,
@@ -327,7 +327,7 @@ const QuestionnaireDynamicField = (props: Props) => {
           onClick={() => {
             handleQuestionSoftDelete &&
               question?.id &&
-              handleQuestionSoftDelete(question?.id, question.positionOrderId);
+              handleQuestionSoftDelete(question?.id);
             setOpenDialog(false);
           }}
           disableElevation
