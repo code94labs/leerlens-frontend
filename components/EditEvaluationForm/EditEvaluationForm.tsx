@@ -49,6 +49,7 @@ import {
   getEvaluationQuestions,
   postEvaluationQuestions,
 } from "../../services/editEvaluationQuestionSets.service";
+import { updateArrayByIndex } from "../../utils/helper";
 
 // constants
 
@@ -229,88 +230,25 @@ const EditEvaluationForm = () => {
   const handlePersonalDetailsQuestionUpdate = async (
     question: QuestionResponse
   ) => {
-    tab === 0
-      ? setPersonalDetailsQuestions((prevQuestions) => {
-          const updatedQuestionsArr = [...prevQuestions];
-
-          const index = updatedQuestionsArr.findIndex(
-            (q) => q.id === question.id
-          );
-
-          if (index !== -1) {
-            updatedQuestionsArr[index] = question;
-          } else {
-            console.error(`Question with id ${question.id} not found`);
-          }
-
-          return updatedQuestionsArr;
-        })
-      : tab === 3
-      ? setProgramAndSupervisorsQuestions((prevQuestions) => {
-          const updatedQuestionsArr = [...prevQuestions];
-
-          const index = updatedQuestionsArr.findIndex(
-            (q) => q.id === question.id
-          );
-
-          if (index !== -1) {
-            updatedQuestionsArr[index] = question;
-          } else {
-            console.error(`Question with id ${question.id} not found`);
-          }
-
-          return updatedQuestionsArr;
-        })
-      : setFinalQuestions((prevQuestions) => {
-          const updatedQuestionsArr = [...prevQuestions];
-
-          const index = updatedQuestionsArr.findIndex(
-            (q) => q.id === question.id
-          );
-
-          if (index !== -1) {
-            updatedQuestionsArr[index] = question;
-          } else {
-            console.error(`Question with id ${question.id} not found`);
-          }
-
-          return updatedQuestionsArr;
-        });
+    if (question.sectionType === SectionType.PersonalDetails) {
+      setPersonalDetailsQuestions(
+        updateArrayByIndex([...personalDetailsQuestions], question)
+      );
+    } else if (question.sectionType === SectionType.ProgramAndSupervisor) {
+      setProgramAndSupervisorsQuestions(
+        updateArrayByIndex([...programAndSupervisorsQuestions], question)
+      );
+    } else {
+      setFinalQuestions(updateArrayByIndex([...finalQuestions], question));
+    }
   };
 
+  // function to update the state of this(parent) component
   const handleEvaluationQuestionUpdate = async (question: FormQuestion) => {
-    if (tab === 1) {
-      setPartOneQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+    if (question.questionSection === QuestionnaireSection.QuestionPartOne) {
+      setPartOneQuestions(updateArrayByIndex([...partOneQuestions], question));
     } else {
-      setPartTwoQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+      setPartTwoQuestions(updateArrayByIndex([...partTwoQuestions], question));
     }
   };
 
@@ -345,7 +283,8 @@ const EditEvaluationForm = () => {
 
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 
@@ -371,7 +310,8 @@ const EditEvaluationForm = () => {
 
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 

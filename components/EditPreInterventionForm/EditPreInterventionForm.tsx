@@ -49,6 +49,7 @@ import {
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
 import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
+import { updateArrayByIndex } from "../../utils/helper";
 
 // constants
 
@@ -204,56 +205,19 @@ const EditPreInterventionForm = () => {
   const handlePersonalDetailsQuestionUpdate = async (
     question: QuestionResponse
   ) => {
-    setPersonalDetailsQuestions((prevQuestions) => {
-      const updatedQuestionsArr = [...prevQuestions];
-
-      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
-
-      if (index !== -1) {
-        updatedQuestionsArr[index] = question;
-      } else {
-        console.error(`Question with id ${question.id} not found`);
-      }
-
-      return updatedQuestionsArr;
-    });
+    setPersonalDetailsQuestions(
+      updateArrayByIndex([...personalDetailsQuestions], question)
+    );
   };
 
+  // function to update the state of this(parent) component
   const handlePreInterventionQuestionUpdate = async (
     question: FormQuestion
   ) => {
-    if (tab === 1) {
-      setPartOneQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+    if (question.questionSection === QuestionnaireSection.QuestionPartOne) {
+      setPartOneQuestions(updateArrayByIndex([...partOneQuestions], question));
     } else {
-      setPartTwoQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+      setPartTwoQuestions(updateArrayByIndex([...partTwoQuestions], question));
     }
   };
 
@@ -266,7 +230,8 @@ const EditPreInterventionForm = () => {
       setPersonalDetailsQuestions(response);
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 
@@ -292,7 +257,8 @@ const EditPreInterventionForm = () => {
 
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 

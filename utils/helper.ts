@@ -16,6 +16,8 @@ const getDropDownItem = (
   )!;
 };
 
+const indexNotFound = -1;
+
 export const generateStudentDetails = (
   formDetailValues: PersonalDetails,
   studentFormInfo: QuestionResponse[]
@@ -103,4 +105,15 @@ export const formContentFiltering = (
 
 export const generateEmptyLabels = (count: number): string[] => {
   return Array.from({ length: count }, () => "");
+};
+
+// function to update the array by the index
+export const updateArrayByIndex = (arrayToUpdate: any[], question: any) => {
+  const index = arrayToUpdate.findIndex((item) => item.id === question.id);
+
+  if (index !== indexNotFound) {
+    arrayToUpdate[index] = question;
+  }
+
+  return arrayToUpdate;
 };

@@ -49,6 +49,7 @@ import {
   postNormgroupQuestions,
 } from "../../services/editNormgroupQuestionSets.service";
 import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
+import { updateArrayByIndex } from "../../utils/helper";
 
 // constants
 
@@ -245,54 +246,17 @@ const EditNormgroupForm = () => {
   const handlePersonalDetailsQuestionUpdate = async (
     question: QuestionResponse
   ) => {
-    setPersonalDetailsQuestions((prevQuestions) => {
-      const updatedQuestionsArr = [...prevQuestions];
-
-      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
-
-      if (index !== -1) {
-        updatedQuestionsArr[index] = question;
-      } else {
-        console.error(`Question with id ${question.id} not found`);
-      }
-
-      return updatedQuestionsArr;
-    });
+    setPersonalDetailsQuestions(
+      updateArrayByIndex([...personalDetailsQuestions], question)
+    );
   };
 
+  // function to update the state of this(parent) component
   const handleNormgroupQuestionUpdate = async (question: FormQuestion) => {
-    if (tab === 1) {
-      setPartOneQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+    if (question.questionSection === QuestionnaireSection.QuestionPartOne) {
+      setPartOneQuestions(updateArrayByIndex([...partOneQuestions], question));
     } else {
-      setPartTwoQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+      setPartTwoQuestions(updateArrayByIndex([...partTwoQuestions], question));
     }
   };
 
@@ -304,7 +268,8 @@ const EditNormgroupForm = () => {
       setPersonalDetailsQuestions(response);
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 
@@ -330,7 +295,8 @@ const EditNormgroupForm = () => {
 
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 

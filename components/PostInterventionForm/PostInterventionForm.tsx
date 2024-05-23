@@ -46,6 +46,15 @@ import { createStudentResponse } from "../../services/response.service";
 // import { loading } from "../EditPreInterventionForm/EditPreInterventionForm";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
+// constants
+
+const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
+
+const questionSectionOne = 0;
+const questionSectionTwo = 1;
+
+// styles
+
 const customStyles = {
   mainBox: {
     border: "1px #E6E6E6 solid",
@@ -163,11 +172,6 @@ const customStyles = {
   },
 };
 
-const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
-
-const questionSectionOne = 0;
-const questionSectionTwo = 1;
-
 const PostInterventionForm = () => {
   const router = useRouter();
 
@@ -177,13 +181,15 @@ const PostInterventionForm = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>([]);
-  const [questionListPartOne, setQuestionListPartOne] = useState<QuestionResponse[]>(
+  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>(
     []
   );
-  const [questionListPartTwo, setQuestionListPartTwo] = useState<QuestionResponse[]>(
-    []
-  );
+  const [questionListPartOne, setQuestionListPartOne] = useState<
+    QuestionResponse[]
+  >([]);
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<
+    QuestionResponse[]
+  >([]);
 
   const [answersPartOne, setAnswersPartOne] = useState<QuestionniareAnswer[]>(
     []
@@ -341,7 +347,7 @@ const PostInterventionForm = () => {
 
         setDisplaySnackbarMsg(true);
 
-        router.replace('/success-message')
+        router.replace("/success-message");
       })
       .catch(() => {
         setIsError(true);
@@ -364,7 +370,8 @@ const PostInterventionForm = () => {
 
         setStudentFormInfo(
           studentFormInfoQuestions.filter(
-            (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
+            (item: QuestionResponse) =>
+              item.sectionType === SectionType.PersonalDetails
           )
         );
 
@@ -383,7 +390,7 @@ const PostInterventionForm = () => {
     const fetchQuestionnaireData = async () => {
       try {
         setIsLoading(true);
-        
+
         const postInterventionQuestions =
           await getAllPostInterventionQuestions();
 
@@ -434,8 +441,7 @@ const PostInterventionForm = () => {
       ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
       : {},
     validationSchema,
-    onSubmit: (values) => {
-    },
+    onSubmit: (values) => {},
   });
 
   const personalDetailsForm = isLoading ? (
@@ -559,16 +565,18 @@ const PostInterventionForm = () => {
       </Typography>
 
       <FormControl>
-        {questionListPartOne.map((questionDetails: QuestionResponse, index: number) => (
-          <CustomScale
-            key={questionDetails.id}
-            {...questionDetails}
-            isDisabled={isLoading}
-            updateAnswer={(answer: number) =>
-              updateAnswerPartOne(questionDetails.id, answer)
-            }
-          />
-        ))}
+        {questionListPartOne.map(
+          (questionDetails: QuestionResponse, index: number) => (
+            <CustomScale
+              key={questionDetails.id}
+              {...questionDetails}
+              isDisabled={isLoading}
+              updateAnswer={(answer: number) =>
+                updateAnswerPartOne(questionDetails.id, answer)
+              }
+            />
+          )
+        )}
       </FormControl>
     </>
   );
@@ -586,16 +594,18 @@ const PostInterventionForm = () => {
       </Typography>
 
       <FormControl>
-        {questionListPartTwo.map((questionDetails: QuestionResponse, index: number) => (
-          <CustomScale
-            key={questionDetails.id}
-            {...questionDetails}
-            isDisabled={isLoading}
-            updateAnswer={(answer: number) =>
-              updateAnswerPartTwo(questionDetails.id, answer)
-            }
-          />
-        ))}
+        {questionListPartTwo.map(
+          (questionDetails: QuestionResponse, index: number) => (
+            <CustomScale
+              key={questionDetails.id}
+              {...questionDetails}
+              isDisabled={isLoading}
+              updateAnswer={(answer: number) =>
+                updateAnswerPartTwo(questionDetails.id, answer)
+              }
+            />
+          )
+        )}
       </FormControl>
     </>
   );

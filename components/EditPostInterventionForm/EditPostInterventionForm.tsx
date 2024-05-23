@@ -49,10 +49,9 @@ import {
   postPostInterventionQuestions,
 } from "../../services/editPostInerventionQuestionSets.service";
 import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
+import { updateArrayByIndex } from "../../utils/helper";
 
 // constants
-
-const indexNotFound = -1;
 
 const topMostIndex = 1;
 
@@ -229,54 +228,19 @@ const EditPostInterventionForm = () => {
   const handlePersonalDetailsQuestionUpdate = async (
     question: QuestionResponse
   ) => {
-    setPersonalDetailsQuestions((prevQuestions) => {
-      const updatedQuestionsArr = [...prevQuestions];
-
-      const index = updatedQuestionsArr.findIndex(
-        (item) => item.id === question.id
-      );
-
-      if (index !== indexNotFound) {
-        updatedQuestionsArr[index] = question;
-      }
-
-      return updatedQuestionsArr;
-    });
+    setPersonalDetailsQuestions(
+      updateArrayByIndex([...personalDetailsQuestions], question)
+    );
   };
 
+  // function to update the state of this(parent) component
   const handlePostInterventionQuestionUpdate = async (
     question: FormQuestion
   ) => {
-    // similar code logic detected, please use new functions and move common logic.
-
-    if (tab === questionSetTabs.quesitonSetOne) {
-      setPartOneQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (item) => item.id === question.id
-        );
-
-        if (index !== indexNotFound) {
-          updatedQuestionsArr[index] = question;
-        }
-
-        return updatedQuestionsArr;
-      });
+    if (question.questionSection === QuestionnaireSection.QuestionPartOne) {
+      setPartOneQuestions(updateArrayByIndex([...partOneQuestions], question));
     } else {
-      setPartTwoQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (item) => item.id === question.id
-        );
-
-        if (index !== indexNotFound) {
-          updatedQuestionsArr[index] = question;
-        }
-
-        return updatedQuestionsArr;
-      });
+      setPartTwoQuestions(updateArrayByIndex([...partTwoQuestions], question));
     }
   };
 
@@ -290,7 +254,8 @@ const EditPostInterventionForm = () => {
 
       dispatch(resetForm());
     } catch (_) {
-      // remove console log and use alert
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 
@@ -319,9 +284,8 @@ const EditPostInterventionForm = () => {
 
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
-
-      // remove console log and use alert
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 
