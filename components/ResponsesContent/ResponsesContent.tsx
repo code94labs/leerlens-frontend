@@ -14,6 +14,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+import Pagination from "@mui/material/Pagination";
 import Grid from "@mui/material/Grid";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
@@ -94,6 +95,17 @@ const customStyles = {
       width: "0",
     },
   },
+  paginationComponent: {
+    width: "100%",
+    marginY: 2,
+    "& .css-1yt0x08-MuiButtonBase-root-MuiPaginationItem-root": {
+      fontWeight: 600,
+    },
+    "& .css-1yt0x08-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected": {
+      backgroundColor: "#A879FF",
+      color: "#FFF",
+    },
+  },
   tabContent: {
     width: "100%",
     zIndex: 3,
@@ -133,6 +145,9 @@ const ResponsesContent = () => {
   const [filterDate, setFilterDate] = useState(dateFilterList[0]);
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
+  const [page, setPage] = useState<number>(1);
+  const [numberOfPages, setNumberOfPages] = useState<number>(10);
+
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
 
@@ -169,6 +184,10 @@ const ResponsesContent = () => {
 
   const handleChangeTabs = (_: SyntheticEvent, newValue: number) => {
     setValue(newValue);
+  };
+
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
   };
 
   const CustomDropdown = ({
@@ -471,6 +490,23 @@ const ResponsesContent = () => {
     </Tabs>
   );
 
+  const PaginationComponent = (
+    <Stack
+      direction="row"
+      justifyContent="end"
+      sx={customStyles.paginationComponent}
+    >
+      <Pagination
+        count={numberOfPages}
+        shape="rounded"
+        // color="primary"
+        page={page}
+        onChange={handleChange}
+        sx={{}}
+      />
+    </Stack>
+  );
+
   const tabSection = (
     <Stack px={2} mt={-3}>
       {tabHeader}
@@ -495,6 +531,7 @@ const ResponsesContent = () => {
           {renderTabContent(value)}
         </Stack>
       )}
+      {PaginationComponent}
     </Stack>
   );
 
