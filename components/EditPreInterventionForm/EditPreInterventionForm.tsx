@@ -49,11 +49,13 @@ import {
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
 import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
-import { updateArrayByIndex } from "../../utils/helper";
+import {
+  moveItemDownInArray,
+  moveItemUpInArray,
+  updateArrayByIndex,
+} from "../../utils/helper";
 
 // constants
-
-const indexNotFound = -1;
 
 const topMostIndex = 1;
 
@@ -268,7 +270,6 @@ const EditPreInterventionForm = () => {
 
   const handleNewQuestionDelete = () => {
     setDisplayNewQuestion(false);
-    // setNewQuestion(initialNewQuestionContent);
   };
 
   const handleNewPersonalDetailsQuestionSave = async ({
@@ -310,7 +311,9 @@ const EditPreInterventionForm = () => {
     questionText: string;
   }) => {
     const newPositionOrderId =
-      tab === 1 ? partOneQuestions.length + 1 : partTwoQuestions.length + 1;
+      tab === questionSetTabs.quesitonSetOne
+        ? partOneQuestions.length + 1
+        : partTwoQuestions.length + 1;
 
     const newQuestion: FormQuestion = {
       questionText: questionText,
@@ -328,78 +331,59 @@ const EditPreInterventionForm = () => {
 
     const response = await postPreInterventionQuestions(newQuestion);
 
-    const updatedQuestionsArr = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const updatedQuestionsArr =
+      tab === questionSetTabs.quesitonSetOne
+        ? [...partOneQuestions]
+        : [...partTwoQuestions];
+
     updatedQuestionsArr?.push(response);
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+
+    if (response.questionSection === QuestionnaireSection.QuestionPartOne) {
+      setPartOneQuestions(updatedQuestionsArr);
+    } else {
+      setPartTwoQuestions(updatedQuestionsArr);
+    }
 
     setDisplayNewQuestion(false);
   };
 
   // Function to handle moving an item up in the array
-  const moveItemUp = (
-    orderId: number | undefined,
-    questionnaireType: boolean
-  ) => {
+  const moveItemUp = (orderId: number | undefined) => {
     if (!orderId) return;
-    if (orderId <= 1) return; // Already at the top, can't move up
-    if (!questionnaireType) {
-      const newQuestionArr = [...personalDetailsQuestions];
-      newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-      newQuestionArr[orderId - 2].positionOrderId = orderId;
+    if (orderId <= topMostIndex) return; // Already at the top, can't move up
 
-      setPersonalDetailsQuestions(newQuestionArr);
-    } else {
-      if (tab === 1) {
-        const newQuestionArr = [...partOneQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-        newQuestionArr[orderId - 2].positionOrderId = orderId;
-
-        setPartOneQuestions(newQuestionArr);
-      } else if (tab === 2) {
-        const newQuestionArr = [...partTwoQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-        newQuestionArr[orderId - 2].positionOrderId = orderId;
-
-        setPartTwoQuestions(newQuestionArr);
-      }
+    if (tab === questionSetTabs.personalDetails) {
+      setPersonalDetailsQuestions(
+        moveItemUpInArray([...personalDetailsQuestions], orderId)
+      );
+    } else if (tab === questionSetTabs.quesitonSetOne) {
+      setPartOneQuestions(moveItemUpInArray([...partOneQuestions], orderId));
+    } else if (tab === questionSetTabs.quesitonSetTwo) {
+      setPartTwoQuestions(moveItemUpInArray([...partTwoQuestions], orderId));
     }
+
     dispatch(setFormModified());
   };
 
   // Function to handle moving an item down in the array
-  const moveItemDown = (
-    orderId: number | undefined,
-    questionnaireType: boolean
-  ) => {
+  const moveItemDown = (orderId: number | undefined) => {
     if (!orderId) return;
-    if (!questionnaireType) {
+    if (tab === questionSetTabs.personalDetails) {
       if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
-      const newQuestionArr = [...personalDetailsQuestions];
-      newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-      newQuestionArr[orderId].positionOrderId = orderId;
 
-      setPersonalDetailsQuestions(newQuestionArr);
-    } else {
-      if (tab === 1) {
-        if (orderId >= partOneQuestions.length) return; // Already at the bottom, can't move down
+      setPersonalDetailsQuestions(
+        moveItemDownInArray([...personalDetailsQuestions], orderId)
+      );
+    } else if (tab === questionSetTabs.quesitonSetOne) {
+      if (orderId >= partOneQuestions.length) return; // Already at the bottom, can't move down
 
-        const newQuestionArr = [...partOneQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-        newQuestionArr[orderId].positionOrderId = orderId;
+      setPartOneQuestions(moveItemDownInArray([...partOneQuestions], orderId));
+    } else if (tab === questionSetTabs.quesitonSetTwo) {
+      if (orderId >= partTwoQuestions.length) return; // Already at the bottom, can't move down
 
-        setPartOneQuestions(newQuestionArr);
-      } else if (tab === 2) {
-        if (orderId >= partTwoQuestions.length) return; // Already at the bottom, can't move down
-
-        const newQuestionArr = [...partTwoQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-        newQuestionArr[orderId].positionOrderId = orderId;
-
-        setPartTwoQuestions(newQuestionArr);
-      }
+      setPartTwoQuestions(moveItemDownInArray([...partTwoQuestions], orderId));
     }
+
     dispatch(setFormModified());
   };
 

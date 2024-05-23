@@ -117,3 +117,19 @@ export const updateArrayByIndex = (arrayToUpdate: any[], question: any) => {
 
   return arrayToUpdate;
 };
+
+// move item up the array
+export const moveItemUpInArray = (newQuestionArr: any[], orderId: number) => {
+  newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
+  newQuestionArr[orderId - 2].positionOrderId = orderId;
+
+  return newQuestionArr;
+};
+
+// move item down the array
+export const moveItemDownInArray = (newQuestionArr: any[], orderId: number) => {
+  newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
+  newQuestionArr[orderId].positionOrderId = orderId;
+
+  return newQuestionArr;
+};
