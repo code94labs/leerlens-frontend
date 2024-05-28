@@ -1,5 +1,10 @@
 import { leerLensApi } from "../api/api";
-import { deleteRequest, getRequest, postRequest, updateRequest } from "../api/requests";
+import {
+  deleteRequest,
+  getRequest,
+  postRequest,
+  updateRequest,
+} from "../api/requests";
 import { CreateStudentResponse, UpdateStudentResponse } from "../utils/types";
 
 export const createStudentResponse = async (reqBody: CreateStudentResponse) => {
@@ -14,9 +19,11 @@ export const createStudentResponse = async (reqBody: CreateStudentResponse) => {
   }
 };
 
-export const getAllStudentResponses = async () => {
+export const getAllStudentResponses = async (limit: number, page: number) => {
   try {
-    const response = await getRequest(leerLensApi.response);
+    const response = await getRequest(
+      `${leerLensApi.response}?limit=${limit}&page=${page}`
+    );
 
     return response.data;
   } catch (error) {
@@ -26,9 +33,15 @@ export const getAllStudentResponses = async () => {
   }
 };
 
-export const updateStudentResponse = async (id: number, reqBody: UpdateStudentResponse) => {
+export const updateStudentResponse = async (
+  id: number,
+  reqBody: UpdateStudentResponse
+) => {
   try {
-    const response = await updateRequest(`${leerLensApi.response}/${id}`, reqBody);
+    const response = await updateRequest(
+      `${leerLensApi.response}/${id}`,
+      reqBody
+    );
 
     return response.data;
   } catch (error) {
@@ -36,12 +49,11 @@ export const updateStudentResponse = async (id: number, reqBody: UpdateStudentRe
 
     throw error;
   }
-}
+};
 
 export const deleteStudentResponseById = async (id: number) => {
   try {
     await deleteRequest(`${leerLensApi.response}/${id}`);
-
   } catch (error) {
     console.error("Error fetching student info questions:", error);
 

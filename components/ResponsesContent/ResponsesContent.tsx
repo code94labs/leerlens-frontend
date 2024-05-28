@@ -146,7 +146,7 @@ const ResponsesContent = () => {
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
   const [page, setPage] = useState<number>(1);
-  const [numberOfPages, setNumberOfPages] = useState<number>(10);
+  const [limit, setLimit] = useState<number>(5);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
@@ -497,7 +497,7 @@ const ResponsesContent = () => {
       sx={customStyles.paginationComponent}
     >
       <Pagination
-        count={numberOfPages}
+        count={2}
         shape="rounded"
         // color="primary"
         page={page}
@@ -535,8 +535,8 @@ const ResponsesContent = () => {
     </Stack>
   );
 
-  const fetchingAllStudentInfo = async () => {
-    await getAllStudentResponses()
+  const fetchingAllStudentResponses = async () => {
+    await getAllStudentResponses(limit, page)
       .then((res) => {
         setStudentResponses(res);
       })
@@ -576,11 +576,11 @@ const ResponsesContent = () => {
     const fetchData = async () => {
       setIsLoading(true);
 
-      await fetchingAllStudentInfo();
+      await fetchingAllStudentResponses();
     };
 
     fetchData();
-  }, []);
+  }, [page]);
 
   useEffect(() => {
     filterResponsesByDate(studentResponses);
