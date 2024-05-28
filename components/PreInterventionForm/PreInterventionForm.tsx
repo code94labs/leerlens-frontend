@@ -20,14 +20,6 @@ import { Input as BaseInput, InputProps } from "@mui/base/Input";
 import { styled } from "@mui/system";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import React, { Fragment, useMemo, useState } from "react";
-import {
-  ageList,
-  completeSentenceList,
-  gradeList,
-  remindProgramList,
-  schoolList,
-  studyFieldList,
-} from "../../utils/constant";
 import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as yup from "yup";

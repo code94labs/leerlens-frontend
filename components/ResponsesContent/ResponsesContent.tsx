@@ -2,8 +2,11 @@ import {
   Alert,
   Box,
   Button,
+  FormControl,
+  InputLabel,
   Menu,
   MenuItem,
+  Select,
   SelectChangeEvent,
   Snackbar,
   Stack,
@@ -11,6 +14,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+import Grid from "@mui/material/Grid";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 
@@ -22,7 +26,14 @@ import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 
 import { StudentResponse } from "../../utils/types";
 import { FormEvaluation } from "../../utils/enum";
-import { dateFilterList } from "../../utils/constant";
+import {
+  ageList,
+  dateFilterList,
+  gradeList,
+  remindProgramList,
+  schoolList,
+  studyFieldList,
+} from "../../utils/constant";
 import { getDateRange } from "../../utils/helper";
 import FilterAltSharpIcon from "@mui/icons-material/FilterAltSharp";
 import EditContentDialog from "./EditContentDialog";
@@ -35,8 +46,8 @@ const customStyles = {
     textTransform: "initial",
     width: 100,
     border: "2px #A879FF solid",
-    px: 8,
-    py: 2,
+    px: 1.25,
+    py: 1.25,
     fontSize: 16,
     fontFamily: champBlackFontFamily,
     fontWeight: 400,
@@ -54,6 +65,7 @@ const customStyles = {
     },
   },
   dropdown: {
+    width: "100%",
     mb: 2,
     mr: 2,
     "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
@@ -112,7 +124,13 @@ const editTypeDropdown = ["Edit class name", "Edit course name"];
 
 const ResponsesContent = () => {
   const [value, setValue] = useState(0);
-  const [filterDate, setFilterDate] = useState(dateFilterList[0]);
+  const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
+  const [filterSchool, setFilterSchool] = useState<number>(schoolList[0].id);
+  const [filterGrade, setFilterGrade] = useState<number>(gradeList[0].id);
+  const [filterCourse, setFilterCourse] = useState<number>(0);
+  const [filterAge, setFilterAge] = useState<number>(ageList[0].age);
+  const [filterStudy, setFilterStudy] = useState<number>(studyFieldList[0].id);
+  const [filterDate, setFilterDate] = useState<string>("");
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -130,16 +148,8 @@ const ResponsesContent = () => {
     []
   );
 
-  const [filteredStudentResponses, setFilteredStudentResponses] = useState<
-    StudentResponse[]
-  >([]);
-
   const isClassEditType = selectedEditType === editTypeDropdown[0];
   const isCourceEditType = selectedEditType === editTypeDropdown[1];
-
-  const handleChangeDate = (event: SelectChangeEvent) => {
-    setFilterDate(event.target.value);
-  };
 
   const handleChangeSelectedEditType = (item: string) => {
     setSelectedEditType(item);
@@ -157,19 +167,160 @@ const ResponsesContent = () => {
     setValue(newValue);
   };
 
-  // const dateDropdown = (
+  // const CustomDropdown = ({
+  //   label,
+  //   selectArray,
+  //   filterValue,
+  //   setFilterValue,
+  // }: {
+  //   label: string;
+  //   selectArray: string[];
+  //   filterValue: string;
+  //   setFilterValue: (value: string) => void;
+  // }) => (
   //   <FormControl sx={customStyles.dropdown}>
-  //     <InputLabel>Date</InputLabel>
+  //     <InputLabel>{label}</InputLabel>
 
-  //     <Select value={filterDate} label="Date" onChange={handleChangeDate}>
-  //       {dateFilterList.map((date) => (
-  //         <MenuItem value={date} key={date}>
-  //           {date}
+  //     <Select
+  //       value={filterValue}
+  //       label={label}
+  //       onChange={(event: SelectChangeEvent) => {
+  //         setFilterValue(event.target.value);
+  //       }}
+  //     >
+  //       {selectArray.map((item) => (
+  //         <MenuItem value={item} key={item}>
+  //           {item}
   //         </MenuItem>
   //       ))}
   //     </Select>
   //   </FormControl>
   // );
+
+  const filtersDiv = (
+    <Grid container spacing={1}>
+      <Grid item xs={4}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>School</InputLabel>
+
+          <Select
+            value={String(filterSchool)}
+            label="School"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterSchool(Number(event.target.value));
+            }}
+          >
+            {schoolList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.schoolName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Grade</InputLabel>
+
+          <Select
+            value={String(filterGrade)}
+            label="Grade"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterGrade(Number(event.target.value));
+            }}
+          >
+            {gradeList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.grade}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Course</InputLabel>
+
+          <Select
+            value={String(filterCourse)}
+            label="Course"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterCourse(Number(event.target.value));
+            }}
+          >
+            <MenuItem value={0}>All</MenuItem>
+            {remindProgramList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.sentence}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={4}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>What do you study</InputLabel>
+
+          <Select
+            value={String(filterStudy)}
+            label="What do you study"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterStudy(Number(event.target.value));
+            }}
+          >
+            {studyFieldList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.studyField}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={1}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Age</InputLabel>
+
+          <Select
+            value={String(filterAge)}
+            label="Age"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterAge(Number(event.target.value));
+            }}
+          >
+            {ageList.map((item) => (
+              <MenuItem value={item.age} key={item.age}>
+                {item.age}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={3}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Date</InputLabel>
+
+          <Select
+            value={filterDate}
+            label="Date"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterDate(event.target.value);
+            }}
+          >
+            {dateFilterList.map((item) => (
+              <MenuItem value={item} key={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+    </Grid>
+  );
 
   const filterEditButtons = (
     <Stack
@@ -179,7 +330,9 @@ const ResponsesContent = () => {
     >
       <Button
         variant="outlined"
-        onClick={() => {}}
+        onClick={() => {
+          setDisplayFiltersDiv((prev) => !prev);
+        }}
         sx={customStyles.primaryButton}
       >
         <FilterAltSharpIcon />
@@ -224,58 +377,60 @@ const ResponsesContent = () => {
   );
 
   const titleFilterSection = (
-    <Stack
-      flexDirection="row"
-      justifyContent="space-between"
-      alignItems="center"
-      px={2}
-      py={3}
-    >
-      <Typography
-        fontSize={20}
-        fontFamily={champBlackFontFamily}
-        textTransform="uppercase"
+    <Stack px={2} py={3} gap={2}>
+      <Stack
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
+        // px={2}
+        // py={3}
       >
-        All
-      </Typography>
+        <Typography
+          fontSize={20}
+          fontFamily={champBlackFontFamily}
+          textTransform="uppercase"
+        >
+          All
+        </Typography>
 
-      {/* {dateDropdown} */}
+        {filterEditButtons}
+      </Stack>
 
-      {filterEditButtons}
+      {displayFiltersDiv && filtersDiv}
     </Stack>
   );
 
-  const filterResponsesByDate = (responses: StudentResponse[]) => {
-    if (!responses) return [];
+  // const filterResponsesByDate = (responses: StudentResponse[]) => {
+  //   if (!responses) return [];
 
-    if (responses.length === 0) return [];
+  //   if (responses.length === 0) return [];
 
-    const dateRangeStr = filterDate;
+  //   const dateRangeStr = filterDate;
 
-    const dateRange = getDateRange(dateRangeStr);
+  //   const dateRange = getDateRange(dateRangeStr);
 
-    const fromDate = new Date(dateRange[0]);
-    const toDate = new Date(dateRange[1]);
+  //   const fromDate = new Date(dateRange[0]);
+  //   const toDate = new Date(dateRange[1]);
 
-    const filteredResponses = responses.filter((response) => {
-      if (response.createdAt) {
-        const createdAtDate = new Date(response.createdAt);
+  //   const filteredResponses = responses.filter((response) => {
+  //     if (response.createdAt) {
+  //       const createdAtDate = new Date(response.createdAt);
 
-        return createdAtDate >= fromDate && createdAtDate <= toDate;
-      }
+  //       return createdAtDate >= fromDate && createdAtDate <= toDate;
+  //     }
 
-      return false;
-    });
+  //     return false;
+  //   });
 
-    setFilteredStudentResponses(filteredResponses);
-  };
+  //   setFilteredStudentResponses(filteredResponses);
+  // };
 
   const getResponsesByFormType = (formType?: FormEvaluation) => {
     if (!formType && formType !== 0) {
-      return filteredStudentResponses;
+      return studentResponses;
     }
 
-    return filteredStudentResponses.filter(
+    return studentResponses.filter(
       (response) => response.formType === formType
     );
   };
@@ -290,7 +445,7 @@ const ResponsesContent = () => {
                 key={response?.id}
                 response={response}
                 isSelectAllChecked={isSelectAllChecked}
-                setFilteredStudentResponses={setFilteredStudentResponses}
+                setFilteredStudentResponses={setStudentResponses}
               />
             ))}
           </Stack>
@@ -306,7 +461,7 @@ const ResponsesContent = () => {
                     key={response.id}
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setFilteredStudentResponses}
+                    setFilteredStudentResponses={setStudentResponses}
                   />
                 )
             )}
@@ -323,7 +478,7 @@ const ResponsesContent = () => {
                     key={response.id}
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setFilteredStudentResponses}
+                    setFilteredStudentResponses={setStudentResponses}
                   />
                 )
             )}
@@ -340,7 +495,7 @@ const ResponsesContent = () => {
                     key={response.id}
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setFilteredStudentResponses}
+                    setFilteredStudentResponses={setStudentResponses}
                   />
                 )
             )}
@@ -357,7 +512,7 @@ const ResponsesContent = () => {
                     key={response.id}
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setFilteredStudentResponses}
+                    setFilteredStudentResponses={setStudentResponses}
                   />
                 )
             )}
@@ -454,8 +609,30 @@ const ResponsesContent = () => {
   }, []);
 
   useEffect(() => {
-    filterResponsesByDate(studentResponses);
-  }, [filterDate, studentResponses]);
+    const dateRangeStr = filterDate;
+
+    const dateRange = getDateRange(dateRangeStr);
+
+    const fromDate = filterDate.length > 1 ? dateRange[0] : null;
+    const toDate = filterDate.length > 1 ? dateRange[1] : null;
+
+    console.log({
+      school: filterSchool,
+      course: filterCourse,
+      grade: filterGrade,
+      study: filterStudy,
+      age: filterAge,
+      fromDate: fromDate,
+      toDate: toDate,
+    });
+  }, [
+    filterSchool,
+    filterCourse,
+    filterGrade,
+    filterStudy,
+    filterAge,
+    filterDate,
+  ]);
 
   return (
     <>

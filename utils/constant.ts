@@ -1,4 +1,5 @@
 export const schoolList = [
+  { id: 0, schoolName: "All" }, // for the dropdown options
   { id: 1, schoolName: "Aeres Hogeschool Dronten" },
   { id: 2, schoolName: "Aeres MBO Almere" },
   { id: 3, schoolName: "Aeres MBO Ede" },
@@ -120,6 +121,7 @@ export const schoolList = [
 ];
 
 export const studyFieldList = [
+  { id: 0, studyField: "All" },
   { id: 1, studyField: "Havo" },
   { id: 2, studyField: "VWO" },
   { id: 3, studyField: "Vmbo TL" },
@@ -128,12 +130,13 @@ export const studyFieldList = [
 ];
 
 export const gradeList = [
-  { id: 1, grade: 1 },
-  { id: 2, grade: 2 },
-  { id: 3, grade: 3 },
-  { id: 4, grade: 4 },
-  { id: 5, grade: 5 },
-  { id: 6, grade: 6 },
+  { id: 0, grade: "All" },
+  { id: 1, grade: "1" },
+  { id: 2, grade: "2" },
+  { id: 3, grade: "3" },
+  { id: 4, grade: "4" },
+  { id: 5, grade: "5" },
+  { id: 6, grade: "6" },
 ];
 
 export const remindProgramList = [
