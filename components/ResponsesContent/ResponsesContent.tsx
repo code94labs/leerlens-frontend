@@ -18,7 +18,7 @@ import Grid from "@mui/material/Grid";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 
-import DyanmicListHeader from "./DyanmicListHeader";
+import DynamicListHeader from "./DynamicListHeader";
 import ResponseAccordion from "./ResponseAccordion";
 import { getAllStudentResponses } from "../../services/response.service";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
@@ -538,7 +538,7 @@ const ResponsesContent = () => {
     <Stack px={2} mt={-3}>
       {tabHeader}
 
-      <DyanmicListHeader
+      <DynamicListHeader
         titles={[
           "Recorded date",
           "Question types",

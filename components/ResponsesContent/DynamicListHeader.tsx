@@ -26,7 +26,7 @@ const customStyles = {
   },
 };
 
-const DyanmicListHeader = (props: Props) => {
+const DynamicListHeader = (props: Props) => {
   const { titles, isMainTitle, isSelectAllChecked, setIsSelectAllChecked } =
     props;
 
@@ -65,4 +65,4 @@ const DyanmicListHeader = (props: Props) => {
   );
 };
 
-export default DyanmicListHeader;
+export default DynamicListHeader;
