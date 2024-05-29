@@ -191,6 +191,7 @@ const customStyles = {
 };
 
 type Props = {
+  showQuestionTypesTab?: boolean;
   response: StudentResponse;
   setFilteredStudentResponses: any;
   isSelectAllChecked: boolean;
@@ -223,6 +224,7 @@ const dropdownPaperProp = {
 
 const ResponseAccordion = (props: Props) => {
   const {
+    showQuestionTypesTab,
     response: studentResponse,
     setFilteredStudentResponses,
     isSelectAllChecked,
@@ -655,9 +657,11 @@ const ResponseAccordion = (props: Props) => {
           formatTimeStamp(new Date(studentResponse.createdAt).toDateString())}
       </Typography>
 
-      <Typography sx={{ flex: 1, pt: 1, width: "11%" }}>
-        {evaluationTypesTitles[studentResponse.formType]}
-      </Typography>
+      {showQuestionTypesTab && (
+        <Typography sx={{ flex: 1, pt: 1, width: "11%" }}>
+          {evaluationTypesTitles[studentResponse.formType]}
+        </Typography>
+      )}
 
       {studentResponse.studentDetails.slice(0, 4).map((studentInfo) => (
         <Typography sx={{ flex: 1, pt: 1, width: "11%" }}>

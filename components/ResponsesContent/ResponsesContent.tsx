@@ -443,6 +443,7 @@ const ResponsesContent = () => {
             {getResponsesByFormType().map((response) => (
               <ResponseAccordion
                 key={response?.id}
+                showQuestionTypesTab
                 response={response}
                 isSelectAllChecked={isSelectAllChecked}
                 setFilteredStudentResponses={setStudentResponses}
@@ -539,14 +540,18 @@ const ResponsesContent = () => {
       {tabHeader}
 
       <DynamicListHeader
-        titles={[
-          "Recorded date",
-          "Question types",
-          "School",
-          "Class",
-          "Age",
-          "Study Program",
-        ]}
+        titles={
+          value === 0
+            ? [
+                "Recorded date",
+                "Question types",
+                "School",
+                "Study",
+                "Grade",
+                "Remind Program",
+              ]
+            : ["Recorded date", "School", "Study", "Grade", "Remind Program"]
+        }
         isMainTitle
         isSelectAllChecked={isSelectAllChecked}
         setIsSelectAllChecked={setIsSelectAllChecked}
