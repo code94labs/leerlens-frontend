@@ -652,26 +652,26 @@ const ResponseAccordion = (props: Props) => {
         checked={isChecked}
       />
 
-      <Typography sx={{ width: "11%", pt: 1 }}>
+      <Typography sx={{ width: "14%", pt: 1 }}>
         {studentResponse.createdAt &&
           formatTimeStamp(new Date(studentResponse.createdAt).toDateString())}
       </Typography>
 
       {showQuestionTypesTab && (
-        <Typography sx={{ flex: 1, pt: 1, width: "11%" }}>
+        <Typography sx={{ pt: 1, width: "14%" }}>
           {evaluationTypesTitles[studentResponse.formType]}
         </Typography>
       )}
 
       {studentResponse.studentDetails.slice(0, 4).map((studentInfo) => (
-        <Typography sx={{ flex: 1, pt: 1, width: "11%" }}>
+        <Typography sx={{ pt: 1, width: "14%" }}>
           {studentInfo.fieldType === FieldType.DropDown
             ? studentInfo.dropdownTitle
             : studentInfo.answer}
         </Typography>
       ))}
 
-      <Box>
+      <Box sx={{ flex: 1, display: "flex", justifyContent: "end" }}>
         <IconButton>
           <KeyboardArrowDownRoundedIcon sx={customStyles.icon} />
         </IconButton>
