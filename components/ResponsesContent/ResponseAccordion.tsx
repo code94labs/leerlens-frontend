@@ -650,14 +650,22 @@ const ResponseAccordion = (props: Props) => {
         checked={isChecked}
       />
 
-      <Typography sx={{ width: 200, pt: 1 }}>
+      <Typography sx={{ width: "11%", pt: 1 }}>
         {studentResponse.createdAt &&
           formatTimeStamp(new Date(studentResponse.createdAt).toDateString())}
       </Typography>
 
-      <Typography sx={{ flex: 1, pt: 1 }}>
+      <Typography sx={{ flex: 1, pt: 1, width: "11%" }}>
         {evaluationTypesTitles[studentResponse.formType]}
       </Typography>
+
+      {studentResponse.studentDetails.slice(0, 4).map((studentInfo) => (
+        <Typography sx={{ flex: 1, pt: 1, width: "11%" }}>
+          {studentInfo.fieldType === FieldType.DropDown
+            ? studentInfo.dropdownTitle
+            : studentInfo.answer}
+        </Typography>
+      ))}
 
       <Box>
         <IconButton>
@@ -677,7 +685,7 @@ const ResponseAccordion = (props: Props) => {
 
   const personalDetails = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Personal details" subTitle="Answers" />
+      <DyanmicListHeader titles={["Personal details", "Answers"]} />
 
       <Stack>
         {studentResponse.studentDetails
@@ -699,7 +707,7 @@ const ResponseAccordion = (props: Props) => {
 
   const questionSetOne = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Question | Part 01" subTitle="Answers" />
+      <DyanmicListHeader titles={["Question | Part 01", "Answers"]} />
 
       <Stack>
         {studentResponse.responses
@@ -720,7 +728,7 @@ const ResponseAccordion = (props: Props) => {
 
   const questionSetTwo = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Question | Part 02" subTitle="Answers" />
+      <DyanmicListHeader titles={["Question | Part 02", "Answers"]} />
 
       <Stack>
         {studentResponse.responses
@@ -741,7 +749,7 @@ const ResponseAccordion = (props: Props) => {
 
   const supervisorEvaluation = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Program and Supervisor" subTitle="Answers" />
+      <DyanmicListHeader titles={["Program and Supervisor", "Answers"]} />
 
       <Stack>
         {studentResponse.studentDetails
@@ -765,7 +773,7 @@ const ResponseAccordion = (props: Props) => {
 
   const final = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Final" subTitle="Answers" />
+      <DyanmicListHeader titles={["Final", "Answers"]} />
 
       <Stack>
         {studentResponse.studentDetails

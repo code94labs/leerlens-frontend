@@ -539,8 +539,14 @@ const ResponsesContent = () => {
       {tabHeader}
 
       <DyanmicListHeader
-        title="Recorded date"
-        subTitle="Question types"
+        titles={[
+          "Recorded date",
+          "Question types",
+          "School",
+          "Class",
+          "Age",
+          "Study Program",
+        ]}
         isMainTitle
         isSelectAllChecked={isSelectAllChecked}
         setIsSelectAllChecked={setIsSelectAllChecked}
