@@ -370,7 +370,7 @@ const PreInterventionForm = () => {
 
         setDisplaySnackbarMsg(true);
 
-        router.replace('/success-message')
+        router.replace("/success-message");
       })
       .catch(() => {
         setIsError(true);
@@ -576,7 +576,7 @@ const PreInterventionForm = () => {
           mb: 4,
         }}
       >
-        1 to 23 statements <br />
+        1 to {questionListPartOne.length} statements <br />
         (1 = completely disagree, 2 = disagree, 3 = somewhat disagree, 4 =
         somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
@@ -635,7 +635,7 @@ const PreInterventionForm = () => {
           mb: 4,
         }}
       >
-        1 to 23 statements
+        1 to {questionListPartTwo.length} statements
         <br />
         (1 = completely disagree, 2 = disagree, 3 = somewhat disagree, 4 =
         somewhat agree, 5 = agree, 6 = completely agree).
@@ -772,7 +772,8 @@ const PreInterventionForm = () => {
           await getStudentFormInfoByFormType(FormEvaluation.PreInterventions);
 
         const studentFormInfoPersonal = studentFormInfoQuestions.filter(
-          (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
+          (item: QuestionResponse) =>
+            item.sectionType === SectionType.PersonalDetails
         );
 
         setStudentFormInfo(studentFormInfoPersonal);

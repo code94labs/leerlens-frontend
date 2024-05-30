@@ -102,7 +102,7 @@ const CustomScale = (props: CustomScaleProps) => {
           Totally disagree
         </Typography>
         <Typography color="grey" sx={customStyles.scaleText}>
-          Totally disagree
+          Totally agree
         </Typography>
       </Stack>
 
@@ -146,7 +146,7 @@ const CustomScale = (props: CustomScaleProps) => {
             md: "flex",
           }}
         >
-          Totally disagree
+          Totally agree
         </Typography>
       </Stack>
     </Stack>
