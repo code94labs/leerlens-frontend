@@ -15,6 +15,24 @@ export const pages: RoutePath[] = [
     text: "Learning Scan Report",
     path: "/admin/dashboard",
     iconPath: "/images/admin-icons/reports.png",
+    sub: [
+      {
+        text: "NormGroup",
+        path: "/admin/dashboard/norm-group",
+      },
+      {
+        text: "Evaluation",
+        path: "/admin/dashboard/evaluation",
+      },
+      {
+        text: "Samengevat",
+        path: "/admin/dashboard/samengevat",
+      },
+      {
+        text: "EML",
+        path: "/admin/dashboard/eml",
+      },
+    ],
   },
   {
     text: "Responses",
@@ -49,7 +67,6 @@ export const pages: RoutePath[] = [
     iconPath: "/images/admin-icons/settings.png",
   },
 ];
-
 
 export const breadcrumbMap: { [key: string]: string } = {
   "/admin/dashboard": "Learning Scan Report",
