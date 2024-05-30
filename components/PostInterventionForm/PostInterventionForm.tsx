@@ -177,13 +177,15 @@ const PostInterventionForm = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>([]);
-  const [questionListPartOne, setQuestionListPartOne] = useState<QuestionResponse[]>(
+  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>(
     []
   );
-  const [questionListPartTwo, setQuestionListPartTwo] = useState<QuestionResponse[]>(
-    []
-  );
+  const [questionListPartOne, setQuestionListPartOne] = useState<
+    QuestionResponse[]
+  >([]);
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<
+    QuestionResponse[]
+  >([]);
 
   const [answersPartOne, setAnswersPartOne] = useState<QuestionniareAnswer[]>(
     []
@@ -341,7 +343,7 @@ const PostInterventionForm = () => {
 
         setDisplaySnackbarMsg(true);
 
-        router.replace('/success-message')
+        router.replace("/success-message");
       })
       .catch(() => {
         setIsError(true);
@@ -364,7 +366,8 @@ const PostInterventionForm = () => {
 
         setStudentFormInfo(
           studentFormInfoQuestions.filter(
-            (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
+            (item: QuestionResponse) =>
+              item.sectionType === SectionType.PersonalDetails
           )
         );
 
@@ -383,7 +386,7 @@ const PostInterventionForm = () => {
     const fetchQuestionnaireData = async () => {
       try {
         setIsLoading(true);
-        
+
         const postInterventionQuestions =
           await getAllPostInterventionQuestions();
 
@@ -434,8 +437,7 @@ const PostInterventionForm = () => {
       ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
       : {},
     validationSchema,
-    onSubmit: (values) => {
-    },
+    onSubmit: (values) => {},
   });
 
   const personalDetailsForm = isLoading ? (
@@ -554,21 +556,24 @@ const PostInterventionForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+        1 to {questionListPartOne.length} statements (1 = completely disagree, 2
+        = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        completely agree).
       </Typography>
 
       <FormControl>
-        {questionListPartOne.map((questionDetails: QuestionResponse, index: number) => (
-          <CustomScale
-            key={questionDetails.id}
-            {...questionDetails}
-            isDisabled={isLoading}
-            updateAnswer={(answer: number) =>
-              updateAnswerPartOne(questionDetails.id, answer)
-            }
-          />
-        ))}
+        {questionListPartOne.map(
+          (questionDetails: QuestionResponse, index: number) => (
+            <CustomScale
+              key={questionDetails.id}
+              {...questionDetails}
+              isDisabled={isLoading}
+              updateAnswer={(answer: number) =>
+                updateAnswerPartOne(questionDetails.id, answer)
+              }
+            />
+          )
+        )}
       </FormControl>
     </>
   );
@@ -581,21 +586,23 @@ const PostInterventionForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
+        1 to {questionListPartTwo.length} statements (1 = completely disagree, 2 = disagree, 3 = somewhat
         disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
 
       <FormControl>
-        {questionListPartTwo.map((questionDetails: QuestionResponse, index: number) => (
-          <CustomScale
-            key={questionDetails.id}
-            {...questionDetails}
-            isDisabled={isLoading}
-            updateAnswer={(answer: number) =>
-              updateAnswerPartTwo(questionDetails.id, answer)
-            }
-          />
-        ))}
+        {questionListPartTwo.map(
+          (questionDetails: QuestionResponse, index: number) => (
+            <CustomScale
+              key={questionDetails.id}
+              {...questionDetails}
+              isDisabled={isLoading}
+              updateAnswer={(answer: number) =>
+                updateAnswerPartTwo(questionDetails.id, answer)
+              }
+            />
+          )
+        )}
       </FormControl>
     </>
   );

@@ -235,19 +235,21 @@ const RemindEvaluationForm = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>([]);
+  const [studentFormInfo, setStudentFormInfo] = useState<QuestionResponse[]>(
+    []
+  );
 
   const [programAndSupervisorsQuestions, setProgramAndSupervisorsQuestions] =
     useState<QuestionResponse[]>([]);
 
   const [finalQuestions, setFinalQuestions] = useState<QuestionResponse[]>([]);
 
-  const [questionListPartOne, setQuestionListPartOne] = useState<QuestionResponse[]>(
-    []
-  );
-  const [questionListPartTwo, setQuestionListPartTwo] = useState<QuestionResponse[]>(
-    []
-  );
+  const [questionListPartOne, setQuestionListPartOne] = useState<
+    QuestionResponse[]
+  >([]);
+  const [questionListPartTwo, setQuestionListPartTwo] = useState<
+    QuestionResponse[]
+  >([]);
 
   const [answersPartOne, setAnswersPartOne] = useState<QuestionniareAnswer[]>(
     []
@@ -358,7 +360,11 @@ const RemindEvaluationForm = () => {
 
     const requestBody: CreateStudentResponse = {
       formType: FormEvaluation.Evaluation,
-      studentDetails: [...personDetailsInfo, ...programSupervisorInfo, ...finalStudentInfo],
+      studentDetails: [
+        ...personDetailsInfo,
+        ...programSupervisorInfo,
+        ...finalStudentInfo,
+      ],
       responses: [...answersPartOne, ...answersPartTwo],
     };
     setIsLoading(true);
@@ -371,7 +377,7 @@ const RemindEvaluationForm = () => {
 
         setDisplaySnackbarMsg(true);
 
-        router.replace('/success-message')
+        router.replace("/success-message");
       })
       .catch(() => {
         setIsError(true);
@@ -544,21 +550,24 @@ const RemindEvaluationForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+        1 to {questionListPartOne.length} statements (1 = completely disagree, 2
+        = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        completely agree).
       </Typography>
 
       <FormControl>
-        {questionListPartOne.map((questionDetails: QuestionResponse, index: number) => (
-          <CustomScale
-            key={questionDetails.id}
-            {...questionDetails}
-            isDisabled={isLoading}
-            updateAnswer={(answer: number) =>
-              updateAnswerPartOne(questionDetails.id, answer)
-            }
-          />
-        ))}
+        {questionListPartOne.map(
+          (questionDetails: QuestionResponse, index: number) => (
+            <CustomScale
+              key={questionDetails.id}
+              {...questionDetails}
+              isDisabled={isLoading}
+              updateAnswer={(answer: number) =>
+                updateAnswerPartOne(questionDetails.id, answer)
+              }
+            />
+          )
+        )}
       </FormControl>
     </>
   );
@@ -571,21 +580,23 @@ const RemindEvaluationForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
+        1 to {questionListPartTwo.length} statements (1 = completely disagree, 2 = disagree, 3 = somewhat
         disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
       </Typography>
 
       <FormControl>
-        {questionListPartTwo.map((questionDetails: QuestionResponse, index: number) => (
-          <CustomScale
-            key={questionDetails.id}
-            {...questionDetails}
-            isDisabled={isLoading}
-            updateAnswer={(answer: number) =>
-              updateAnswerPartTwo(questionDetails.id, answer)
-            }
-          />
-        ))}
+        {questionListPartTwo.map(
+          (questionDetails: QuestionResponse, index: number) => (
+            <CustomScale
+              key={questionDetails.id}
+              {...questionDetails}
+              isDisabled={isLoading}
+              updateAnswer={(answer: number) =>
+                updateAnswerPartTwo(questionDetails.id, answer)
+              }
+            />
+          )
+        )}
       </FormControl>
     </>
   );
@@ -789,8 +800,7 @@ const RemindEvaluationForm = () => {
       ? Object.fromEntries(finalQuestions.map((field) => [field.id, ""]))
       : {},
     validationSchema: finalQuestionsValidationSchema,
-    onSubmit: () => {
-    },
+    onSubmit: () => {},
   });
 
   const finalContentForm = (
@@ -990,7 +1000,8 @@ const RemindEvaluationForm = () => {
           await getStudentFormInfoByFormType(FormEvaluation.Evaluation);
 
         const studentFormInfoPersonal = studentFormInfoQuestions.filter(
-          (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
+          (item: QuestionResponse) =>
+            item.sectionType === SectionType.PersonalDetails
         );
 
         const studentFormInfoProgram = studentFormInfoQuestions.filter(
