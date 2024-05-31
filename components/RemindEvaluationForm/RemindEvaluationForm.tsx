@@ -550,9 +550,9 @@ const RemindEvaluationForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartOne.length} statements (1 = completely disagree, 2
-        = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
-        completely agree).
+        1 to {questionListPartOne.length} statements (1 = totally disagree, 2 =
+        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        totally agree).
       </Typography>
 
       <FormControl>
@@ -580,8 +580,9 @@ const RemindEvaluationForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartTwo.length} statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+        1 to {questionListPartTwo.length} statements (1 = totally disagree, 2 =
+        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        totally agree).
       </Typography>
 
       <FormControl>
