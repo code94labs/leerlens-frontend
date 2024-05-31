@@ -31,10 +31,12 @@ const Breadcrumb = () => {
     .split("/")
     .filter((segment) => segment !== "");
 
-  const breadcrumbs = pathSegments.map((segment, index) => {
+  console.log(router.asPath);
+
+  const breadcrumbs = pathSegments.slice(1).map((segment, index) => {
     const route = `/${pathSegments.slice(0, index + 1).join("/")}`;
     const label = breadcrumbMap[route] || segment;
-    const isLast = index === pathSegments.length - 1;
+    const isLast = index === pathSegments.slice(1).length - 1;
     if (isLast) {
       return (
         <Typography
