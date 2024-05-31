@@ -77,7 +77,7 @@ const customStyles = {
       xs: 900,
       md: 1000,
     },
-    mb: 1,
+    // mb: 1,
     textTransform: "uppercase",
     fontFamily: champBlackFontFamily,
     color: "#1A1A1A",
@@ -652,7 +652,7 @@ const PostInterventionForm = () => {
           Post-Intervention Measurement
         </Typography>
 
-        <Typography variant="body1" sx={customStyles.body}>
+        <Typography variant="subtitle1" sx={customStyles.body}>
           Here are some general questions about you?
         </Typography>
       </Box>
