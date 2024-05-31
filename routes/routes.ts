@@ -4,7 +4,7 @@ export enum MenuType {
 
 export type RoutePath = {
   text: string;
-  path?: string;
+  path: string;
   type?: MenuType;
   sub?: RoutePath[];
   iconPath?: string;
@@ -41,6 +41,7 @@ export const pages: RoutePath[] = [
   },
   {
     text: "Question Set",
+    path: "/admin/question-set",
     iconPath: "/images/admin-icons/questions.png",
     sub: [
       {

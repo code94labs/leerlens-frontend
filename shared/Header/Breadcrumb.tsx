@@ -31,8 +31,6 @@ const Breadcrumb = () => {
     .split("/")
     .filter((segment) => segment !== "");
 
-  console.log(router.asPath);
-
   const breadcrumbs = pathSegments.slice(1).map((segment, index) => {
     const route = `/${pathSegments.slice(0, index + 1).join("/")}`;
     const label = breadcrumbMap[route] || segment;
