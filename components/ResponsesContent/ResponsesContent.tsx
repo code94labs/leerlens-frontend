@@ -123,7 +123,8 @@ const customStyles = {
 const editTypeDropdown = ["Edit class name", "Edit course name"];
 
 const ResponsesContent = () => {
-  const [value, setValue] = useState(0);
+  const [tabValue, setTabValue] = useState(0);
+
   const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
   const [filterSchool, setFilterSchool] = useState<number>(schoolList[0].id);
   const [filterGrade, setFilterGrade] = useState<number>(gradeList[0].id);
@@ -131,12 +132,14 @@ const ResponsesContent = () => {
   const [filterAge, setFilterAge] = useState<number>(ageList[0].age);
   const [filterStudy, setFilterStudy] = useState<number>(studyFieldList[0].id);
   const [filterDate, setFilterDate] = useState<string>("");
+
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
 
   const [open, setOpen] = useState(false);
+  const [refetch, setRefetch] = useState(true);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
@@ -147,6 +150,7 @@ const ResponsesContent = () => {
   const [studentResponses, setStudentResponses] = useState<StudentResponse[]>(
     []
   );
+  const [selectedResponseIds, setSelectedResponseIds] = useState<number[]>([]);
 
   const isClassEditType = selectedEditType === editTypeDropdown[0];
   const isCourceEditType = selectedEditType === editTypeDropdown[1];
@@ -164,7 +168,7 @@ const ResponsesContent = () => {
   };
 
   const handleChangeTabs = (_: SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+    setTabValue(newValue);
   };
 
   // const CustomDropdown = ({
@@ -426,6 +430,8 @@ const ResponsesContent = () => {
   // };
 
   const getResponsesByFormType = (formType?: FormEvaluation) => {
+    if (!studentResponses) return [];
+
     if (!formType && formType !== 0) {
       return studentResponses;
     }
@@ -446,6 +452,7 @@ const ResponsesContent = () => {
                 response={response}
                 isSelectAllChecked={isSelectAllChecked}
                 setFilteredStudentResponses={setStudentResponses}
+                setSelectedResponseIds={setSelectedResponseIds}
               />
             ))}
           </Stack>
@@ -462,6 +469,7 @@ const ResponsesContent = () => {
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setStudentResponses}
+                    setSelectedResponseIds={setSelectedResponseIds}
                   />
                 )
             )}
@@ -479,6 +487,7 @@ const ResponsesContent = () => {
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setStudentResponses}
+                    setSelectedResponseIds={setSelectedResponseIds}
                   />
                 )
             )}
@@ -496,6 +505,7 @@ const ResponsesContent = () => {
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setStudentResponses}
+                    setSelectedResponseIds={setSelectedResponseIds}
                   />
                 )
             )}
@@ -513,6 +523,7 @@ const ResponsesContent = () => {
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setStudentResponses}
+                    setSelectedResponseIds={setSelectedResponseIds}
                   />
                 )
             )}
@@ -525,7 +536,7 @@ const ResponsesContent = () => {
   };
 
   const tabHeader = (
-    <Tabs value={value} onChange={handleChangeTabs} sx={customStyles.tabs}>
+    <Tabs value={tabValue} onChange={handleChangeTabs} sx={customStyles.tabs}>
       <Tab value={0} label="All" />
       <Tab value={1} label="Pre - Intervention" />
       <Tab value={2} label="Post - Intervention" />
@@ -539,9 +550,9 @@ const ResponsesContent = () => {
       {tabHeader}
 
       <DyanmicListHeader
+        isMainTitle
         title="Recorded date"
         subTitle="Question types"
-        isMainTitle
         isSelectAllChecked={isSelectAllChecked}
         setIsSelectAllChecked={setIsSelectAllChecked}
       />
@@ -555,7 +566,7 @@ const ResponsesContent = () => {
           justifyContent="space-between"
           sx={customStyles.scrollableList}
         >
-          {renderTabContent(value)}
+          {renderTabContent(tabValue)}
         </Stack>
       )}
     </Stack>
@@ -603,10 +614,12 @@ const ResponsesContent = () => {
       setIsLoading(true);
 
       await fetchingAllStudentInfo();
+
+      setRefetch(false);
     };
 
-    fetchData();
-  }, []);
+    refetch && fetchData();
+  }, [refetch]);
 
   useEffect(() => {
     const dateRangeStr = filterDate;
@@ -634,6 +647,50 @@ const ResponsesContent = () => {
     filterDate,
   ]);
 
+  useEffect(() => {
+    if (isSelectAllChecked) {
+      switch (tabValue) {
+        case 0:
+          setSelectedResponseIds(studentResponses.map((res) => res.id));
+          break;
+
+        case 1:
+          setSelectedResponseIds(
+            studentResponses
+              .filter((res) => res.formType === FormEvaluation.PreInterventions)
+              .map((res) => res.id)
+          );
+          break;
+
+        case 2:
+          setSelectedResponseIds(
+            studentResponses
+              .filter((res) => res.formType === FormEvaluation.PostInterventions)
+              .map((res) => res.id)
+          );
+          break;
+
+        case 3:
+          setSelectedResponseIds(
+            studentResponses
+              .filter((res) => res.formType === FormEvaluation.Evaluation)
+              .map((res) => res.id)
+          );
+          break;
+
+        case 4:
+          setSelectedResponseIds(
+            studentResponses
+              .filter((res) => res.formType === FormEvaluation.Normgroup)
+              .map((res) => res.id)
+          );
+          break;
+      }
+    } else {
+      setSelectedResponseIds([]);
+    }
+  }, [isSelectAllChecked]);
+
   return (
     <>
       <Stack sx={customStyles.stack}>
@@ -649,6 +706,8 @@ const ResponsesContent = () => {
         setOpen={setOpen}
         isClassEdit={isClassEditType}
         isCourseEdit={isCourceEditType}
+        selectedResponseIds={selectedResponseIds}
+        setRefetch={setRefetch}
       />
     </>
   );
