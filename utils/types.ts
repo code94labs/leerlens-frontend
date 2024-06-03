@@ -35,6 +35,7 @@ export type FormQuestion = {
   questionSetId: number;
   questionSection: number;
   answer?: number | string;
+  summaryTypes: number[];
 };
 
 export type PersonalDetails = {
@@ -72,8 +73,8 @@ export type UpdateQuestionResponse = {
 };
 
 export type UpdateStudentResponse = {
-  studentDetails: UpdateQuestionResponse[]
-}
+  studentDetails: UpdateQuestionResponse[];
+};
 
 export type StudentResponse = CreateStudentResponse & {
   id: number;

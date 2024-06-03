@@ -39,6 +39,27 @@ import {
   FormQuestion,
   QuestionResponse,
 } from "../../utils/types";
+import { summaryTypes } from "../../utils/constant";
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+// function getStyles(name: string, personName: readonly string[], theme: Theme) {
+//   return {
+//     fontWeight:
+//       personName.indexOf(name) === -1
+//         ? theme.typography.fontWeightRegular
+//         : theme.typography.fontWeightMedium,
+//   };
+// }
 
 const customStyles = {
   textField: {
@@ -244,36 +265,6 @@ type Props = {
   ) => void;
 };
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
-
-const summaryTypes = [
-  { id: SummaryTypes.demograficalData, label: "Demografical Data" },
-  {
-    id: SummaryTypes.experimentingWithLearning,
-    label: "Experimenting With Learning",
-  },
-  { id: SummaryTypes.growthMindset, label: "Growth Mindset" },
-  { id: SummaryTypes.ownership, label: "Ownership" },
-];
-
-function getStyles(name: string, personName: readonly string[], theme: Theme) {
-  return {
-    fontWeight:
-      personName.indexOf(name) === -1
-        ? theme.typography.fontWeightRegular
-        : theme.typography.fontWeightMedium,
-  };
-}
-
 const QuestionnaireDynamicField = (props: Props) => {
   const {
     title,
@@ -289,8 +280,8 @@ const QuestionnaireDynamicField = (props: Props) => {
   const theme = useTheme();
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedSummaryTypes, setSelectedSummaryTypes] = useState<string[]>(
-    []
+  const [selectedSummaryTypes, setSelectedSummaryTypes] = useState<number[]>(
+    question?.summaryTypes ?? []
   );
 
   const handleChange = (
@@ -301,7 +292,9 @@ const QuestionnaireDynamicField = (props: Props) => {
     } = event;
     setSelectedSummaryTypes(
       // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
+      typeof value === "string"
+        ? value.split(",").map((item) => Number(item))
+        : value
     );
   };
 
@@ -514,7 +507,7 @@ const QuestionnaireDynamicField = (props: Props) => {
               <MenuItem
                 key={item.id}
                 value={item.id}
-                style={getStyles(item.label, selectedSummaryTypes, theme)}
+                // style={getStyles(item.label, selectedSummaryTypes, theme)}
               >
                 {item.label}
               </MenuItem>
