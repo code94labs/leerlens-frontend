@@ -10,12 +10,12 @@ const customStyles = {
   stack: {
     border: "1px #E6E6E6 solid",
     py: 2.5,
-    borderLeft: 'none',
-    borderRight: 'none'
+    borderLeft: "none",
+    borderRight: "none",
   },
 };
 
-const DyanmicListContent = (props: Props) => {
+const DynamicListContent = (props: Props) => {
   const { question, answer } = props;
 
   return (
@@ -31,4 +31,4 @@ const DyanmicListContent = (props: Props) => {
   );
 };
 
-export default DyanmicListContent;
+export default DynamicListContent;

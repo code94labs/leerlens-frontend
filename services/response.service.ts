@@ -10,6 +10,7 @@ import {
   BulkUpdateClassName,
   BulkUpdateCourse,
   CreateStudentResponse,
+  GetResponsesQueryParams,
   UpdateStudentResponse,
 } from "../utils/types";
 
@@ -25,9 +26,11 @@ export const createStudentResponse = async (reqBody: CreateStudentResponse) => {
   }
 };
 
-export const getAllStudentResponses = async () => {
+export const getAllStudentResponses = async (
+  params: GetResponsesQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.response);
+    const response = await getRequest(leerLensApi.response, params);
 
     return response.data;
   } catch (error) {
@@ -72,7 +75,10 @@ export const bulkUpdateClassName = async (reqBody: BulkUpdateClassName) => {
 
 export const bulkUpdateCourse = async (reqBody: BulkUpdateCourse) => {
   try {
-    const response = await patchRequest(`${leerLensApi.responseBulkCourse}`, reqBody);
+    const response = await patchRequest(
+      `${leerLensApi.responseBulkCourse}`,
+      reqBody
+    );
 
     return response.data;
   } catch (error) {
@@ -80,7 +86,7 @@ export const bulkUpdateCourse = async (reqBody: BulkUpdateCourse) => {
 
     throw error;
   }
-}
+};
 
 export const deleteStudentResponseById = async (id: number) => {
   try {

@@ -3,8 +3,7 @@ import React, { Dispatch, SetStateAction } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 
 type Props = {
-  title: string;
-  subTitle: string;
+  titles: string[];
   isMainTitle?: boolean;
   isSelectAllChecked?: boolean;
   setIsSelectAllChecked?: Dispatch<SetStateAction<boolean>>;
@@ -27,14 +26,9 @@ const customStyles = {
   },
 };
 
-const DyanmicListHeader = (props: Props) => {
-  const {
-    title,
-    subTitle,
-    isMainTitle,
-    isSelectAllChecked,
-    setIsSelectAllChecked,
-  } = props;
+const DynamicListHeader = (props: Props) => {
+  const { titles, isMainTitle, isSelectAllChecked, setIsSelectAllChecked } =
+    props;
 
   const handleSelectAllItems = () => {
     const isChecked = !isSelectAllChecked;
@@ -57,26 +51,20 @@ const DyanmicListHeader = (props: Props) => {
         <Checkbox sx={customStyles.checkBox} onChange={handleSelectAllItems} />
       )}
 
-      <Typography
-        fontWeight={800}
-        color="#4C4C4D"
-        width={isMainTitle ? 150 : "50%"}
-        fontFamily={champBlackFontFamily}
-        pr={5}
-      >
-        {title}
-      </Typography>
-
-      <Typography
-        fontWeight={800}
-        width={isMainTitle ? 600 : "50%"}
-        color="#4C4C4D"
-        fontFamily={champBlackFontFamily}
-      >
-        {subTitle}
-      </Typography>
+      {titles.map((title: string, index: number) => (
+        <Typography
+          fontWeight={800}
+          color="#4C4C4D"
+          width={isMainTitle ? "10.5%" : "50%"}
+          fontFamily={champBlackFontFamily}
+          pr={5}
+          key={index}
+        >
+          {title}
+        </Typography>
+      ))}
     </Stack>
   );
 };
 
-export default DyanmicListHeader;
+export default DynamicListHeader;
