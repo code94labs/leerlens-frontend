@@ -40,6 +40,13 @@ export enum RemindProgramQuestionSetID {
   QuestionSetTwo = 1,
 }
 
+export enum SummaryTypes {
+  demograficalData = 0,
+  experimentingWithLearning = 1,
+  growthMindset = 2,
+  ownership = 3,
+}
+
 export const fieldTypeTitles = {
   [FieldType.DropDown]: "Drop down",
   [FieldType.TextField]: "Text",
