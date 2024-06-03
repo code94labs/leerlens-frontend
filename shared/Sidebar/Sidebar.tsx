@@ -17,11 +17,24 @@ const logoImg = "/logo-v2.png";
 
 const Sidebar = () => {
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isOpen, setIsOpen] = useState(false);
+  const [accordionsOpen, setAccordionsOpen] = useState<string[]>([]);
 
   const handleRouteNavigation = (route: RoutePath) => {
     if (route.path) {
       router.push(route.path);
+    }
+  };
+
+  const handleAccordionExpansion = (routePath: string) => {
+    if (accordionsOpen.includes(routePath)) {
+      const tempAccordionOpenArray = accordionsOpen.filter(
+        (item) => item !== routePath
+      );
+      setAccordionsOpen(tempAccordionOpenArray);
+    } else {
+      const tempAccordionOpenArray = [...accordionsOpen, routePath];
+      setAccordionsOpen(tempAccordionOpenArray);
     }
   };
 
@@ -35,12 +48,16 @@ const Sidebar = () => {
     return (
       <div key={index}>
         {route.sub ? (
-          <Accordion expanded={isOpen} onChange={() => setIsOpen(!isOpen)}>
+          <Accordion
+            expanded={accordionsOpen.includes(route.path)}
+            onChange={() => handleAccordionExpansion(route.path)}
+          >
             <AccordionSummary sx={customStyles.accordionSummary}>
               <Button
                 sx={{
                   ...customStyles.menuItem,
-                  ...(router.pathname === route.path &&
+                  ...(route.path &&
+                    router.pathname.includes(route.path) &&
                     customStyles.activeMenuItem),
                 }}
               >
@@ -100,7 +117,7 @@ const Sidebar = () => {
       </div>
     );
   };
-  
+
   return (
     <Stack sx={customStyles.stack}>
       <Stack

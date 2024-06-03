@@ -82,7 +82,7 @@ const customStyles = {
       xs: 900,
       md: 1000,
     },
-    mb: 1,
+    // mb: 1,
     textTransform: "uppercase",
     fontFamily: champBlackFontFamily,
     color: "#1A1A1A",
@@ -370,7 +370,7 @@ const PreInterventionForm = () => {
 
         setDisplaySnackbarMsg(true);
 
-        router.replace('/success-message')
+        router.replace("/success-message");
       })
       .catch(() => {
         setIsError(true);
@@ -576,9 +576,9 @@ const PreInterventionForm = () => {
           mb: 4,
         }}
       >
-        1 to 23 statements <br />
-        (1 = completely disagree, 2 = disagree, 3 = somewhat disagree, 4 =
-        somewhat agree, 5 = agree, 6 = completely agree).
+        1 to {questionListPartOne.length} statements (1 = totally disagree, 2
+        = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        totally agree).
       </Typography>
 
       <FormControl
@@ -635,10 +635,9 @@ const PreInterventionForm = () => {
           mb: 4,
         }}
       >
-        1 to 23 statements
-        <br />
-        (1 = completely disagree, 2 = disagree, 3 = somewhat disagree, 4 =
-        somewhat agree, 5 = agree, 6 = completely agree).
+        1 to {questionListPartTwo.length} statements (1 = totally disagree, 2
+        = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        totally agree).
       </Typography>
 
       <FormControl
@@ -772,7 +771,8 @@ const PreInterventionForm = () => {
           await getStudentFormInfoByFormType(FormEvaluation.PreInterventions);
 
         const studentFormInfoPersonal = studentFormInfoQuestions.filter(
-          (item: QuestionResponse) => item.sectionType === SectionType.PersonalDetails
+          (item: QuestionResponse) =>
+            item.sectionType === SectionType.PersonalDetails
         );
 
         setStudentFormInfo(studentFormInfoPersonal);
@@ -793,7 +793,7 @@ const PreInterventionForm = () => {
           Pre-Intervention Measurement
         </Typography>
 
-        <Typography variant="h6" sx={customStyles.body}>
+        <Typography variant="subtitle1" sx={customStyles.body}>
           Here are some general questions about you?
         </Typography>
       </Box>
