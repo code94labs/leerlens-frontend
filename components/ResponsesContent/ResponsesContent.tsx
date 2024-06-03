@@ -82,7 +82,7 @@ const customStyles = {
   },
   tabs: {
     "& .Mui-selected": {
-      color: "black",
+      color: "#A879FF",
       fontWeight: "bold",
       fontSize: 16,
       borderBottom: "5px solid #A879FF",
