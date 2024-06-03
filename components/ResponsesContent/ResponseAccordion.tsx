@@ -28,8 +28,8 @@ import {
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-import DyanmicListHeader from "./DyanmicListHeader";
-import DyanmicListContent from "./DyanmicListContent";
+import DynamicListHeader from "./DynamicListHeader";
+import DynamicListContent from "./DynamicListContent";
 import {
   StudentDetailsAnswer,
   StudentResponse,
@@ -44,7 +44,14 @@ import {
   evaluationTypesTitles,
 } from "../../utils/enum";
 import { formContentFiltering, formatTimeStamp } from "../../utils/helper";
-import { ChangeEvent, Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import {
   deleteStudentResponseById,
   updateStudentResponse,
@@ -191,6 +198,7 @@ const customStyles = {
 };
 
 type Props = {
+  showQuestionTypesTab?: boolean;
   response: StudentResponse;
   isSelectAllChecked: boolean;
   setFilteredStudentResponses: Dispatch<SetStateAction<StudentResponse[]>>;
@@ -224,10 +232,11 @@ const dropdownPaperProp = {
 
 const ResponseAccordion = (props: Props) => {
   const {
+    showQuestionTypesTab,
     isSelectAllChecked,
     response: studentResponse,
     setFilteredStudentResponses,
-    setSelectedResponseIds
+    setSelectedResponseIds,
   } = props;
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
@@ -366,9 +375,9 @@ const ResponseAccordion = (props: Props) => {
 
     setIsChecked(isChecked);
 
-    if(!isChecked) {
+    if (!isChecked) {
       setSelectedResponseIds((prev: number[]) => {
-        return prev.filter((stdId: number) => stdId !== studentResponse.id)
+        return prev.filter((stdId: number) => stdId !== studentResponse.id);
       });
     } else {
       setSelectedResponseIds((prev: number[]) => {
@@ -664,16 +673,26 @@ const ResponseAccordion = (props: Props) => {
         checked={isChecked}
       />
 
-      <Typography sx={{ width: 200, pt: 1 }}>
+      <Typography sx={{ width: "14%", pt: 1 }}>
         {studentResponse.createdAt &&
           formatTimeStamp(new Date(studentResponse.createdAt).toDateString())}
       </Typography>
 
-      <Typography sx={{ flex: 1, pt: 1 }}>
-        {evaluationTypesTitles[studentResponse.formType]}
-      </Typography>
+      {showQuestionTypesTab && (
+        <Typography sx={{ pt: 1, width: "14%" }}>
+          {evaluationTypesTitles[studentResponse.formType]}
+        </Typography>
+      )}
 
-      <Box>
+      {studentResponse.studentDetails.slice(0, 4).map((studentInfo) => (
+        <Typography sx={{ pt: 1, width: "14%" }}>
+          {studentInfo.fieldType === FieldType.DropDown
+            ? studentInfo.dropdownTitle
+            : studentInfo.answer}
+        </Typography>
+      ))}
+
+      <Box sx={{ flex: 1, display: "flex", justifyContent: "end" }}>
         <IconButton>
           <KeyboardArrowDownRoundedIcon sx={customStyles.icon} />
         </IconButton>
@@ -691,13 +710,13 @@ const ResponseAccordion = (props: Props) => {
 
   const personalDetails = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Personal details" subTitle="Answers" />
+      <DynamicListHeader titles={["Personal details", "Answers"]}/>
 
       <Stack>
         {studentResponse.studentDetails
           .filter((item) => item.sectionType === SectionType.PersonalDetails)
           .map((studentInfo) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={studentInfo.questionId}
               question={studentInfo.questionTitle}
               answer={
@@ -713,7 +732,7 @@ const ResponseAccordion = (props: Props) => {
 
   const questionSetOne = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Question | Part 01" subTitle="Answers" />
+      <DynamicListHeader titles={["Question | Part 01", "Answers"]} />
 
       <Stack>
         {studentResponse.responses
@@ -722,7 +741,7 @@ const ResponseAccordion = (props: Props) => {
               item.questionSection === QuestionnaireSection.QuestionPartOne
           )
           .map((question) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={question.questionId}
               question={`${question.questionId}. ${question.questionTitle}`}
               answer={question.answerText}
@@ -734,7 +753,7 @@ const ResponseAccordion = (props: Props) => {
 
   const questionSetTwo = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Question | Part 02" subTitle="Answers" />
+      <DynamicListHeader titles={["Question | Part 02", "Answers"]} />
 
       <Stack>
         {studentResponse.responses
@@ -743,7 +762,7 @@ const ResponseAccordion = (props: Props) => {
               item.questionSection === QuestionnaireSection.QuestionPartTwo
           )
           .map((question, index) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={index}
               question={`${question.questionId}. ${question.questionTitle}`}
               answer={question.answerText}
@@ -755,7 +774,7 @@ const ResponseAccordion = (props: Props) => {
 
   const supervisorEvaluation = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Program and Supervisor" subTitle="Answers" />
+      <DynamicListHeader titles={["Program and Supervisor", "Answers"]} />
 
       <Stack>
         {studentResponse.studentDetails
@@ -763,7 +782,7 @@ const ResponseAccordion = (props: Props) => {
             (item) => item.sectionType === SectionType.ProgramAndSupervisor
           )
           .map((studentInfo) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={studentInfo.questionId}
               question={studentInfo.questionTitle}
               answer={
@@ -779,13 +798,13 @@ const ResponseAccordion = (props: Props) => {
 
   const final = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Final" subTitle="Answers" />
+      <DynamicListHeader titles={["Final", "Answers"]} />
 
       <Stack>
         {studentResponse.studentDetails
           .filter((item) => item.sectionType === SectionType.Final)
           .map((studentInfo) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={studentInfo.questionId}
               question={studentInfo.questionTitle}
               answer={studentInfo.answer}

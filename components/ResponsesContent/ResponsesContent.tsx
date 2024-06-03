@@ -19,7 +19,7 @@ import Grid from "@mui/material/Grid";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 
-import DyanmicListHeader from "./DyanmicListHeader";
+import DynamicListHeader from "./DynamicListHeader";
 import ResponseAccordion from "./ResponseAccordion";
 import { getAllStudentResponses } from "../../services/response.service";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
@@ -476,6 +476,7 @@ const ResponsesContent = () => {
             {getResponsesByFormType().map((response) => (
               <ResponseAccordion
                 key={response?.id}
+                showQuestionTypesTab
                 response={response}
                 isSelectAllChecked={isSelectAllChecked}
                 setFilteredStudentResponses={setStudentResponses}
@@ -596,10 +597,20 @@ const ResponsesContent = () => {
     <Stack px={2} mt={-3}>
       {tabHeader}
 
-      <DyanmicListHeader
+      <DynamicListHeader
         isMainTitle
-        title="Recorded date"
-        subTitle="Question types"
+        titles={
+          tabValue === ResponsesTabs.All
+            ? [
+                "Recorded date",
+                "Question types",
+                "School",
+                "Study",
+                "Grade",
+                "Remind Program",
+              ]
+            : ["Recorded date", "School", "Study", "Grade", "Remind Program"]
+        }
         isSelectAllChecked={isSelectAllChecked}
         setIsSelectAllChecked={setIsSelectAllChecked}
       />
@@ -698,7 +709,7 @@ const ResponsesContent = () => {
     filterAge,
     filterDate,
     page,
-    limit
+    limit,
   ]);
 
   useEffect(() => {
