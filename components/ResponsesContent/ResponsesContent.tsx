@@ -32,6 +32,7 @@ import {
   dateFilterList,
   gradeList,
   remindProgramList,
+  remindProgramListForFilters,
   schoolList,
   studyFieldList,
 } from "../../utils/constant";
@@ -148,7 +149,9 @@ const ResponsesContent = () => {
   const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
   const [filterSchool, setFilterSchool] = useState<number>(schoolList[0].id);
   const [filterGrade, setFilterGrade] = useState<number>(gradeList[0].id);
-  const [filterCourse, setFilterCourse] = useState<number>(0);
+  const [filterCourse, setFilterCourse] = useState<number>(
+    remindProgramListForFilters[0].id
+  );
   const [filterAge, setFilterAge] = useState<number>(ageList[0].id);
   const [filterStudy, setFilterStudy] = useState<number>(studyFieldList[0].id);
   const [filterDate, setFilterDate] = useState<string>("");
@@ -156,7 +159,8 @@ const ResponsesContent = () => {
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
   const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(2);
+  const [limit, setLimit] = useState<number>(100);
+  const [numberOfPages, setNumberOfPages] = useState<number>(1);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
@@ -281,8 +285,7 @@ const ResponsesContent = () => {
               setFilterCourse(Number(event.target.value));
             }}
           >
-            <MenuItem value={0}>All</MenuItem>
-            {remindProgramList.map((item) => (
+            {remindProgramListForFilters.map((item) => (
               <MenuItem value={item.id} key={item.id}>
                 {item.sentence}
               </MenuItem>
@@ -583,7 +586,7 @@ const ResponsesContent = () => {
       sx={customStyles.paginationComponent}
     >
       <Pagination
-        count={2}
+        count={numberOfPages}
         shape="rounded"
         // color="primary"
         page={page}
@@ -676,7 +679,8 @@ const ResponsesContent = () => {
 
       await getAllStudentResponses(params)
         .then((res) => {
-          setStudentResponses(res);
+          setStudentResponses(res.items);
+          setNumberOfPages(res.meta.totalPages);
         })
         .catch(() => {
           setIsError(true);

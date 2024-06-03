@@ -182,6 +182,16 @@ export const remindProgramList = [
   },
 ];
 
+// remindLearningProgram for filter
+export const remindProgramListForFilters = [
+  {
+    id: 0,
+    sentence: "All",
+    questionSetId: 1,
+  },
+  ...remindProgramList,
+];
+
 // TODO: GET THE ACTUAL DATA FOR THIS
 export const ageList = [
   { id: 0, age: "All" },
