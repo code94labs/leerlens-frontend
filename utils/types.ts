@@ -72,8 +72,8 @@ export type UpdateQuestionResponse = {
 };
 
 export type UpdateStudentResponse = {
-  studentDetails: UpdateQuestionResponse[]
-}
+  studentDetails: UpdateQuestionResponse[];
+};
 
 export type BulkUpdateClassName = {
   newClass: string;
@@ -87,4 +87,17 @@ export type BulkUpdateCourse = {
 
 export type StudentResponse = CreateStudentResponse & {
   id: number;
+};
+
+export type GetResponsesQueryParams = {
+  formType?: number;
+  age?: number;
+  course?: number;
+  fromDate?: string;
+  toDate?: string;
+  grade?: number;
+  school?: number;
+  study?: number;
+  page?: number;
+  limit?: number;
 };

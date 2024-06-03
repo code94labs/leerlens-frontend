@@ -25,7 +25,7 @@ import { getAllStudentResponses } from "../../services/response.service";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 
-import { StudentResponse } from "../../utils/types";
+import { GetResponsesQueryParams, StudentResponse } from "../../utils/types";
 import { FormEvaluation } from "../../utils/enum";
 import {
   ageList,
@@ -134,21 +134,29 @@ const customStyles = {
 
 const editTypeDropdown = ["Edit class name", "Edit course name"];
 
+enum ResponsesTabs {
+  All = 0,
+  PreInterventions = 1,
+  PostInterventions = 2,
+  Normgroup = 3,
+  Evaluation = 4,
+}
+
 const ResponsesContent = () => {
-  const [tabValue, setTabValue] = useState(0);
+  const [tabValue, setTabValue] = useState<ResponsesTabs>(ResponsesTabs.All);
 
   const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
   const [filterSchool, setFilterSchool] = useState<number>(schoolList[0].id);
   const [filterGrade, setFilterGrade] = useState<number>(gradeList[0].id);
   const [filterCourse, setFilterCourse] = useState<number>(0);
-  const [filterAge, setFilterAge] = useState<number>(ageList[0].age);
+  const [filterAge, setFilterAge] = useState<number>(ageList[0].id);
   const [filterStudy, setFilterStudy] = useState<number>(studyFieldList[0].id);
   const [filterDate, setFilterDate] = useState<string>("");
 
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
   const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(5);
+  const [limit, setLimit] = useState<number>(2);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
@@ -182,7 +190,7 @@ const ResponsesContent = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleChangeTabs = (_: SyntheticEvent, newValue: number) => {
+  const handleChangeTabs = (_: SyntheticEvent, newValue: ResponsesTabs) => {
     setTabValue(newValue);
   };
 
@@ -303,7 +311,7 @@ const ResponsesContent = () => {
         </FormControl>
       </Grid>
 
-      <Grid item xs={1}>
+      <Grid item xs={2}>
         <FormControl sx={customStyles.dropdown}>
           <InputLabel>Age</InputLabel>
 
@@ -315,7 +323,7 @@ const ResponsesContent = () => {
             }}
           >
             {ageList.map((item) => (
-              <MenuItem value={item.age} key={item.age}>
+              <MenuItem value={item.id} key={item.age}>
                 {item.age}
               </MenuItem>
             ))}
@@ -556,11 +564,14 @@ const ResponsesContent = () => {
 
   const tabHeader = (
     <Tabs value={tabValue} onChange={handleChangeTabs} sx={customStyles.tabs}>
-      <Tab value={0} label="All" />
-      <Tab value={1} label="Pre - Intervention" />
-      <Tab value={2} label="Post - Intervention" />
-      <Tab value={3} label="Evaluation" />
-      <Tab value={4} label="NormGroup" />
+      <Tab value={ResponsesTabs.All} label="All" />
+      <Tab value={ResponsesTabs.PreInterventions} label="Pre - Intervention" />
+      <Tab
+        value={ResponsesTabs.PostInterventions}
+        label="Post - Intervention"
+      />
+      <Tab value={ResponsesTabs.Evaluation} label="Evaluation" />
+      <Tab value={ResponsesTabs.Normgroup} label="NormGroup" />
     </Tabs>
   );
 
@@ -609,22 +620,6 @@ const ResponsesContent = () => {
     </Stack>
   );
 
-  const fetchingAllStudentResponses = async () => {
-    await getAllStudentResponses(limit, page)
-      .then((res) => {
-        setStudentResponses(res);
-      })
-      .catch(() => {
-        setIsError(true);
-
-        setNotificationMsg("Error when fetching all student responses...");
-        setDisplaySnackbarMsg(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-
   const snackbar = (
     <Snackbar
       open={displaySnackbarMsg}
@@ -647,6 +642,42 @@ const ResponsesContent = () => {
   );
 
   useEffect(() => {
+    const fetchingAllStudentResponses = async () => {
+      // making the params object
+      const params: GetResponsesQueryParams = {
+        formType: tabValue !== 0 ? tabValue - 1 : undefined,
+        age: filterAge !== 0 ? filterAge : undefined,
+        course: filterCourse !== 0 ? filterCourse : undefined,
+        grade: filterGrade !== 0 ? filterGrade : undefined,
+        school: filterSchool !== 0 ? filterSchool : undefined,
+        study: filterStudy !== 0 ? filterStudy : undefined,
+        fromDate:
+          filterDate.length > 1
+            ? getDateRange(filterDate)[0].replace(/[/]/g, "-")
+            : undefined,
+        toDate:
+          filterDate.length > 1
+            ? getDateRange(filterDate)[1].replace(/[/]/g, "-")
+            : undefined,
+        page,
+        limit,
+      };
+
+      await getAllStudentResponses(params)
+        .then((res) => {
+          setStudentResponses(res);
+        })
+        .catch(() => {
+          setIsError(true);
+
+          setNotificationMsg("Error when fetching all student responses...");
+          setDisplaySnackbarMsg(true);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    };
+
     const fetchData = async () => {
       setIsLoading(true);
 
@@ -655,33 +686,19 @@ const ResponsesContent = () => {
       setRefetch(false);
     };
 
-    refetch && fetchData();
-  }, [refetch]);
-
-  useEffect(() => {
-    const dateRangeStr = filterDate;
-
-    const dateRange = getDateRange(dateRangeStr);
-
-    const fromDate = filterDate.length > 1 ? dateRange[0] : null;
-    const toDate = filterDate.length > 1 ? dateRange[1] : null;
-
-    console.log({
-      school: filterSchool,
-      course: filterCourse,
-      grade: filterGrade,
-      study: filterStudy,
-      age: filterAge,
-      fromDate: fromDate,
-      toDate: toDate,
-    });
+    // refetch && fetchData();
+    fetchData();
   }, [
+    refetch,
+    tabValue,
     filterSchool,
     filterCourse,
     filterGrade,
     filterStudy,
     filterAge,
     filterDate,
+    page,
+    limit
   ]);
 
   useEffect(() => {
@@ -702,7 +719,9 @@ const ResponsesContent = () => {
         case 2:
           setSelectedResponseIds(
             studentResponses
-              .filter((res) => res.formType === FormEvaluation.PostInterventions)
+              .filter(
+                (res) => res.formType === FormEvaluation.PostInterventions
+              )
               .map((res) => res.id)
           );
           break;
