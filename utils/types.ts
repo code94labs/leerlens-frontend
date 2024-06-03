@@ -75,6 +75,16 @@ export type UpdateStudentResponse = {
   studentDetails: UpdateQuestionResponse[]
 }
 
+export type BulkUpdateClassName = {
+  newClass: string;
+  responseIds: number[];
+};
+
+export type BulkUpdateCourse = {
+  newCourseId: number;
+  responseIds: number[];
+};
+
 export type StudentResponse = CreateStudentResponse & {
   id: number;
 };

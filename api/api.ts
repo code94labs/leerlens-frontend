@@ -1,5 +1,5 @@
-export const baseUrl = "http://localhost:5000";
-// export const baseUrl = "http://leerlens-backend-nestjs-env-env.eba-4m4wcq8f.us-east-1.elasticbeanstalk.com"
+export const baseUrl = "http://localhost:5001";
+// export const baseUrl = "https://leerlens.nl";
 
 export const leerLensApi = {
   studentFormInfo: `${baseUrl}/studentFormInfo`,
@@ -10,7 +10,7 @@ export const leerLensApi = {
 
   postIntervention: `${baseUrl}/questionnaire/post-intervention`,
   postInterventionSoftDelete: `${baseUrl}/questionnaire/post-intervention/soft-delete`,
-  
+
   evaluation: `${baseUrl}/questionnaire/evaluation`,
   evaluationSoftDelete: `${baseUrl}/questionnaire/evaluation/soft-delete`,
 
@@ -18,6 +18,8 @@ export const leerLensApi = {
   normgroupSoftDelete: `${baseUrl}/questionnaire/normgroup/soft-delete`,
 
   response: `${baseUrl}/response`,
+  responseBulkClass: `${baseUrl}/response/bulk-class`,
+  responseBulkCourse: `${baseUrl}/response/bulk-course`,
 
   login: `${baseUrl}/auth/login`,
   forgotPassword: `${baseUrl}/auth/forgot-password`,

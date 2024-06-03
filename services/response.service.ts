@@ -2,10 +2,16 @@ import { leerLensApi } from "../api/api";
 import {
   deleteRequest,
   getRequest,
+  patchRequest,
   postRequest,
   updateRequest,
 } from "../api/requests";
-import { CreateStudentResponse, UpdateStudentResponse } from "../utils/types";
+import {
+  BulkUpdateClassName,
+  BulkUpdateCourse,
+  CreateStudentResponse,
+  UpdateStudentResponse,
+} from "../utils/types";
 
 export const createStudentResponse = async (reqBody: CreateStudentResponse) => {
   try {
@@ -50,6 +56,33 @@ export const updateStudentResponse = async (
     throw error;
   }
 };
+
+export const bulkUpdateClassName = async (reqBody: BulkUpdateClassName) => {
+  try {
+    const response = await patchRequest(
+      `${leerLensApi.responseBulkClass}`,
+      reqBody
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error caused during class name bulk update request:", error);
+
+    throw error;
+  }
+};
+
+export const bulkUpdateCourse = async (reqBody: BulkUpdateCourse) => {
+  try {
+    const response = await patchRequest(`${leerLensApi.responseBulkCourse}`, reqBody);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error caused during course bulk update request:", error);
+
+    throw error;
+  }
+}
 
 export const deleteStudentResponseById = async (id: number) => {
   try {

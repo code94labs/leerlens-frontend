@@ -1,5 +1,5 @@
 import { Checkbox, Stack, Typography } from "@mui/material";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
   subTitle: string;
   isMainTitle?: boolean;
   isSelectAllChecked?: boolean;
-  setIsSelectAllChecked?: (value: boolean) => void;
+  setIsSelectAllChecked?: Dispatch<SetStateAction<boolean>>;
 };
 
 const customStyles = {
@@ -37,7 +37,9 @@ const DyanmicListHeader = (props: Props) => {
   } = props;
 
   const handleSelectAllItems = () => {
-    setIsSelectAllChecked && setIsSelectAllChecked(!isSelectAllChecked);
+    const isChecked = !isSelectAllChecked;
+
+    setIsSelectAllChecked && setIsSelectAllChecked(isChecked);
   };
 
   return (

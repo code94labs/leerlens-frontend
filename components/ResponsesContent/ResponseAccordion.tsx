@@ -44,7 +44,7 @@ import {
   evaluationTypesTitles,
 } from "../../utils/enum";
 import { formContentFiltering, formatTimeStamp } from "../../utils/helper";
-import { ChangeEvent, Fragment, useEffect, useState } from "react";
+import { ChangeEvent, Dispatch, Fragment, SetStateAction, useEffect, useState } from "react";
 import {
   deleteStudentResponseById,
   updateStudentResponse,
@@ -192,8 +192,9 @@ const customStyles = {
 
 type Props = {
   response: StudentResponse;
-  setFilteredStudentResponses: any;
   isSelectAllChecked: boolean;
+  setFilteredStudentResponses: Dispatch<SetStateAction<StudentResponse[]>>;
+  setSelectedResponseIds: Dispatch<SetStateAction<number[]>>;
 };
 
 const generalSteps = [
@@ -223,9 +224,10 @@ const dropdownPaperProp = {
 
 const ResponseAccordion = (props: Props) => {
   const {
+    isSelectAllChecked,
     response: studentResponse,
     setFilteredStudentResponses,
-    isSelectAllChecked,
+    setSelectedResponseIds
   } = props;
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
@@ -360,7 +362,19 @@ const ResponseAccordion = (props: Props) => {
   };
 
   const handleCheckBox = (event: ChangeEvent<HTMLInputElement>) => {
-    setIsChecked(event.target.checked);
+    const isChecked = event.target.checked;
+
+    setIsChecked(isChecked);
+
+    if(!isChecked) {
+      setSelectedResponseIds((prev: number[]) => {
+        return prev.filter((stdId: number) => stdId !== studentResponse.id)
+      });
+    } else {
+      setSelectedResponseIds((prev: number[]) => {
+        return [...prev, studentResponse.id];
+      });
+    }
   };
 
   const disableExpand = (event: any) => {

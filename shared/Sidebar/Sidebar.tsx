@@ -100,6 +100,7 @@ const Sidebar = () => {
       </div>
     );
   };
+  
   return (
     <Stack sx={customStyles.stack}>
       <Stack
