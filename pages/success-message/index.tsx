@@ -94,7 +94,7 @@ const SuccessMessage = () => {
       <Box sx={customStyles.card}>
         <Stack justifyContent="center" alignItems={"center"}>
           <Image
-            src="/Logo.png"
+            src="/Logo-HQ.png"
             height={40}
             width={130}
             alt="logo"

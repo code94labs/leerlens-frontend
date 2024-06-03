@@ -69,8 +69,14 @@ const generateScaleArr = (min: number, max: number) => {
 };
 
 const CustomScale = (props: CustomScaleProps) => {
-  const { questionText, minValue, maxValue, positionOrderId, updateAnswer, isDisabled } =
-    props;
+  const {
+    questionText,
+    minValue,
+    maxValue,
+    positionOrderId,
+    updateAnswer,
+    isDisabled,
+  } = props;
 
   const [selectedValue, setSelectedValue] = useState(0);
 
@@ -111,6 +117,7 @@ const CustomScale = (props: CustomScaleProps) => {
         alignItems="center"
         gap={2}
         justifyContent="space-between"
+        sx={{ width: maxValue === 6 ? 650 : 900 }}
       >
         <Typography
           color="grey"
