@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Dialog,
@@ -9,18 +10,25 @@ import {
   FormControl,
   MenuItem,
   Select,
+  Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
 import { remindProgramList } from "../../utils/constant";
+import {
+  bulkUpdateClassName,
+  bulkUpdateCourse,
+} from "../../services/response.service";
 
 type Props = {
   open: boolean;
-  setOpen: (open: boolean) => void;
   isClassEdit?: boolean;
   isCourseEdit?: boolean;
+  selectedResponseIds: number[];
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  setRefetch: Dispatch<SetStateAction<boolean>>;
 };
 
 const customStyles = {
@@ -82,12 +90,33 @@ const customStyles = {
     justifyContent: "space-between",
     mx: 2,
   },
+  snackbarAlert: {
+    width: "100%",
+    bgcolor: "white",
+    fontWeight: 600,
+    borderRadius: 2,
+    border: "none",
+  },
 };
 
 const EditContentDialog = (props: Props) => {
-  const { open, setOpen, isClassEdit, isCourseEdit } = props;
+  const {
+    open,
+    setOpen,
+    isClassEdit,
+    isCourseEdit,
+    selectedResponseIds,
+    setRefetch,
+  } = props;
 
   const [course, setCourse] = useState(0);
+  const [className, setClassName] = useState("");
+
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState("");
+
+  const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [maxWidth] = useState<DialogProps["maxWidth"]>("md");
 
@@ -99,9 +128,75 @@ const EditContentDialog = (props: Props) => {
     setCourse(event.target.value as number);
   };
 
+  const snackbar = (
+    <Snackbar
+      open={displaySnackbarMsg}
+      autoHideDuration={6000}
+      onClose={() => setDisplaySnackbarMsg(false)}
+      anchorOrigin={{
+        vertical: "bottom",
+        horizontal: "right",
+      }}
+    >
+      <Alert
+        onClose={() => setDisplaySnackbarMsg(false)}
+        severity={isError ? "error" : "success"}
+        variant="outlined"
+        sx={customStyles.snackbarAlert}
+      >
+        {notificationMsg}
+      </Alert>
+    </Snackbar>
+  );
+
+  // Performing a get request action again to get the update course titles & note that this feature won't be used frequently by the client.
+  const handleUpdate = async () => {
+    try {
+      setIsLoading(true);
+
+      if (isClassEdit) {
+        const reqBody = {
+          newClass: className,
+          responseIds: selectedResponseIds,
+        };
+
+        await bulkUpdateClassName(reqBody);
+
+        setNotificationMsg("Successfully updated the class name");
+        setDisplaySnackbarMsg(true);
+      } else {
+        const reqBody = {
+          newCourseId: course,
+          responseIds: selectedResponseIds,
+        };
+
+        await bulkUpdateCourse(reqBody);
+
+        setNotificationMsg("Successfully updated the remind program");
+        setDisplaySnackbarMsg(true);
+      }
+
+      handleClose();
+    } catch (_) {
+      setIsError(true);
+
+      setNotificationMsg("Error when deleting student response...");
+      setDisplaySnackbarMsg(true);
+    } finally {
+      setIsLoading(false);
+
+      setRefetch(true);
+    }
+  };
+
   const inputClassEdit = (
     <DialogContent sx={customStyles.dialogContent}>
-      <TextField placeholder="Class Name Here" fullWidth />
+      <TextField
+        placeholder="Class Name Here"
+        value={className}
+        onChange={(e) => setClassName(e.target.value)}
+        fullWidth
+      />
     </DialogContent>
   );
 
@@ -137,34 +232,46 @@ const EditContentDialog = (props: Props) => {
 
   const dialogActionButtons = (
     <DialogActions sx={customStyles.dialogActions}>
-      <Button onClick={handleClose} sx={customStyles.secondaryButton}>
+      <Button
+        onClick={handleClose}
+        sx={customStyles.secondaryButton}
+        disabled={isLoading}
+      >
         Cancel
       </Button>
 
-      <Button onClick={handleClose} sx={customStyles.primaryButton}>
-        Update
+      <Button
+        onClick={handleUpdate}
+        sx={customStyles.primaryButton}
+        disabled={isLoading}
+      >
+        {isLoading ? "Updating..." : "Update"}
       </Button>
     </DialogActions>
   );
 
   return (
-    <Dialog
-      open={open}
-      keepMounted
-      onClose={handleClose}
-      maxWidth={maxWidth}
-      sx={customStyles.dialog}
-    >
-      <Box p={4}>
-        {dialogTitle}
+    <>
+      <Dialog
+        open={open}
+        keepMounted
+        onClose={handleClose}
+        maxWidth={maxWidth}
+        sx={customStyles.dialog}
+      >
+        <Box p={4}>
+          {dialogTitle}
 
-        {isClassEdit && inputClassEdit}
+          {isClassEdit && inputClassEdit}
 
-        {isCourseEdit && inputCourseEdit}
+          {isCourseEdit && inputCourseEdit}
 
-        {dialogActionButtons}
-      </Box>
-    </Dialog>
+          {dialogActionButtons}
+        </Box>
+      </Dialog>
+
+      {snackbar}
+    </>
   );
 };
 

@@ -14,6 +14,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material";
+import Pagination from "@mui/material/Pagination";
 import Grid from "@mui/material/Grid";
 import React, { SyntheticEvent, useEffect, useState } from "react";
 import { champBlackFontFamily } from "../../shared/typography";
@@ -24,13 +25,14 @@ import { getAllStudentResponses } from "../../services/response.service";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 
-import { StudentResponse } from "../../utils/types";
+import { GetResponsesQueryParams, StudentResponse } from "../../utils/types";
 import { FormEvaluation } from "../../utils/enum";
 import {
   ageList,
   dateFilterList,
   gradeList,
   remindProgramList,
+  remindProgramListForFilters,
   schoolList,
   studyFieldList,
 } from "../../utils/constant";
@@ -80,7 +82,7 @@ const customStyles = {
   },
   tabs: {
     "& .Mui-selected": {
-      color: "black",
+      color: "#A879FF",
       fontWeight: "bold",
       fontSize: 16,
       borderBottom: "5px solid #A879FF",
@@ -99,6 +101,17 @@ const customStyles = {
     maxHeight: "60vh",
     "&::-webkit-scrollbar": {
       width: "0",
+    },
+  },
+  paginationComponent: {
+    width: "100%",
+    marginY: 2,
+    "& .css-1yt0x08-MuiButtonBase-root-MuiPaginationItem-root": {
+      fontWeight: 600,
+    },
+    "& .css-1yt0x08-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected": {
+      backgroundColor: "#A879FF",
+      color: "#FFF",
     },
   },
   tabContent: {
@@ -122,21 +135,38 @@ const customStyles = {
 
 const editTypeDropdown = ["Edit class name", "Edit course name"];
 
+enum ResponsesTabs {
+  All = 0,
+  PreInterventions = 1,
+  PostInterventions = 2,
+  Normgroup = 3,
+  Evaluation = 4,
+}
+
 const ResponsesContent = () => {
-  const [value, setValue] = useState(0);
+  const [tabValue, setTabValue] = useState<ResponsesTabs>(ResponsesTabs.All);
+
   const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
   const [filterSchool, setFilterSchool] = useState<number>(schoolList[0].id);
   const [filterGrade, setFilterGrade] = useState<number>(gradeList[0].id);
-  const [filterCourse, setFilterCourse] = useState<number>(0);
-  const [filterAge, setFilterAge] = useState<number>(ageList[0].age);
+  const [filterCourse, setFilterCourse] = useState<number>(
+    remindProgramListForFilters[0].id
+  );
+  const [filterAge, setFilterAge] = useState<number>(ageList[0].id);
   const [filterStudy, setFilterStudy] = useState<number>(studyFieldList[0].id);
   const [filterDate, setFilterDate] = useState<string>("");
+
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
+
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState<number>(100);
+  const [numberOfPages, setNumberOfPages] = useState<number>(1);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isSelectAllChecked, setIsSelectAllChecked] = useState(false);
 
   const [open, setOpen] = useState(false);
+  const [refetch, setRefetch] = useState(true);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
@@ -147,6 +177,7 @@ const ResponsesContent = () => {
   const [studentResponses, setStudentResponses] = useState<StudentResponse[]>(
     []
   );
+  const [selectedResponseIds, setSelectedResponseIds] = useState<number[]>([]);
 
   const isClassEditType = selectedEditType === editTypeDropdown[0];
   const isCourceEditType = selectedEditType === editTypeDropdown[1];
@@ -163,8 +194,12 @@ const ResponsesContent = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleChangeTabs = (_: SyntheticEvent, newValue: number) => {
-    setValue(newValue);
+  const handleChangeTabs = (_: SyntheticEvent, newValue: ResponsesTabs) => {
+    setTabValue(newValue);
+  };
+
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
   };
 
   // const CustomDropdown = ({
@@ -250,8 +285,7 @@ const ResponsesContent = () => {
               setFilterCourse(Number(event.target.value));
             }}
           >
-            <MenuItem value={0}>All</MenuItem>
-            {remindProgramList.map((item) => (
+            {remindProgramListForFilters.map((item) => (
               <MenuItem value={item.id} key={item.id}>
                 {item.sentence}
               </MenuItem>
@@ -280,7 +314,7 @@ const ResponsesContent = () => {
         </FormControl>
       </Grid>
 
-      <Grid item xs={1}>
+      <Grid item xs={2}>
         <FormControl sx={customStyles.dropdown}>
           <InputLabel>Age</InputLabel>
 
@@ -292,7 +326,7 @@ const ResponsesContent = () => {
             }}
           >
             {ageList.map((item) => (
-              <MenuItem value={item.age} key={item.age}>
+              <MenuItem value={item.id} key={item.age}>
                 {item.age}
               </MenuItem>
             ))}
@@ -426,6 +460,8 @@ const ResponsesContent = () => {
   // };
 
   const getResponsesByFormType = (formType?: FormEvaluation) => {
+    if (!studentResponses) return [];
+
     if (!formType && formType !== 0) {
       return studentResponses;
     }
@@ -447,6 +483,7 @@ const ResponsesContent = () => {
                 response={response}
                 isSelectAllChecked={isSelectAllChecked}
                 setFilteredStudentResponses={setStudentResponses}
+                setSelectedResponseIds={setSelectedResponseIds}
               />
             ))}
           </Stack>
@@ -463,6 +500,7 @@ const ResponsesContent = () => {
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setStudentResponses}
+                    setSelectedResponseIds={setSelectedResponseIds}
                   />
                 )
             )}
@@ -480,6 +518,7 @@ const ResponsesContent = () => {
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setStudentResponses}
+                    setSelectedResponseIds={setSelectedResponseIds}
                   />
                 )
             )}
@@ -497,6 +536,7 @@ const ResponsesContent = () => {
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setStudentResponses}
+                    setSelectedResponseIds={setSelectedResponseIds}
                   />
                 )
             )}
@@ -514,6 +554,7 @@ const ResponsesContent = () => {
                     response={response}
                     isSelectAllChecked={isSelectAllChecked}
                     setFilteredStudentResponses={setStudentResponses}
+                    setSelectedResponseIds={setSelectedResponseIds}
                   />
                 )
             )}
@@ -526,13 +567,33 @@ const ResponsesContent = () => {
   };
 
   const tabHeader = (
-    <Tabs value={value} onChange={handleChangeTabs} sx={customStyles.tabs}>
-      <Tab value={0} label="All" />
-      <Tab value={1} label="Pre - Intervention" />
-      <Tab value={2} label="Post - Intervention" />
-      <Tab value={3} label="Evaluation" />
-      <Tab value={4} label="NormGroup" />
+    <Tabs value={tabValue} onChange={handleChangeTabs} sx={customStyles.tabs}>
+      <Tab value={ResponsesTabs.All} label="All" />
+      <Tab value={ResponsesTabs.PreInterventions} label="Pre - Intervention" />
+      <Tab
+        value={ResponsesTabs.PostInterventions}
+        label="Post - Intervention"
+      />
+      <Tab value={ResponsesTabs.Evaluation} label="Evaluation" />
+      <Tab value={ResponsesTabs.Normgroup} label="NormGroup" />
     </Tabs>
+  );
+
+  const PaginationComponent = (
+    <Stack
+      direction="row"
+      justifyContent="end"
+      sx={customStyles.paginationComponent}
+    >
+      <Pagination
+        count={numberOfPages}
+        shape="rounded"
+        // color="primary"
+        page={page}
+        onChange={handleChange}
+        sx={{}}
+      />
+    </Stack>
   );
 
   const tabSection = (
@@ -540,8 +601,9 @@ const ResponsesContent = () => {
       {tabHeader}
 
       <DynamicListHeader
+        isMainTitle
         titles={
-          value === 0
+          tabValue === ResponsesTabs.All
             ? [
                 "Recorded date",
                 "Question types",
@@ -552,7 +614,6 @@ const ResponsesContent = () => {
               ]
             : ["Recorded date", "School", "Study", "Grade", "Remind Program"]
         }
-        isMainTitle
         isSelectAllChecked={isSelectAllChecked}
         setIsSelectAllChecked={setIsSelectAllChecked}
       />
@@ -566,27 +627,12 @@ const ResponsesContent = () => {
           justifyContent="space-between"
           sx={customStyles.scrollableList}
         >
-          {renderTabContent(value)}
+          {renderTabContent(tabValue)}
         </Stack>
       )}
+      {PaginationComponent}
     </Stack>
   );
-
-  const fetchingAllStudentInfo = async () => {
-    await getAllStudentResponses()
-      .then((res) => {
-        setStudentResponses(res);
-      })
-      .catch(() => {
-        setIsError(true);
-
-        setNotificationMsg("Error when fetching all student responses...");
-        setDisplaySnackbarMsg(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
 
   const snackbar = (
     <Snackbar
@@ -610,40 +656,111 @@ const ResponsesContent = () => {
   );
 
   useEffect(() => {
+    const fetchingAllStudentResponses = async () => {
+      // making the params object
+      const params: GetResponsesQueryParams = {
+        formType: tabValue !== 0 ? tabValue - 1 : undefined,
+        age: filterAge !== 0 ? filterAge : undefined,
+        course: filterCourse !== 0 ? filterCourse : undefined,
+        grade: filterGrade !== 0 ? filterGrade : undefined,
+        school: filterSchool !== 0 ? filterSchool : undefined,
+        study: filterStudy !== 0 ? filterStudy : undefined,
+        fromDate:
+          filterDate.length > 1
+            ? getDateRange(filterDate)[0].replace(/[/]/g, "-")
+            : undefined,
+        toDate:
+          filterDate.length > 1
+            ? getDateRange(filterDate)[1].replace(/[/]/g, "-")
+            : undefined,
+        page,
+        limit,
+      };
+
+      await getAllStudentResponses(params)
+        .then((res) => {
+          setStudentResponses(res.items);
+          setNumberOfPages(res.meta.totalPages);
+        })
+        .catch(() => {
+          setIsError(true);
+
+          setNotificationMsg("Error when fetching all student responses...");
+          setDisplaySnackbarMsg(true);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    };
+
     const fetchData = async () => {
       setIsLoading(true);
 
-      await fetchingAllStudentInfo();
+      await fetchingAllStudentResponses();
+
+      setRefetch(false);
     };
 
+    // refetch && fetchData();
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    const dateRangeStr = filterDate;
-
-    const dateRange = getDateRange(dateRangeStr);
-
-    const fromDate = filterDate.length > 1 ? dateRange[0] : null;
-    const toDate = filterDate.length > 1 ? dateRange[1] : null;
-
-    console.log({
-      school: filterSchool,
-      course: filterCourse,
-      grade: filterGrade,
-      study: filterStudy,
-      age: filterAge,
-      fromDate: fromDate,
-      toDate: toDate,
-    });
   }, [
+    refetch,
+    tabValue,
     filterSchool,
     filterCourse,
     filterGrade,
     filterStudy,
     filterAge,
     filterDate,
+    page,
+    limit,
   ]);
+
+  useEffect(() => {
+    if (isSelectAllChecked) {
+      switch (tabValue) {
+        case 0:
+          setSelectedResponseIds(studentResponses.map((res) => res.id));
+          break;
+
+        case 1:
+          setSelectedResponseIds(
+            studentResponses
+              .filter((res) => res.formType === FormEvaluation.PreInterventions)
+              .map((res) => res.id)
+          );
+          break;
+
+        case 2:
+          setSelectedResponseIds(
+            studentResponses
+              .filter(
+                (res) => res.formType === FormEvaluation.PostInterventions
+              )
+              .map((res) => res.id)
+          );
+          break;
+
+        case 3:
+          setSelectedResponseIds(
+            studentResponses
+              .filter((res) => res.formType === FormEvaluation.Evaluation)
+              .map((res) => res.id)
+          );
+          break;
+
+        case 4:
+          setSelectedResponseIds(
+            studentResponses
+              .filter((res) => res.formType === FormEvaluation.Normgroup)
+              .map((res) => res.id)
+          );
+          break;
+      }
+    } else {
+      setSelectedResponseIds([]);
+    }
+  }, [isSelectAllChecked]);
 
   return (
     <>
@@ -660,6 +777,8 @@ const ResponsesContent = () => {
         setOpen={setOpen}
         isClassEdit={isClassEditType}
         isCourseEdit={isCourceEditType}
+        selectedResponseIds={selectedResponseIds}
+        setRefetch={setRefetch}
       />
     </>
   );

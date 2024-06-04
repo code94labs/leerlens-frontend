@@ -6,9 +6,9 @@ export const postRequest = (api: string, body: object) =>
     .then((response) => response)
     .catch((error) => error);
 
-export const getRequest = (api: string) =>
+export const getRequest = (api: string, params?: object) =>
   axios
-    .get(api)
+    .get(api, { params: params })
     .then((response) => response)
     .catch((error) => error);
 
