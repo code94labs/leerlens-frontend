@@ -35,6 +35,7 @@ export type FormQuestion = {
   questionSetId: number;
   questionSection: number;
   answer?: number | string;
+  summaryTypes: number[];
 };
 
 export type PersonalDetails = {

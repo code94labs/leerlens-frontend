@@ -1,3 +1,5 @@
+import { SummaryTypes } from "./enum";
+
 export const schoolList = [
   { id: 0, schoolName: "All" }, // for the dropdown options
   { id: 1, schoolName: "Aeres Hogeschool Dronten" },
@@ -219,4 +221,14 @@ export const dateFilterList = [
   "2024/01/01 - 2024/12/31",
   "2023/01/01 - 2023/12/31",
   "2022/01/01 - 2022/12/31",
+];
+
+export const summaryTypes = [
+  { id: SummaryTypes.demograficalData, label: "Demografical Data" },
+  {
+    id: SummaryTypes.experimentingWithLearning,
+    label: "Experimenting With Learning",
+  },
+  { id: SummaryTypes.growthMindset, label: "Growth Mindset" },
+  { id: SummaryTypes.ownership, label: "Ownership" },
 ];
