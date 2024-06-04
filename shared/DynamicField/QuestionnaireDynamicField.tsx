@@ -321,13 +321,14 @@ const QuestionnaireDynamicField = (props: Props) => {
       if (question && handleQuestionUpdate) {
         const newQuestion: FormQuestion = question;
         newQuestion.questionText = formik.values.questionText;
+        newQuestion.summaryTypes = selectedSummaryTypes;
 
         handleQuestionUpdate(newQuestion);
       }
     };
 
     handleSaveChanges();
-  }, [question, formik.values.questionText]);
+  }, [question, formik.values.questionText, selectedSummaryTypes]);
 
   const deleteQuestionDialogModel = (
     <Box sx={customStyles.modalContent}>
