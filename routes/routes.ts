@@ -25,6 +25,10 @@ export const pages: RoutePath[] = [
         path: "/admin/dashboard/evaluation",
       },
       {
+        text: "Pre-Post Interventions",
+        path: "/admin/dashboard/pre-post-interventions",
+      },
+      {
         text: "Samengevat",
         path: "/admin/dashboard/samengevat",
       },
