@@ -74,15 +74,19 @@ const DashboardPrePostInterventionsContent = (props: Props) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const filterButton = (
-    <Stack px={2} py={3} gap={2}>
-      <Button variant="outlined" startIcon={<FilterAltIcon />}>
+    <Stack px={2} py={3}>
+      <Button
+        variant="outlined"
+        startIcon={<FilterAltIcon />}
+        sx={{ width: "max-content" }}
+      >
         Filter
       </Button>
     </Stack>
   );
 
   const titleSection = (
-    <Stack px={2} py={3} gap={2}>
+    <Stack mx={2} mt={3}>
       <Typography
         fontSize={20}
         fontFamily={champBlackFontFamily}
@@ -90,11 +94,10 @@ const DashboardPrePostInterventionsContent = (props: Props) => {
         color={"#1A1A1A"}
         fontWeight={900}
       >
-        The seasonal school
+        Pre - Post Intervention
       </Typography>
       <Typography fontSize={18} color={"#1A1A1A"}>
-        After the program students gave us grades and assessed statements.Below
-        you can read the results
+        # tagline for pre post intervention
       </Typography>
     </Stack>
   );
@@ -131,7 +134,7 @@ const DashboardPrePostInterventionsContent = (props: Props) => {
           {statisticsData.map((data, index) => (
             <Grid item xs={4} key={index}>
               <VerticalBarChartType01
-                title={`${index + 1}.${data.questionText}`}
+                title={`${index + 1}. ${data.questionText}`}
                 labels={["Learning 1", "Learning 2"]}
                 datasets={[
                   {
