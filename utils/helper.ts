@@ -27,9 +27,6 @@ export const generateStudentDetails = (
       const questionId = parseInt(key);
       const formValue = formDetailValues[key];
 
-      console.log("questionId", questionId);
-      console.log("formVlaue", formValue);
-
       studentFormInfo.forEach((question) => {
         if (
           question.id === questionId &&
