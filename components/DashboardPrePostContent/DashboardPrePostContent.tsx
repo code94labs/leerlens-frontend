@@ -19,24 +19,11 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 
-import NumericalDigit from "../../shared/Dashboard/NumericalDigit/NumericalDigit";
-import ProgressBar from "../../shared/Dashboard/ProgressBar/ProgressBar";
-import ProgressIndicator from "../../shared/Dashboard/ProgressIndicator/ProgressIndicator";
-import VerticalBarChartType02 from "../../shared/Dashboard/VerticalBarChartType02/VerticalBarChartType02";
-
-import { champBlackFontFamily } from "../../shared/typography";
-
-import { FormQuestion } from "../../utils/types";
-import { ChartType, FieldType, QuestionnaireSection } from "../../utils/enum";
 import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
-import { getPrePostStatistics } from "../../services/dashboardStatistics.service";
 
-const barChartColorCombinations = [
-  ["#F9C8A6", "#EB7200"],
-  ["#DCC9FF", "#A879FF"],
-  ["#FDB8CB", "#F5477C"],
-  ["#AEDCD1", "#05A88D"],
-];
+import { getPrePostStatistics } from "../../services/dashboardStatistics.service";
+import { champBlackFontFamily } from "../../shared/typography";
+import { barChartColorCombinations } from "../../utils/constant";
 
 ChartJS.register(
   CategoryScale,
@@ -58,7 +45,7 @@ const customStyles = {
 
 type Props = {};
 
-const DashboardPrePostInterventionsContent = (props: Props) => {
+const DashboardPrePostContent = (props: Props) => {
   const [statisticsData, setStatisticsData] = useState<
     {
       questionText: string;
@@ -102,6 +89,9 @@ const DashboardPrePostInterventionsContent = (props: Props) => {
     </Stack>
   );
 
+  const getBackgroundColors = (index: number) =>
+    barChartColorCombinations[index % barChartColorCombinations.length];
+
   useEffect(() => {
     const fetchingPrePostStatistics = async () => {
       setIsLoading(true);
@@ -112,7 +102,7 @@ const DashboardPrePostInterventionsContent = (props: Props) => {
         .catch(() => {
           setIsError(true);
 
-          setNotificationMsg("Error when fetching all student responses...");
+          setNotificationMsg("Error when fetching pre-post intervention statistics...");
           setDisplaySnackbarMsg(true);
         })
         .finally(() => {
@@ -139,10 +129,7 @@ const DashboardPrePostInterventionsContent = (props: Props) => {
                 datasets={[
                   {
                     data: [data.learningOne, data.learningTwo],
-                    backgroundColor:
-                      barChartColorCombinations[
-                        index % barChartColorCombinations.length
-                      ],
+                    backgroundColor: getBackgroundColors(index),
                   },
                 ]}
               />
@@ -154,4 +141,4 @@ const DashboardPrePostInterventionsContent = (props: Props) => {
   );
 };
 
-export default DashboardPrePostInterventionsContent;
+export default DashboardPrePostContent;

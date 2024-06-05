@@ -12,3 +12,15 @@ export const getPrePostStatistics = async () => {
     throw error;
   }
 };
+
+export const getNormGroupStatistics = async () => {
+  try {
+    const response = await getRequest(leerLensApi.normGroupStatistics);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Norm group statistics", error);
+
+    throw error;
+  }
+};

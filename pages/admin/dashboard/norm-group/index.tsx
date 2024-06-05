@@ -1,8 +1,10 @@
-import { Stack } from "@mui/material";
 import React from "react";
 import { useRouter } from "next/navigation";
+import { Stack } from "@mui/material";
+
 import Sidebar from "../../../../shared/Sidebar/Sidebar";
 import AdminHeader from "../../../../shared/Header/AdminHeader";
+import DashboardNormGroupContent from "../../../../components/DashboardNormGroupContent/DashboardNormGroupContent";
 
 const DashboardNormGroupPage = () => {
   const router = useRouter();
@@ -14,7 +16,7 @@ const DashboardNormGroupPage = () => {
       <Stack width={"100%"}>
         <AdminHeader title="Dashboard - Norm Group" shouldDisplayBreadcrumb />
 
-        {/* Content */}
+        <DashboardNormGroupContent />
       </Stack>
     </Stack>
   );

@@ -17,9 +17,13 @@ export const leerLensApi = {
   normgroup: `${baseUrl}/questionnaire/normgroup`,
   normgroupSoftDelete: `${baseUrl}/questionnaire/normgroup/soft-delete`,
 
-  response: `${baseUrl}/response/filter`,
+  response: `${baseUrl}/response`,
+  responseFilter: `${baseUrl}/response/filter`,
   responseBulkClass: `${baseUrl}/response/bulk-class`,
   responseBulkCourse: `${baseUrl}/response/bulk-course`,
+
+  prePostStatistics: `${baseUrl}/dashboard/pre-post/statistics`,
+  normGroupStatistics: `${baseUrl}/dashboard/normgroup/statistics`,
 
   login: `${baseUrl}/auth/login`,
   forgotPassword: `${baseUrl}/auth/forgot-password`,

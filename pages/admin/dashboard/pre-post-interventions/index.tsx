@@ -5,7 +5,7 @@ import { Stack } from "@mui/material";
 
 import Sidebar from "../../../../shared/Sidebar/Sidebar";
 import AdminHeader from "../../../../shared/Header/AdminHeader";
-import DashboardPrePostInterventionsContent from "../../../../components/DashboardPrePostInterventionsContent/DashboardPrePostInterventionsContent";
+import DashboardPrePostContent from "../../../../components/DashboardPrePostContent/DashboardPrePostContent";
 
 const DashboardPrePostInterventionsPage = () => {
   const router = useRouter();
@@ -17,7 +17,7 @@ const DashboardPrePostInterventionsPage = () => {
       <Stack width={"100%"}>
         <AdminHeader title="Dashboard - Pre-Post Interventions" shouldDisplayBreadcrumb />
 
-        <DashboardPrePostInterventionsContent />
+        <DashboardPrePostContent />
       </Stack>
     </Stack>
   );
