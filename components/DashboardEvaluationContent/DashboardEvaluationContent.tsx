@@ -173,15 +173,19 @@ const DashboardEvaluationContent = (props: Props) => {
   };
 
   const filterButton = (
-    <Stack px={2} py={3} gap={2}>
-      <Button variant="outlined" startIcon={<FilterAltIcon />}>
+    <Stack px={2} py={3}>
+      <Button
+        variant="outlined"
+        startIcon={<FilterAltIcon />}
+        sx={{ width: "max-content" }}
+      >
         Filter
       </Button>
     </Stack>
   );
 
   const titleSection = (
-    <Stack px={2} py={3} gap={2}>
+    <Stack mx={2} mt={3}>
       <Typography
         fontSize={20}
         fontFamily={champBlackFontFamily}

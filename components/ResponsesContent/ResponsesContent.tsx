@@ -82,7 +82,7 @@ const customStyles = {
   },
   tabs: {
     "& .Mui-selected": {
-      color: "#A879FF",
+      color: "#A879FF !important",
       fontWeight: "bold",
       fontSize: 16,
       borderBottom: "5px solid #A879FF",
@@ -159,7 +159,7 @@ const ResponsesContent = () => {
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
   const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(100);
+  const [limit, setLimit] = useState<number>(25);
   const [numberOfPages, setNumberOfPages] = useState<number>(1);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -472,92 +472,58 @@ const ResponsesContent = () => {
   };
 
   const renderTabContent = (tabValue: number) => {
-    switch (tabValue) {
-      case 0:
-        return (
-          <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType().map((response) => (
+    const getFilteredResponses = (formType?: FormEvaluation) => {
+      return getResponsesByFormType(formType).length > 0 ? (
+        getResponsesByFormType(formType).map(
+          (response) =>
+            response && (
               <ResponseAccordion
-                key={response?.id}
-                showQuestionTypesTab
+                key={response.id}
                 response={response}
                 isSelectAllChecked={isSelectAllChecked}
                 setFilteredStudentResponses={setStudentResponses}
                 setSelectedResponseIds={setSelectedResponseIds}
               />
-            ))}
-          </Stack>
+            )
+        )
+      ) : (
+        <Stack justifyContent="center" alignItems="center" height={200}>
+          <Typography fontSize={18}>No responses were found</Typography>
+        </Stack>
+      );
+    };
+
+    switch (tabValue) {
+      case 0:
+        return (
+          <Stack sx={customStyles.tabContent}>{getFilteredResponses()}</Stack>
         );
 
       case 1:
         return (
           <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType(FormEvaluation.PreInterventions).map(
-              (response) =>
-                response && (
-                  <ResponseAccordion
-                    key={response.id}
-                    response={response}
-                    isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setStudentResponses}
-                    setSelectedResponseIds={setSelectedResponseIds}
-                  />
-                )
-            )}
+            {getFilteredResponses(FormEvaluation.PreInterventions)}
           </Stack>
         );
 
       case 2:
         return (
           <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType(FormEvaluation.PostInterventions).map(
-              (response) =>
-                response && (
-                  <ResponseAccordion
-                    key={response.id}
-                    response={response}
-                    isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setStudentResponses}
-                    setSelectedResponseIds={setSelectedResponseIds}
-                  />
-                )
-            )}
+            {getFilteredResponses(FormEvaluation.PostInterventions)}
           </Stack>
         );
 
       case 3:
         return (
           <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType(FormEvaluation.Evaluation).map(
-              (response) =>
-                response && (
-                  <ResponseAccordion
-                    key={response.id}
-                    response={response}
-                    isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setStudentResponses}
-                    setSelectedResponseIds={setSelectedResponseIds}
-                  />
-                )
-            )}
+            {getFilteredResponses(FormEvaluation.Evaluation)}
           </Stack>
         );
 
       case 4:
         return (
           <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType(FormEvaluation.Normgroup).map(
-              (response) =>
-                response && (
-                  <ResponseAccordion
-                    key={response.id}
-                    response={response}
-                    isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setStudentResponses}
-                    setSelectedResponseIds={setSelectedResponseIds}
-                  />
-                )
-            )}
+            {getFilteredResponses(FormEvaluation.Normgroup)}
           </Stack>
         );
 
@@ -630,7 +596,7 @@ const ResponsesContent = () => {
           {renderTabContent(tabValue)}
         </Stack>
       )}
-      {PaginationComponent}
+      {numberOfPages > 1 && PaginationComponent}
     </Stack>
   );
 
