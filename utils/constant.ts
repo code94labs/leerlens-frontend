@@ -232,3 +232,11 @@ export const summaryTypes = [
   { id: SummaryTypes.growthMindset, label: "Growth Mindset" },
   { id: SummaryTypes.ownership, label: "Ownership" },
 ];
+
+// array of color combinations to be assigned for bar charts
+export const barChartColorCombinations = [
+  ["#F9C8A6", "#EB7200"],
+  ["#DCC9FF", "#A879FF"],
+  ["#FDB8CB", "#F5477C"],
+  ["#AEDCD1", "#05A88D"],
+];
