@@ -1,4 +1,10 @@
-import { ChartType, FieldType, FormEvaluation, SectionType, SummaryTypes } from "./enum";
+import {
+  ChartType,
+  FieldType,
+  FormEvaluation,
+  SectionType,
+  SummaryTypes,
+} from "./enum";
 
 export type DropDownOptions = {
   id: number;
@@ -102,4 +108,17 @@ export type GetResponsesQueryParams = {
   study?: number;
   page?: number;
   limit?: number;
+};
+
+export type DashboardBarChart = {
+  questionText: string;
+  learningOne: number;
+  learningTwo: number;
+};
+
+export type DashboardEvaluationChart = {
+  questionId: number;
+  questionText: string;
+  chartType: ChartType;
+  answerStatistics: number[];
 };

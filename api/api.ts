@@ -24,6 +24,7 @@ export const leerLensApi = {
 
   prePostStatistics: `${baseUrl}/dashboard/pre-post/statistics`,
   normGroupStatistics: `${baseUrl}/dashboard/normgroup/statistics`,
+  evaluationStatistics: `${baseUrl}/dashboard/evaluation/statistics`,
 
   login: `${baseUrl}/auth/login`,
   forgotPassword: `${baseUrl}/auth/forgot-password`,

@@ -25,6 +25,7 @@ import { champBlackFontFamily } from "../../shared/typography";
 
 import { getNormGroupStatistics } from "../../services/dashboardStatistics.service";
 import { barChartColorCombinations } from "../../utils/constant";
+import { DashboardBarChart } from "../../utils/types";
 
 ChartJS.register(
   CategoryScale,
@@ -47,13 +48,7 @@ const customStyles = {
 type Props = {};
 
 const DashboardNormGroupContent = (props: Props) => {
-  const [statisticsData, setStatisticsData] = useState<
-    {
-      questionText: string;
-      learningOne: number;
-      learningTwo: number;
-    }[]
-  >([]);
+  const [statisticsData, setStatisticsData] = useState<DashboardBarChart[]>([]);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
   const [notificationMsg, setNotificationMsg] = useState<string>("");

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -26,9 +26,11 @@ import VerticalBarChartType02 from "../../shared/Dashboard/VerticalBarChartType0
 
 import { champBlackFontFamily } from "../../shared/typography";
 
-import { FormQuestion } from "../../utils/types";
+import { DashboardEvaluationChart, FormQuestion } from "../../utils/types";
 import { ChartType, FieldType, QuestionnaireSection } from "../../utils/enum";
 import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
+import { getEvaluationStatistics } from "../../services/dashboardStatistics.service";
+import { getWeightedAverage } from "../../utils/helper";
 
 const sampleEvaluationQuestionData: FormQuestion[] = [
   {
@@ -119,25 +121,35 @@ const customStyles = {
 type Props = {};
 
 const DashboardEvaluationContent = (props: Props) => {
-  const getChartComponent = (question: FormQuestion) => {
-    switch (question.chartType) {
+  const [statisticsData, setStatisticsData] = useState<
+    DashboardEvaluationChart[]
+  >([]);
+
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
+  const [notificationMsg, setNotificationMsg] = useState<string>("");
+
+  const [isError, setIsError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const getChartComponent = (stat: DashboardEvaluationChart) => {
+    switch (stat.chartType) {
       case ChartType.numericalRepresentation:
-        return <NumericalDigit title={question.questionText} value={0} />;
+        return <NumericalDigit title={stat.questionText} value={getWeightedAverage(stat.answerStatistics)} />;
       case ChartType.progressIndicatorTypeOne:
         return (
           <ProgressIndicator
-            title={question.questionText}
-            value={7}
-            color={"#45f"}
+            title={stat.questionText}
+            value={getWeightedAverage(stat.answerStatistics)}
+            color={"#A879FF"}
             type={FieldType.DropDown}
           />
         );
       case ChartType.progressIndicatorTypeTwo:
         return (
           <ProgressBar
-            title={question.questionText}
-            value={7}
-            color={"#45f"}
+            title={stat.questionText}
+            value={getWeightedAverage(stat.answerStatistics)}
+            color={"#A879FF"}
             type={FieldType.DropDown}
           />
         );
@@ -157,11 +169,13 @@ const DashboardEvaluationContent = (props: Props) => {
       case ChartType.verticalBarChartTypeTwo:
         return (
           <VerticalBarChartType02
-            title={question.questionText}
-            labels={["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]}
+            title={stat.questionText}
+            labels={stat.answerStatistics.map((stat, index) =>
+              (index + 1).toString()
+            )}
             datasets={[
               {
-                data: [4, 10, 4, 7, 6, 8, 8, 8, 8, 8],
+                data: stat.answerStatistics,
                 backgroundColor: ["#A879FF"],
               },
             ]}
@@ -202,6 +216,27 @@ const DashboardEvaluationContent = (props: Props) => {
     </Stack>
   );
 
+  useEffect(() => {
+    const fetchingEvaluationStatistics = async () => {
+      setIsLoading(true);
+      await getEvaluationStatistics()
+        .then((res) => {
+          setStatisticsData(res);
+        })
+        .catch(() => {
+          setIsError(true);
+
+          setNotificationMsg("Error when fetching evaluation statistics...");
+          setDisplaySnackbarMsg(true);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    };
+
+    fetchingEvaluationStatistics();
+  }, []);
+
   return (
     <>
       <Stack sx={customStyles.stack}>
@@ -210,8 +245,8 @@ const DashboardEvaluationContent = (props: Props) => {
         {filterButton}
 
         <Grid container px={2} spacing={2}>
-          {sampleEvaluationQuestionData.map((question) => (
-            <Grid item xs={4} key={question.id}>
+          {statisticsData.map((stat) => (
+            <Grid item xs={4} key={stat.questionId}>
               <Box
               // height={200}
               // // width={200}
@@ -222,7 +257,7 @@ const DashboardEvaluationContent = (props: Props) => {
               // p={2}
               // sx={{ border: "2px solid grey" }}
               >
-                {getChartComponent(question)}
+                {getChartComponent(stat)}
               </Box>
             </Grid>
           ))}

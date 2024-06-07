@@ -24,3 +24,15 @@ export const getNormGroupStatistics = async () => {
     throw error;
   }
 };
+
+export const getEvaluationStatistics = async () => {
+  try {
+    const response = await getRequest(leerLensApi.evaluationStatistics);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching evaluation statistics", error);
+
+    throw error;
+  }
+};

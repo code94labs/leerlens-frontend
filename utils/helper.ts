@@ -101,3 +101,21 @@ export const formContentFiltering = (
 export const generateEmptyLabels = (count: number): string[] => {
   return Array.from({ length: count }, () => "");
 };
+
+export const getWeightedAverage = (statistics: number[]) => {
+  let sum = 0;
+  let totalCount = 0;
+
+  for (let i = 0; i < statistics.length; i++) {
+    const occurrences = statistics[i];
+    sum += (i + 1) * occurrences;
+    totalCount += occurrences;
+  }
+
+  // avoid the divison by 0
+  if (totalCount === 0) {
+    return 0;
+  }
+
+  return sum / totalCount;
+};
