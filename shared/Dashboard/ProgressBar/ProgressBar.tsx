@@ -14,9 +14,10 @@ type Props = {
 const customStyles = {
   stack: {
     border: "2px #E6E6E6 solid",
-    width: 450,
+    width: "100%",
+    height: "100%",
     borderRadius: 2,
-    p: 3,
+    // p: 3,
   },
   progressBar: {
     width: "100%",
@@ -33,11 +34,10 @@ const customStyles = {
     top: 0,
   },
   title: {
-    fontWeight: "bold",
-    fontFamily: livvic.style.fontFamily,
-    fontSize: 18,
-    textTransform: "uppercase",
-    textAlign: "center",
+    fontWeight: 700,
+    fontSize: 16,
+    color: "#1A1A1A",
+    m: 4,
   },
   toolTip: {
     border: "1px black solid",
@@ -122,14 +122,14 @@ const ProgressBar = (props: Props) => {
     );
 
   return (
-    <Stack sx={customStyles.stack} m={3} mb={8}>
+    <Stack sx={customStyles.stack}>
       <Typography mb={3} sx={customStyles.title}>
         {title}
       </Typography>
 
       {toolTip}
 
-      <Stack flexDirection="row" alignItems="center">
+      <Stack flexDirection="row" alignItems="center" mb={5}>
         {startScaleValue}
 
         {progressIndicator}

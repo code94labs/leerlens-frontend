@@ -31,74 +31,7 @@ import { ChartType, FieldType, QuestionnaireSection } from "../../utils/enum";
 import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
 import { getEvaluationStatistics } from "../../services/dashboardStatistics.service";
 import { getWeightedAverage } from "../../utils/helper";
-
-const sampleEvaluationQuestionData: FormQuestion[] = [
-  {
-    id: 1,
-    questionText: "what is your name",
-    positionOrderId: 12,
-    minValue: 0,
-    maxValue: 6,
-    isDelete: false,
-    isNewlyAdded: true,
-    questionSetId: 0,
-    questionSection: QuestionnaireSection.QuestionPartOne,
-    summaryTypes: [0],
-    chartType: ChartType.numericalRepresentation,
-  },
-  {
-    id: 2,
-    questionText: "rate our program",
-    positionOrderId: 12,
-    minValue: 0,
-    maxValue: 6,
-    isDelete: false,
-    isNewlyAdded: true,
-    questionSetId: 0,
-    questionSection: QuestionnaireSection.QuestionPartOne,
-    summaryTypes: [0],
-    chartType: ChartType.progressIndicatorTypeTwo,
-  },
-  {
-    id: 3,
-    questionText: "rate our coordinators",
-    positionOrderId: 12,
-    minValue: 0,
-    maxValue: 6,
-    isDelete: false,
-    isNewlyAdded: true,
-    questionSetId: 0,
-    questionSection: QuestionnaireSection.QuestionPartOne,
-    summaryTypes: [0],
-    chartType: ChartType.progressIndicatorTypeOne,
-  },
-  // {
-  //   id: 3,
-  //   questionText: "How much will you recommend this program to a friend",
-  //   positionOrderId: 12,
-  //   minValue: 0,
-  //   maxValue: 6,
-  //   isDelete: false,
-  //   isNewlyAdded: true,
-  //   questionSetId: 0,
-  //   questionSection: QuestionnaireSection.QuestionPartOne,
-  //   summaryTypes: [0],
-  //   chartType: ChartType.verticalBarChartTypeOne,
-  // },
-  {
-    id: 4,
-    questionText: "How much will you recommend this program to a friend",
-    positionOrderId: 12,
-    minValue: 0,
-    maxValue: 6,
-    isDelete: false,
-    isNewlyAdded: true,
-    questionSetId: 0,
-    questionSection: QuestionnaireSection.QuestionPartOne,
-    summaryTypes: [0],
-    chartType: ChartType.verticalBarChartTypeTwo,
-  },
-];
+import { chartColors } from "../../utils/constant";
 
 ChartJS.register(
   CategoryScale,
@@ -131,25 +64,30 @@ const DashboardEvaluationContent = (props: Props) => {
   const [isError, setIsError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const getChartComponent = (stat: DashboardEvaluationChart) => {
+  const getChartComponent = (stat: DashboardEvaluationChart, index: number) => {
     switch (stat.chartType) {
       case ChartType.numericalRepresentation:
-        return <NumericalDigit title={stat.questionText} value={getWeightedAverage(stat.answerStatistics)} />;
+        return (
+          <NumericalDigit
+            title={`${index + 1}.${stat.questionText}`}
+            value={getWeightedAverage(stat.answerStatistics)}
+          />
+        );
       case ChartType.progressIndicatorTypeOne:
         return (
           <ProgressIndicator
-            title={stat.questionText}
+            title={`${index + 1}.${stat.questionText}`}
             value={getWeightedAverage(stat.answerStatistics)}
-            color={"#A879FF"}
+            color={chartColors[index % chartColors.length]}
             type={FieldType.DropDown}
           />
         );
       case ChartType.progressIndicatorTypeTwo:
         return (
           <ProgressBar
-            title={stat.questionText}
+            title={`${index + 1}.${stat.questionText}`}
             value={getWeightedAverage(stat.answerStatistics)}
-            color={"#A879FF"}
+            color={chartColors[index % chartColors.length]}
             type={FieldType.DropDown}
           />
         );
@@ -169,14 +107,14 @@ const DashboardEvaluationContent = (props: Props) => {
       case ChartType.verticalBarChartTypeTwo:
         return (
           <VerticalBarChartType02
-            title={stat.questionText}
+            title={`${index + 1}.${stat.questionText}`}
             labels={stat.answerStatistics.map((stat, index) =>
               (index + 1).toString()
             )}
             datasets={[
               {
                 data: stat.answerStatistics,
-                backgroundColor: ["#A879FF"],
+                backgroundColor: [chartColors[index % chartColors.length]],
               },
             ]}
           />
@@ -245,22 +183,13 @@ const DashboardEvaluationContent = (props: Props) => {
         {filterButton}
 
         <Grid container px={2} spacing={2}>
-          {statisticsData.map((stat) => (
-            <Grid item xs={4} key={stat.questionId}>
-              <Box
-              // height={200}
-              // // width={200}
-              // my={4}
-              // display="flex"
-              // alignItems="center"
-              // gap={4}
-              // p={2}
-              // sx={{ border: "2px solid grey" }}
-              >
-                {getChartComponent(stat)}
-              </Box>
-            </Grid>
-          ))}
+          {statisticsData.map(
+            (stat: DashboardEvaluationChart, index: number) => (
+              <Grid item xs={4} key={stat.questionId}>
+                {getChartComponent(stat, index)}
+              </Grid>
+            )
+          )}
         </Grid>
       </Stack>
     </>

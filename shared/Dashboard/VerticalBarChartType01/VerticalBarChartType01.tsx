@@ -36,11 +36,10 @@ interface VerticalBarChartType01Props {
   labels?: string[];
   datasets: Dataset[];
   removeBarGaps?: boolean;
-  height?: number;
 }
 
 const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
-  const { title, labels, datasets, removeBarGaps = false, height } = props;
+  const { title, labels, datasets, removeBarGaps = false } = props;
 
   const options = {
     responsive: true,
@@ -136,7 +135,7 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
     <Stack sx={customStyles.stack} direction="column" justifyContent="space-between">
       <Typography sx={customStyles.title}>{title}</Typography>
 
-      <Bar options={options} data={data} height={height ?? 200} />
+      <Bar options={options} data={data} height={200} />
     </Stack>
   );
 };

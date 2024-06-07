@@ -234,6 +234,8 @@ export const summaryTypes = [
   { id: SummaryTypes.ownership, label: "Ownership" },
 ];
 
+export const chartColors = ["#EB7200", "#F5477C", "#A879FF", "#00A88D"];
+
 // array of color combinations to be assigned for bar charts
 export const barChartColorCombinations = [
   ["#F9C8A6", "#EB7200"],
