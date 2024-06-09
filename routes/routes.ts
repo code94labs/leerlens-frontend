@@ -17,6 +17,10 @@ export const pages: RoutePath[] = [
     iconPath: "/images/admin-icons/reports.png",
     sub: [
       {
+        text: "Pre-Post",
+        path: "/admin/dashboard/pre-post",
+      },
+      {
         text: "NormGroup",
         path: "/admin/dashboard/norm-group",
       },
