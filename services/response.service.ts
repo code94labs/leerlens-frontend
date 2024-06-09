@@ -30,7 +30,7 @@ export const getAllStudentResponses = async (
   params: GetResponsesQueryParams
 ) => {
   try {
-    const response = await getRequest(leerLensApi.response, params);
+    const response = await getRequest(leerLensApi.responseFilter, params);
 
     return response.data;
   } catch (error) {

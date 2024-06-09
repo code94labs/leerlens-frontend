@@ -32,7 +32,7 @@ const Breadcrumb = () => {
     .filter((segment) => segment !== "");
 
   const breadcrumbs = pathSegments.slice(1).map((segment, index) => {
-    const route = `/${pathSegments.slice(0, index + 1).join("/")}`;
+    const route = `/${pathSegments.slice(1, index + 2).join("/")}`;
     const label = breadcrumbMap[route] || segment;
     const isLast = index === pathSegments.slice(1).length - 1;
     if (isLast) {

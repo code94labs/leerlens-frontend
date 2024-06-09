@@ -9,9 +9,10 @@ type Props = {
 
 const customStyles = {
   title: {
-    fontWeight: 400,
-    fontFamily: champBlackFontFamily,
-    fontSize: 24,
+    fontWeight: 700,
+    fontSize: 16,
+    color: "#1A1A1A",
+    m: 4,
   },
   label: {
     fontSize: 50,
@@ -22,7 +23,9 @@ const customStyles = {
   stack: {
     border: "2px #E6E6E6 solid",
     borderRadius: 2,
-    p: 3,
+    width: "100%",
+    height: "100%",
+    // p: 3,
   },
 };
 

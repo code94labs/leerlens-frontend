@@ -218,6 +218,7 @@ export const classList = [];
 export const gmailAddress = "https://mail.google.com";
 
 export const dateFilterList = [
+  "All",
   "2024/01/01 - 2024/12/31",
   "2023/01/01 - 2023/12/31",
   "2022/01/01 - 2022/12/31",
@@ -231,4 +232,14 @@ export const summaryTypes = [
   },
   { id: SummaryTypes.growthMindset, label: "Growth Mindset" },
   { id: SummaryTypes.ownership, label: "Ownership" },
+];
+
+export const chartColors = ["#EB7200", "#F5477C", "#A879FF", "#00A88D"];
+
+// array of color combinations to be assigned for bar charts
+export const barChartColorCombinations = [
+  ["#F9C8A6", "#EB7200"],
+  ["#DCC9FF", "#A879FF"],
+  ["#FDB8CB", "#F5477C"],
+  ["#AEDCD1", "#05A88D"],
 ];

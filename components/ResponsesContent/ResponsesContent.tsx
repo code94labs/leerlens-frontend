@@ -1,3 +1,5 @@
+import React, { SyntheticEvent, useEffect, useState } from "react";
+
 import {
   Alert,
   Box,
@@ -16,14 +18,18 @@ import {
 } from "@mui/material";
 import Pagination from "@mui/material/Pagination";
 import Grid from "@mui/material/Grid";
-import React, { SyntheticEvent, useEffect, useState } from "react";
+import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
+import FilterAltSharpIcon from "@mui/icons-material/FilterAltSharp";
+import DoNotDisturbAltOutlinedIcon from "@mui/icons-material/DoNotDisturbAltOutlined";
+
 import { champBlackFontFamily } from "../../shared/typography";
 
 import DynamicListHeader from "./DynamicListHeader";
 import ResponseAccordion from "./ResponseAccordion";
-import { getAllStudentResponses } from "../../services/response.service";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
-import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
+import EditContentDialog from "./EditContentDialog";
+
+import { getAllStudentResponses } from "../../services/response.service";
 
 import { GetResponsesQueryParams, StudentResponse } from "../../utils/types";
 import { FormEvaluation } from "../../utils/enum";
@@ -37,8 +43,6 @@ import {
   studyFieldList,
 } from "../../utils/constant";
 import { getDateRange } from "../../utils/helper";
-import FilterAltSharpIcon from "@mui/icons-material/FilterAltSharp";
-import EditContentDialog from "./EditContentDialog";
 
 const customStyles = {
   primaryButton: {
@@ -66,6 +70,30 @@ const customStyles = {
       border: "2px #E6E6E6 solid",
     },
   },
+  primaryButtonOutlined: {
+    color: "#A879FF",
+    borderRadius: 2,
+    textTransform: "initial",
+    width: 160,
+    border: "2px #A879FF solid",
+    px: 1.25,
+    py: 1.25,
+    fontSize: 16,
+    fontFamily: champBlackFontFamily,
+    fontWeight: 400,
+    mx: 1.5,
+
+    "&:hover": {
+      backgroundColor: "#A879FF",
+      color: "white",
+      border: "2px #A879FF solid",
+    },
+    "&:disabled": {
+      backgroundColor: "#E6E6E6",
+      color: "#98989A",
+      border: "2px #E6E6E6 solid",
+    },
+  },
   dropdown: {
     width: "100%",
     mb: 2,
@@ -82,7 +110,7 @@ const customStyles = {
   },
   tabs: {
     "& .Mui-selected": {
-      color: "#A879FF",
+      color: "#A879FF !important",
       fontWeight: "bold",
       fontSize: 16,
       borderBottom: "5px solid #A879FF",
@@ -154,12 +182,12 @@ const ResponsesContent = () => {
   );
   const [filterAge, setFilterAge] = useState<number>(ageList[0].id);
   const [filterStudy, setFilterStudy] = useState<number>(studyFieldList[0].id);
-  const [filterDate, setFilterDate] = useState<string>("");
+  const [filterDate, setFilterDate] = useState<string>(dateFilterList[0]);
 
   const [selectedEditType, setSelectedEditType] = useState(editTypeDropdown[0]);
 
   const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState<number>(100);
+  const [limit, setLimit] = useState<number>(25);
   const [numberOfPages, setNumberOfPages] = useState<number>(1);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -202,35 +230,29 @@ const ResponsesContent = () => {
     setPage(value);
   };
 
-  // const CustomDropdown = ({
-  //   label,
-  //   selectArray,
-  //   filterValue,
-  //   setFilterValue,
-  // }: {
-  //   label: string;
-  //   selectArray: string[];
-  //   filterValue: string;
-  //   setFilterValue: (value: string) => void;
-  // }) => (
-  //   <FormControl sx={customStyles.dropdown}>
-  //     <InputLabel>{label}</InputLabel>
+  const areFiltersActivated = () => {
+    if (
+      filterSchool !== schoolList[0].id ||
+      filterGrade !== gradeList[0].id ||
+      filterCourse !== remindProgramListForFilters[0].id ||
+      filterAge !== ageList[0].id ||
+      filterStudy !== studyFieldList[0].id ||
+      filterDate !== dateFilterList[0]
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  };
 
-  //     <Select
-  //       value={filterValue}
-  //       label={label}
-  //       onChange={(event: SelectChangeEvent) => {
-  //         setFilterValue(event.target.value);
-  //       }}
-  //     >
-  //       {selectArray.map((item) => (
-  //         <MenuItem value={item} key={item}>
-  //           {item}
-  //         </MenuItem>
-  //       ))}
-  //     </Select>
-  //   </FormControl>
-  // );
+  const resetAllFilters = () => {
+    setFilterSchool(schoolList[0].id);
+    setFilterGrade(gradeList[0].id);
+    setFilterCourse(remindProgramListForFilters[0].id);
+    setFilterAge(ageList[0].id);
+    setFilterStudy(studyFieldList[0].id);
+    setFilterDate(dateFilterList[0]);
+  };
 
   const filtersDiv = (
     <Grid container spacing={1}>
@@ -362,6 +384,20 @@ const ResponsesContent = () => {
       alignItems="center"
       justifyContent="space-between"
     >
+      {!areFiltersActivated() && (
+        <Button
+          variant="outlined"
+          onClick={resetAllFilters}
+          sx={customStyles.primaryButtonOutlined}
+        >
+          <DoNotDisturbAltOutlinedIcon />
+
+          <Typography fontWeight={800} mx={0.8}>
+            Reset filters
+          </Typography>
+        </Button>
+      )}
+
       <Button
         variant="outlined"
         onClick={() => {
@@ -472,92 +508,58 @@ const ResponsesContent = () => {
   };
 
   const renderTabContent = (tabValue: number) => {
-    switch (tabValue) {
-      case 0:
-        return (
-          <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType().map((response) => (
+    const getFilteredResponses = (formType?: FormEvaluation) => {
+      return getResponsesByFormType(formType).length > 0 ? (
+        getResponsesByFormType(formType).map(
+          (response) =>
+            response && (
               <ResponseAccordion
-                key={response?.id}
-                showQuestionTypesTab
+                key={response.id}
                 response={response}
                 isSelectAllChecked={isSelectAllChecked}
                 setFilteredStudentResponses={setStudentResponses}
                 setSelectedResponseIds={setSelectedResponseIds}
               />
-            ))}
-          </Stack>
+            )
+        )
+      ) : (
+        <Stack justifyContent="center" alignItems="center" height={200}>
+          <Typography fontSize={18}>No responses were found</Typography>
+        </Stack>
+      );
+    };
+
+    switch (tabValue) {
+      case 0:
+        return (
+          <Stack sx={customStyles.tabContent}>{getFilteredResponses()}</Stack>
         );
 
       case 1:
         return (
           <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType(FormEvaluation.PreInterventions).map(
-              (response) =>
-                response && (
-                  <ResponseAccordion
-                    key={response.id}
-                    response={response}
-                    isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setStudentResponses}
-                    setSelectedResponseIds={setSelectedResponseIds}
-                  />
-                )
-            )}
+            {getFilteredResponses(FormEvaluation.PreInterventions)}
           </Stack>
         );
 
       case 2:
         return (
           <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType(FormEvaluation.PostInterventions).map(
-              (response) =>
-                response && (
-                  <ResponseAccordion
-                    key={response.id}
-                    response={response}
-                    isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setStudentResponses}
-                    setSelectedResponseIds={setSelectedResponseIds}
-                  />
-                )
-            )}
+            {getFilteredResponses(FormEvaluation.PostInterventions)}
           </Stack>
         );
 
       case 3:
         return (
           <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType(FormEvaluation.Evaluation).map(
-              (response) =>
-                response && (
-                  <ResponseAccordion
-                    key={response.id}
-                    response={response}
-                    isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setStudentResponses}
-                    setSelectedResponseIds={setSelectedResponseIds}
-                  />
-                )
-            )}
+            {getFilteredResponses(FormEvaluation.Evaluation)}
           </Stack>
         );
 
       case 4:
         return (
           <Stack sx={customStyles.tabContent}>
-            {getResponsesByFormType(FormEvaluation.Normgroup).map(
-              (response) =>
-                response && (
-                  <ResponseAccordion
-                    key={response.id}
-                    response={response}
-                    isSelectAllChecked={isSelectAllChecked}
-                    setFilteredStudentResponses={setStudentResponses}
-                    setSelectedResponseIds={setSelectedResponseIds}
-                  />
-                )
-            )}
+            {getFilteredResponses(FormEvaluation.Normgroup)}
           </Stack>
         );
 
@@ -630,7 +632,7 @@ const ResponsesContent = () => {
           {renderTabContent(tabValue)}
         </Stack>
       )}
-      {PaginationComponent}
+      {numberOfPages > 1 && PaginationComponent}
     </Stack>
   );
 
@@ -666,11 +668,11 @@ const ResponsesContent = () => {
         school: filterSchool !== 0 ? filterSchool : undefined,
         study: filterStudy !== 0 ? filterStudy : undefined,
         fromDate:
-          filterDate.length > 1
+          filterDate !== dateFilterList[0]
             ? getDateRange(filterDate)[0].replace(/[/]/g, "-")
             : undefined,
         toDate:
-          filterDate.length > 1
+          filterDate !== dateFilterList[0]
             ? getDateRange(filterDate)[1].replace(/[/]/g, "-")
             : undefined,
         page,

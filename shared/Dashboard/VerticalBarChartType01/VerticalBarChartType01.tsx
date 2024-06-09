@@ -14,20 +14,15 @@ export const livvic = Livvic({
 
 const customStyles = {
   title: {
-    fontWeight: 400,
-    fontFamily: champBlackFontFamily,
-    fontSize: 24,
-  },
-  label: {
-    fontSize: 50,
-    fontWeight: 500,
-    color: "#333333",
-    my: 6,
+    fontWeight: 700,
+    fontSize: 16,
+    color: "#1A1A1A",
+    m: 4,
   },
   stack: {
     border: "2px #E6E6E6 solid",
     borderRadius: 2,
-    p: 3,
+    height: "100%",
   },
 };
 
@@ -41,11 +36,10 @@ interface VerticalBarChartType01Props {
   labels?: string[];
   datasets: Dataset[];
   removeBarGaps?: boolean;
-  height?: number;
 }
 
 const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
-  const { title, labels, datasets, removeBarGaps, height } = props;
+  const { title, labels, datasets, removeBarGaps = false } = props;
 
   const options = {
     responsive: true,
@@ -53,19 +47,19 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
       legend: {
         display: false,
       },
-      title: {
-        display: true,
-        text: title?.toLocaleUpperCase(),
-        font: {
-          size: 15,
-          weight: 700,
-          family: livvic.style.fontFamily,
-        },
-        color: "#1A1A1A",
-        padding: {
-          bottom: 50,
-        },
-      },
+      // title: {
+      //   display: true,
+      // text: title?.toLocaleUpperCase(),
+      // font: {
+      //   size: 15,
+      //   weight: 700,
+      //   family: livvic.style.fontFamily,
+      // },
+      // color: "#1A1A1A",
+      //   padding: {
+      //     bottom: 50,
+      //   },
+      // },
       datalabels: {
         backgroundColor: "black",
         anchor: "end" as "center" | "start" | "end",
@@ -105,8 +99,8 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
         },
         ticks: {
           font: {
-            size: 13,
-            weight: 800,
+            size: 12,
+            weight: 600,
           },
         },
       },
@@ -119,8 +113,8 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
       padding: {
         left: 120,
         right: 120,
-        top: 0,
-        bottom: 0,
+        top: 30,
+        bottom: 10,
       },
     },
     elements: {
@@ -138,10 +132,10 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
   };
 
   return (
-    <Stack sx={customStyles.stack}>
-      {/* <Typography sx={customStyles.title}>ABSOLUTE DIFFERENCE</Typography> */}
+    <Stack sx={customStyles.stack} direction="column" justifyContent="space-between">
+      <Typography sx={customStyles.title}>{title}</Typography>
 
-      <Bar options={options} data={data} height={height ?? 200} />
+      <Bar options={options} data={data} height={200} />
     </Stack>
   );
 };

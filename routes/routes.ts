@@ -29,6 +29,10 @@ export const pages: RoutePath[] = [
         path: "/admin/dashboard/evaluation",
       },
       {
+        text: "Pre-Post Interventions",
+        path: "/admin/dashboard/pre-post-interventions",
+      },
+      {
         text: "Samengevat",
         path: "/admin/dashboard/samengevat",
       },
@@ -74,7 +78,7 @@ export const pages: RoutePath[] = [
 ];
 
 export const breadcrumbMap: { [key: string]: string } = {
-  "/admin/dashboard": "Learning Scan Report",
+  "/dashboard": "Learning Scan Report",
   "/admin/responses": "Responses",
   "/admin/question-set/pre-intervention": "Pre-Intervention",
   "/admin/question-set/post-intervention": "Post-Intervention",
