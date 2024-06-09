@@ -61,3 +61,16 @@ export const evaluationTypesTitles = {
   [FormEvaluation.Evaluation]: "Evaluation",
   [FormEvaluation.Normgroup]: "Normgroup",
 };
+
+// chart types for dashboard
+export enum ChartType {
+  numericalRepresentation = 0,
+  progressIndicatorTypeOne = 1, // horizontal progress indicator
+  progressIndicatorTypeTwo = 2, // semi circular progress indicator
+  horizontalBarChartTypeOne = 3, // common horizontal bar chart
+  horizontalBarChartTypeTwo = 4, // horizontal bar chart spanning both directions
+  verticalBarChartTypeOne = 5, // with two bars
+  verticalBarChartTypeTwo = 6, // with multiple bars(6/10) and with/without labels
+  verticalBarChartTypeThree = 7, // individual bar chart (three bars)
+  lineChart = 8,
+}

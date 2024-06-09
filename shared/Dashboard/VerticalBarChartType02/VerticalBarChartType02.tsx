@@ -13,11 +13,10 @@ export const livvic = Livvic({
 
 const customStyles = {
   title: {
-    fontWeight: "bold",
-    fontFamily: livvic.style.fontFamily,
-    fontSize: 18,
-    textTransform: "uppercase",
-    textAlign: "center",
+    fontWeight: 700,
+    fontSize: 16,
+    color: "#1A1A1A",
+    m: 4,
   },
   label: {
     fontSize: 50,
@@ -28,8 +27,10 @@ const customStyles = {
   stack: {
     border: "2px #E6E6E6 solid",
     borderRadius: 2,
-    p: 3,
-    maxHeight: 300,
+    // p: 3,
+    // maxHeight: 280,
+    height: "100%",
+    width: "100%",
   },
 };
 
@@ -51,24 +52,23 @@ const VerticalBarChartType02 = ({
 }: VerticalBarChartType02Props) => {
   const options = {
     responsive: true,
-    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false,
       },
-      title: {
-        display: true,
-        text: title.toLocaleUpperCase(),
-        font: {
-          size: 15,
-          weight: 700,
-          family: livvic.style.fontFamily,
-        },
-        color: "#1A1A1A",
-        padding: {
-          bottom: 50,
-        },
-      },
+      // title: {
+      //   display: true,
+      //   text: title.toLocaleUpperCase(),
+      //   font: {
+      //     size: 15,
+      //     weight: 700,
+      //     family: livvic.style.fontFamily,
+      //   },
+      //   color: "#1A1A1A",
+      //   padding: {
+      //     bottom: 50,
+      //   },
+      // },
       datalabels: {
         display: dataLabelsVisible,
         backgroundColor: "black",
@@ -118,14 +118,14 @@ const VerticalBarChartType02 = ({
         grid: { display: false },
       },
     },
-    // layout: {
-    //   padding: {
-    //     left: 120,
-    //     right: 120,
-    //     top: 0,
-    //     bottom: 0,
-    //   },
-    // },
+    layout: {
+      padding: {
+        left: 30,
+        right: 30,
+        top: 0,
+        bottom: 0,
+      },
+    },
     elements: {
       bar: {
         borderRadius: dataLabelsVisible ? 5 : 10,
@@ -142,12 +142,10 @@ const VerticalBarChartType02 = ({
   };
 
   return (
-    <Stack sx={customStyles.stack}>
-      {/* <Typography mb={3} sx={customStyles.title}>
-        {title}
-      </Typography> */}
+    <Stack sx={customStyles.stack} direction="column" justifyContent="space-between">
+      <Typography sx={customStyles.title}>{title}</Typography>
 
-      <Bar options={options} data={data} height={200} />
+      <Bar options={options} data={data} height="100%" />
     </Stack>
   );
 };

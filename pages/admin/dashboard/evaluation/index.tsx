@@ -1,8 +1,11 @@
-import { Stack } from "@mui/material";
 import React from "react";
 import { useRouter } from "next/navigation";
+
+import { Stack } from "@mui/material";
+
 import Sidebar from "../../../../shared/Sidebar/Sidebar";
 import AdminHeader from "../../../../shared/Header/AdminHeader";
+import DashboardEvaluationContent from "../../../../components/DashboardEvaluationContent/DashboardEvaluationContent";
 
 const DashboardEvaluationPage = () => {
   const router = useRouter();
@@ -14,7 +17,7 @@ const DashboardEvaluationPage = () => {
       <Stack width={"100%"}>
         <AdminHeader title="Dashboard - Evaluation" shouldDisplayBreadcrumb />
 
-        {/* Content */}
+        <DashboardEvaluationContent />
       </Stack>
     </Stack>
   );

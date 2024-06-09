@@ -1,12 +1,13 @@
 import React from "react";
 import { useRouter } from "next/navigation";
+
 import { Stack } from "@mui/material";
 
 import Sidebar from "../../../../shared/Sidebar/Sidebar";
 import AdminHeader from "../../../../shared/Header/AdminHeader";
-import DashboardNormGroupContent from "../../../../components/DashboardNormGroupContent/DashboardNormGroupContent";
+import DashboardPrePostContent from "../../../../components/DashboardPrePostContent/DashboardPrePostContent";
 
-const DashboardNormGroupPage = () => {
+const DashboardPrePostInterventionsPage = () => {
   const router = useRouter();
 
   return (
@@ -14,12 +15,12 @@ const DashboardNormGroupPage = () => {
       <Sidebar />
 
       <Stack width={"100%"}>
-        <AdminHeader title="Dashboard - Norm Group" shouldDisplayBreadcrumb />
+        <AdminHeader title="Dashboard - Pre-Post Interventions" shouldDisplayBreadcrumb />
 
-        <DashboardNormGroupContent />
+        <DashboardPrePostContent />
       </Stack>
     </Stack>
   );
 };
 
-export default DashboardNormGroupPage;
+export default DashboardPrePostInterventionsPage;
