@@ -106,7 +106,9 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
       },
       y: {
         display: false,
-        grid: { display: false },
+        grid: {
+          display: false,
+        },
       },
     },
     layout: {
@@ -132,7 +134,11 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
   };
 
   return (
-    <Stack sx={customStyles.stack} direction="column" justifyContent="space-between">
+    <Stack
+      sx={customStyles.stack}
+      direction="column"
+      justifyContent="space-between"
+    >
       <Typography sx={customStyles.title}>{title}</Typography>
 
       <Bar options={options} data={data} height={200} />

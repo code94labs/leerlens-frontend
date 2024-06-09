@@ -243,3 +243,7 @@ export const barChartColorCombinations = [
   ["#FDB8CB", "#F5477C"],
   ["#AEDCD1", "#05A88D"],
 ];
+
+export const barChartGrouColorPallete = [
+  "#FFECAA", "#BDE5E5", "#CFC0D8", "#F8A0A0"
+]

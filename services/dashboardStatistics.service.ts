@@ -13,6 +13,44 @@ export const getPrePostStatistics = async () => {
   }
 };
 
+export const getPrePostSummaryStatistics = async () => {
+  try {
+    const response = await getRequest(leerLensApi.prePostSummaryStatistics);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Pre Post Interventions summary statistics", error);
+
+    throw error;
+  }
+};
+
+export const getPrePostAbsoluteStat = async () => {
+  try {
+    const response = await getRequest(leerLensApi.prePostAbsoluteStat);
+
+    console.log("response", response);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Pre Post Interventions absolute statistics", error);
+
+    throw error;
+  }
+};
+
+export const getPrePostRelativeStat = async () => {
+  try {
+    const response = await getRequest(leerLensApi.prePostRelativeStat);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching Pre Post Interventions relative statistics", error);
+
+    throw error;
+  }
+};
+
 export const getNormGroupStatistics = async () => {
   try {
     const response = await getRequest(leerLensApi.normGroupStatistics);
