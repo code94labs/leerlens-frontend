@@ -25,7 +25,7 @@ export const leerLensApi = {
   prePostStatistics: `${baseUrl}/dashboard/pre-post/statistics`,
   prePostSummaryStatistics: `${baseUrl}/dashboard/pre-post/summary-statistics`,
   prePostAbsoluteStat: `${baseUrl}/dashboard/pre-post/absolute-statistics`,
-  prePostRelativeStat: `${baseUrl}/dashboard/pre-post/relative-statistics`,
+  prePostRelativeStat: `${baseUrl}/dashboard/pre-post/elative-statistics`,
 
   normGroupStatistics: `${baseUrl}/dashboard/normgroup/statistics`,
   normGroupSummaryStatistics: `${baseUrl}/dashboard/normgroup/summary-statistics`,

@@ -473,7 +473,6 @@ const SharedDashboardPage = () => {
         <Grid item xs={4}>
           <VerticalBarChartType01
             removeBarGaps
-            height={350}
             datasets={[
               {
                 data: [9.1, 16.1, 10.1],
@@ -486,7 +485,6 @@ const SharedDashboardPage = () => {
         <Grid item xs={4}>
           <VerticalBarChartType01
             removeBarGaps
-            height={350}
             datasets={[
               {
                 data: [9.1, 16.1, 10.1],
@@ -499,7 +497,6 @@ const SharedDashboardPage = () => {
         <Grid item xs={4}>
           <VerticalBarChartType01
             removeBarGaps
-            height={350}
             datasets={[
               {
                 data: [9.1, 16.1, 10.1],
