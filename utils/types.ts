@@ -116,6 +116,11 @@ export type DashboardBarChart = {
   learningTwo: number;
 };
 
+export type DashboardStatistics = {
+  title: string;
+  value: number;
+};
+
 export type DashboardEvaluationChart = {
   questionId: number;
   questionText: string;

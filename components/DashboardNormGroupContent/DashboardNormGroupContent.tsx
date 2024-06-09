@@ -23,9 +23,18 @@ import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType0
 
 import { champBlackFontFamily } from "../../shared/typography";
 
-import { getNormGroupStatistics } from "../../services/dashboardStatistics.service";
-import { barChartColorCombinations } from "../../utils/constant";
-import { DashboardBarChart } from "../../utils/types";
+import {
+  getNormgroupAbsoluteStat,
+  getNormgroupRelativeStat,
+  getNormgroupStatistics,
+  getNormgroupSummaryStatistics,
+} from "../../services/dashboardStatistics.service";
+import {
+  barChartColorCombinations,
+  barChartGrouColorPallete,
+} from "../../utils/constant";
+import { DashboardBarChart, DashboardStatistics } from "../../utils/types";
+import { CircularProgress } from "@mui/material";
 
 ChartJS.register(
   CategoryScale,
@@ -43,18 +52,112 @@ const customStyles = {
   stack: {
     backgroundColor: "white",
   },
+  loading: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100%",
+  },
+  loadingIcon: {
+    color: "#A879FF",
+  },
 };
 
 type Props = {};
 
 const DashboardNormGroupContent = (props: Props) => {
   const [statisticsData, setStatisticsData] = useState<DashboardBarChart[]>([]);
+  const [summaryData, setSummaryData] = useState<DashboardBarChart[]>([]);
+
+  const [absoluteDifference, setAbsoluteDifference] = useState<
+    DashboardStatistics[]
+  >([]);
+  const [relativeDifference, setRelativeDifference] = useState<
+    DashboardStatistics[]
+  >([]);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
   const [notificationMsg, setNotificationMsg] = useState<string>("");
 
   const [isError, setIsError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const getBackgroundColors = (index: number) =>
+    barChartColorCombinations[index % barChartColorCombinations.length];
+
+  const fetchSummaryStat = async () => {
+    setIsLoading(true);
+
+    await getNormgroupSummaryStatistics()
+      .then((res) => {
+        setSummaryData(res);
+      })
+      .catch(() => {
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching summary statistics...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const fetchQuestionnaireStat = async () => {
+    setIsLoading(true);
+
+    await getNormgroupStatistics()
+      .then((res) => {
+        setStatisticsData(res);
+      })
+      .catch(() => {
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching questionnaire statistics...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const fetchAbsoluteStat = async () => {
+    setIsLoading(true);
+
+    await getNormgroupAbsoluteStat()
+      .then((res) => {
+        console.log("absolute reponse:", res);
+
+        setAbsoluteDifference(res);
+      })
+      .catch(() => {
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching questionnaire statistics...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const fetchRelativeStat = async () => {
+    setIsLoading(true);
+
+    await getNormgroupRelativeStat()
+      .then((res) => {
+        setRelativeDifference(res);
+      })
+      .catch(() => {
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching questionnaire statistics...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const filterButton = (
     <Stack px={2} py={3}>
@@ -85,39 +188,15 @@ const DashboardNormGroupContent = (props: Props) => {
     </Stack>
   );
 
-  const getBackgroundColors = (index: number) =>
-    barChartColorCombinations[index % barChartColorCombinations.length];
-
-  useEffect(() => {
-    const fetchingNormGroupStatistics = async () => {
-      setIsLoading(true);
-      await getNormGroupStatistics()
-        .then((res) => {
-          setStatisticsData(res);
-        })
-        .catch(() => {
-          setIsError(true);
-
-          setNotificationMsg("Error when fetching norm group statistics...");
-          setDisplaySnackbarMsg(true);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    };
-
-    fetchingNormGroupStatistics();
-  }, []);
-
-  return (
+  const questionnaireCharts = (
     <>
-      <Stack sx={customStyles.stack}>
-        {titleSection}
+      <Typography variant="h5" m={2} fontWeight={800}>
+        Questionnaires
+      </Typography>
 
-        {filterButton}
-
-        <Grid container px={2} spacing={2}>
-          {statisticsData.map((data, index) => (
+      <Grid container px={2} spacing={2}>
+        {statisticsData &&
+          statisticsData.map((data, index) => (
             <Grid item xs={4} key={index}>
               <VerticalBarChartType01
                 title={`${index + 1}. ${data.questionText}`}
@@ -131,7 +210,108 @@ const DashboardNormGroupContent = (props: Props) => {
               />
             </Grid>
           ))}
-        </Grid>
+      </Grid>
+    </>
+  );
+
+  const summaryCharts = (
+    <Stack my={2}>
+      <Typography variant="h5" m={2} fontWeight={800}>
+        Summary charts
+      </Typography>
+
+      <Grid container px={2} spacing={2}>
+        {summaryData &&
+          summaryData.map((data, index) => (
+            <Grid item xs={4} key={index}>
+              <VerticalBarChartType01
+                title={`${index + 1}. ${data.questionText}`}
+                labels={["Learning 1", "Learning 2"]}
+                datasets={[
+                  {
+                    data: [data.learningOne, data.learningTwo],
+                    backgroundColor: getBackgroundColors(index),
+                  },
+                ]}
+              />
+            </Grid>
+          ))}
+      </Grid>
+    </Stack>
+  );
+
+  const statisticalCharts = (
+    <Stack my={2}>
+      <Typography variant="h5" m={2} fontWeight={800}>
+        Statistical charts
+      </Typography>
+
+      <Grid container spacing={2} px={2}>
+        {absoluteDifference && (
+          <Grid item xs={6}>
+            <VerticalBarChartType01
+              removeBarGaps
+              title="Absolute Difference"
+              labels={absoluteDifference.map((data) => data.title)}
+              datasets={[
+                {
+                  data: absoluteDifference.map((data) => data.value),
+                  backgroundColor: barChartGrouColorPallete,
+                },
+              ]}
+            />
+          </Grid>
+        )}
+
+        {relativeDifference && (
+          <Grid item xs={6}>
+            <VerticalBarChartType01
+              removeBarGaps
+              title="Relative Difference"
+              labels={relativeDifference.map((data) => data.title)}
+              datasets={[
+                {
+                  data: relativeDifference.map((data) => data.value),
+                  backgroundColor: barChartGrouColorPallete,
+                },
+              ]}
+            />
+          </Grid>
+        )}
+      </Grid>
+    </Stack>
+  );
+
+  const loading = (
+    <Box sx={customStyles.loading}>
+      <CircularProgress sx={customStyles.loadingIcon} />
+    </Box>
+  );
+
+  useEffect(() => {
+    fetchQuestionnaireStat();
+
+    fetchSummaryStat();
+
+    fetchAbsoluteStat();
+
+    fetchRelativeStat();
+  }, []);
+
+  return (
+    <>
+      <Stack sx={customStyles.stack}>
+        {titleSection}
+
+        {filterButton}
+
+        {!isLoading && summaryCharts}
+
+        {!isLoading && statisticalCharts}
+
+        {!isLoading && questionnaireCharts}
+
+        {isLoading && loading}
       </Stack>
     </>
   );

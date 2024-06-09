@@ -33,6 +33,7 @@ import {
   barChartGrouColorPallete,
 } from "../../utils/constant";
 import { CircularProgress } from "@mui/material";
+import { DashboardBarChart, DashboardStatistics } from "../../utils/types";
 
 ChartJS.register(
   CategoryScale,
@@ -64,34 +65,14 @@ const customStyles = {
 type Props = {};
 
 const DashboardPrePostContent = (props: Props) => {
-  const [statisticsData, setStatisticsData] = useState<
-    {
-      questionText: string;
-      learningOne: number;
-      learningTwo: number;
-    }[]
-  >([]);
-
-  const [summaryData, setSummaryData] = useState<
-    {
-      questionText: string;
-      learningOne: number;
-      learningTwo: number;
-    }[]
-  >([]);
+  const [statisticsData, setStatisticsData] = useState<DashboardBarChart[]>([]);
+  const [summaryData, setSummaryData] = useState<DashboardBarChart[]>([]);
 
   const [absoluteDifference, setAbsoluteDifference] = useState<
-    {
-      title: string;
-      value: number;
-    }[]
+    DashboardStatistics[]
   >([]);
-
   const [relativeDifference, setRelativeDifference] = useState<
-    {
-      title: string;
-      value: number;
-    }[]
+    DashboardStatistics[]
   >([]);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);

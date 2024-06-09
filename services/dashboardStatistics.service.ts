@@ -13,6 +13,18 @@ export const getPrePostStatistics = async () => {
   }
 };
 
+export const getNormgroupStatistics = async () => {
+  try {
+    const response = await getRequest(leerLensApi.normGroupStatistics);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching normgroup statistics", error);
+
+    throw error;
+  }
+};
+
 export const getPrePostSummaryStatistics = async () => {
   try {
     const response = await getRequest(leerLensApi.prePostSummaryStatistics);
@@ -20,6 +32,18 @@ export const getPrePostSummaryStatistics = async () => {
     return response.data;
   } catch (error) {
     console.error("Error fetching Pre Post Interventions summary statistics", error);
+
+    throw error;
+  }
+};
+
+export const getNormgroupSummaryStatistics = async () => {
+  try {
+    const response = await getRequest(leerLensApi.normGroupSummaryStatistics);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching normgroup summary statistics", error);
 
     throw error;
   }
@@ -39,6 +63,20 @@ export const getPrePostAbsoluteStat = async () => {
   }
 };
 
+export const getNormgroupAbsoluteStat = async () => {
+  try {
+    const response = await getRequest(leerLensApi.normGroupAbsoluteStat);
+
+    console.log("response", response);
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching normgroup absolute statistics", error);
+
+    throw error;
+  }
+};
+
 export const getPrePostRelativeStat = async () => {
   try {
     const response = await getRequest(leerLensApi.prePostRelativeStat);
@@ -51,13 +89,13 @@ export const getPrePostRelativeStat = async () => {
   }
 };
 
-export const getNormGroupStatistics = async () => {
+export const getNormgroupRelativeStat = async () => {
   try {
-    const response = await getRequest(leerLensApi.normGroupStatistics);
+    const response = await getRequest(leerLensApi.normGroupRelativeStat);
 
     return response.data;
   } catch (error) {
-    console.error("Error fetching Norm group statistics", error);
+    console.error("Error fetching normgroup relative statistics", error);
 
     throw error;
   }
