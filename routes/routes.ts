@@ -17,8 +17,8 @@ export const pages: RoutePath[] = [
     iconPath: "/images/admin-icons/reports.png",
     sub: [
       {
-        text: "Pre-Post",
-        path: "/admin/dashboard/pre-post",
+        text: "Pre-Post Interventions",
+        path: "/admin/dashboard/pre-post-interventions",
       },
       {
         text: "NormGroup",
@@ -27,18 +27,6 @@ export const pages: RoutePath[] = [
       {
         text: "Evaluation",
         path: "/admin/dashboard/evaluation",
-      },
-      {
-        text: "Pre-Post Interventions",
-        path: "/admin/dashboard/pre-post-interventions",
-      },
-      {
-        text: "Samengevat",
-        path: "/admin/dashboard/samengevat",
-      },
-      {
-        text: "EML",
-        path: "/admin/dashboard/eml",
       },
     ],
   },
