@@ -385,7 +385,7 @@ const DashboardEvaluationContent = (props: Props) => {
   );
 
   useEffect(() => {
-    const fetchingAllStudentResponses = async () => {
+    const fetchingEvaluationStatistics = async () => {
       // making the params object
       const params: GetStatisticsQueryParams = {
         age: filterAge !== 0 ? filterAge : undefined,
@@ -418,7 +418,7 @@ const DashboardEvaluationContent = (props: Props) => {
         });
     };
 
-    fetchingAllStudentResponses();
+    fetchingEvaluationStatistics();
   }, [
     filterSchool,
     filterCourse,

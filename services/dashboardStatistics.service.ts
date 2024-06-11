@@ -2,9 +2,11 @@ import { leerLensApi } from "../api/api";
 import { getRequest } from "../api/requests";
 import { GetStatisticsQueryParams } from "../utils/types";
 
-export const getPrePostStatistics = async () => {
+export const getPrePostStatistics = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.prePostStatistics);
+    const response = await getRequest(leerLensApi.prePostStatistics, params);
 
     return response.data;
   } catch (error) {
@@ -14,9 +16,11 @@ export const getPrePostStatistics = async () => {
   }
 };
 
-export const getNormgroupStatistics = async () => {
+export const getNormgroupStatistics = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.normGroupStatistics);
+    const response = await getRequest(leerLensApi.normGroupStatistics, params);
 
     return response.data;
   } catch (error) {
