@@ -110,6 +110,16 @@ export type GetResponsesQueryParams = {
   limit?: number;
 };
 
+export type GetStatisticsQueryParams = {
+  age?: number;
+  course?: number;
+  fromDate?: string;
+  toDate?: string;
+  grade?: number;
+  school?: number;
+  study?: number;
+};
+
 export type DashboardBarChart = {
   questionText: string;
   learningOne: number;

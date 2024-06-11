@@ -27,11 +27,15 @@ import VerticalBarChartType02 from "../../shared/Dashboard/VerticalBarChartType0
 
 import { champBlackFontFamily } from "../../shared/typography";
 
-import { DashboardEvaluationChart, FormQuestion } from "../../utils/types";
+import {
+  DashboardEvaluationChart,
+  FormQuestion,
+  GetStatisticsQueryParams,
+} from "../../utils/types";
 import { ChartType, FieldType, QuestionnaireSection } from "../../utils/enum";
 import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
 import { getEvaluationStatistics } from "../../services/dashboardStatistics.service";
-import { getWeightedAverage } from "../../utils/helper";
+import { getDateRange, getWeightedAverage } from "../../utils/helper";
 import {
   ageList,
   chartColors,
@@ -381,9 +385,25 @@ const DashboardEvaluationContent = (props: Props) => {
   );
 
   useEffect(() => {
-    const fetchingEvaluationStatistics = async () => {
-      setIsLoading(true);
-      await getEvaluationStatistics()
+    const fetchingAllStudentResponses = async () => {
+      // making the params object
+      const params: GetStatisticsQueryParams = {
+        age: filterAge !== 0 ? filterAge : undefined,
+        course: filterCourse !== 0 ? filterCourse : undefined,
+        grade: filterGrade !== 0 ? filterGrade : undefined,
+        school: filterSchool !== 0 ? filterSchool : undefined,
+        study: filterStudy !== 0 ? filterStudy : undefined,
+        fromDate:
+          filterDate !== dateFilterList[0]
+            ? getDateRange(filterDate)[0].replace(/[/]/g, "-")
+            : undefined,
+        toDate:
+          filterDate !== dateFilterList[0]
+            ? getDateRange(filterDate)[1].replace(/[/]/g, "-")
+            : undefined,
+      };
+
+      await getEvaluationStatistics(params)
         .then((res) => {
           setStatisticsData(res);
         })
@@ -398,8 +418,15 @@ const DashboardEvaluationContent = (props: Props) => {
         });
     };
 
-    fetchingEvaluationStatistics();
-  }, []);
+    fetchingAllStudentResponses();
+  }, [
+    filterSchool,
+    filterCourse,
+    filterGrade,
+    filterStudy,
+    filterAge,
+    filterDate,
+  ]);
 
   return (
     <>
