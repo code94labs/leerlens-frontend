@@ -18,6 +18,15 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import {
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
+import DoNotDisturbAltOutlinedIcon from "@mui/icons-material/DoNotDisturbAltOutlined";
 
 import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
 
@@ -29,11 +38,21 @@ import {
 } from "../../services/dashboardStatistics.service";
 import { champBlackFontFamily } from "../../shared/typography";
 import {
+  ageList,
   barChartColorCombinations,
   barChartGrouColorPallete,
+  dateFilterList,
+  gradeList,
+  remindProgramListForFilters,
+  schoolList,
+  studyFieldList,
 } from "../../utils/constant";
-import { CircularProgress } from "@mui/material";
-import { DashboardBarChart, DashboardStatistics } from "../../utils/types";
+import {
+  DashboardBarChart,
+  DashboardStatistics,
+  GetStatisticsQueryParams,
+} from "../../utils/types";
+import { getDateRange } from "../../utils/helper";
 
 ChartJS.register(
   CategoryScale,
@@ -60,6 +79,20 @@ const customStyles = {
   loadingIcon: {
     color: "#A879FF",
   },
+  dropdown: {
+    width: "100%",
+    mb: 2,
+    mr: 2,
+    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "grey !important",
+    },
+    "& .MuiInputBase-input": {
+      fontWeight: 600,
+    },
+    "& .MuiInputLabel-root.Mui-focused": {
+      color: "grey",
+    },
+  },
 };
 
 type Props = {};
@@ -75,6 +108,16 @@ const DashboardPrePostContent = (props: Props) => {
     DashboardStatistics[]
   >([]);
 
+  const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
+  const [filterSchool, setFilterSchool] = useState<number>(schoolList[0].id);
+  const [filterGrade, setFilterGrade] = useState<number>(gradeList[0].id);
+  const [filterCourse, setFilterCourse] = useState<number>(
+    remindProgramListForFilters[0].id
+  );
+  const [filterAge, setFilterAge] = useState<number>(ageList[0].id);
+  const [filterStudy, setFilterStudy] = useState<number>(studyFieldList[0].id);
+  const [filterDate, setFilterDate] = useState<string>(dateFilterList[0]);
+
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
   const [notificationMsg, setNotificationMsg] = useState<string>("");
 
@@ -83,6 +126,30 @@ const DashboardPrePostContent = (props: Props) => {
 
   const getBackgroundColors = (index: number) =>
     barChartColorCombinations[index % barChartColorCombinations.length];
+
+  const areFiltersActivated = () => {
+    if (
+      filterSchool !== schoolList[0].id ||
+      filterGrade !== gradeList[0].id ||
+      filterCourse !== remindProgramListForFilters[0].id ||
+      filterAge !== ageList[0].id ||
+      filterStudy !== studyFieldList[0].id ||
+      filterDate !== dateFilterList[0]
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const resetAllFilters = () => {
+    setFilterSchool(schoolList[0].id);
+    setFilterGrade(gradeList[0].id);
+    setFilterCourse(remindProgramListForFilters[0].id);
+    setFilterAge(ageList[0].id);
+    setFilterStudy(studyFieldList[0].id);
+    setFilterDate(dateFilterList[0]);
+  };
 
   const fetchSummaryStat = async () => {
     setIsLoading(true);
@@ -105,7 +172,24 @@ const DashboardPrePostContent = (props: Props) => {
   const fetchQuestionnaireStat = async () => {
     setIsLoading(true);
 
-    await getPrePostStatistics()
+    // making the params object
+    const params: GetStatisticsQueryParams = {
+      age: filterAge !== 0 ? filterAge : undefined,
+      course: filterCourse !== 0 ? filterCourse : undefined,
+      grade: filterGrade !== 0 ? filterGrade : undefined,
+      school: filterSchool !== 0 ? filterSchool : undefined,
+      study: filterStudy !== 0 ? filterStudy : undefined,
+      fromDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDate)[0].replace(/[/]/g, "-")
+          : undefined,
+      toDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDate)[1].replace(/[/]/g, "-")
+          : undefined,
+    };
+
+    await getPrePostStatistics(params)
       .then((res) => {
         setStatisticsData(res);
       })
@@ -158,16 +242,157 @@ const DashboardPrePostContent = (props: Props) => {
       });
   };
 
-  const filterButton = (
-    <Stack px={2} py={3}>
+  const filterButtonDiv = (
+    <Stack px={2} py={3} direction="row" justifyContent="space-between">
       <Button
         variant="outlined"
+        onClick={() => {
+          setDisplayFiltersDiv((prev) => !prev);
+        }}
         startIcon={<FilterAltIcon />}
         sx={{ width: "max-content" }}
       >
         Filter
       </Button>
+      {!areFiltersActivated() && (
+        <Button
+          variant="outlined"
+          onClick={resetAllFilters}
+          // sx={customStyles.primaryButtonOutlined}
+          sx={{ width: "max-content" }}
+        >
+          <DoNotDisturbAltOutlinedIcon />
+
+          <Typography fontWeight={800} mx={0.8}>
+            Reset filters
+          </Typography>
+        </Button>
+      )}
     </Stack>
+  );
+
+  const filtersDiv = (
+    <Grid container px={2} gap={2}>
+      <Grid item xs={4}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>School</InputLabel>
+
+          <Select
+            value={String(filterSchool)}
+            label="School"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterSchool(Number(event.target.value));
+            }}
+          >
+            {schoolList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.schoolName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Grade</InputLabel>
+
+          <Select
+            value={String(filterGrade)}
+            label="Grade"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterGrade(Number(event.target.value));
+            }}
+          >
+            {gradeList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.grade}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Course</InputLabel>
+
+          <Select
+            value={String(filterCourse)}
+            label="Course"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterCourse(Number(event.target.value));
+            }}
+          >
+            {remindProgramListForFilters.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.sentence}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={3}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>What do you study</InputLabel>
+
+          <Select
+            value={String(filterStudy)}
+            label="What do you study"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterStudy(Number(event.target.value));
+            }}
+          >
+            {studyFieldList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.studyField}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Age</InputLabel>
+
+          <Select
+            value={String(filterAge)}
+            label="Age"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterAge(Number(event.target.value));
+            }}
+          >
+            {ageList.map((item) => (
+              <MenuItem value={item.id} key={item.age}>
+                {item.age}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={3}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Date</InputLabel>
+
+          <Select
+            value={filterDate}
+            label="Date"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterDate(event.target.value);
+            }}
+          >
+            {dateFilterList.map((item) => (
+              <MenuItem value={item} key={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+    </Grid>
   );
 
   const titleSection = (
@@ -295,14 +520,23 @@ const DashboardPrePostContent = (props: Props) => {
     fetchAbsoluteStat();
 
     fetchRelativeStat();
-  }, []);
+  }, [
+    filterSchool,
+    filterCourse,
+    filterGrade,
+    filterStudy,
+    filterAge,
+    filterDate,
+  ]);
 
   return (
     <>
       <Stack sx={customStyles.stack}>
         {titleSection}
 
-        {filterButton}
+        {filterButtonDiv}
+
+        {displayFiltersDiv && filtersDiv}
 
         {!isLoading && summaryCharts}
 
