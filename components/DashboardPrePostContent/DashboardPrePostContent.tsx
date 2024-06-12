@@ -53,6 +53,7 @@ import {
   GetStatisticsQueryParams,
 } from "../../utils/types";
 import { getDateRange } from "../../utils/helper";
+import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
 ChartJS.register(
   CategoryScale,
@@ -261,6 +262,7 @@ const DashboardPrePostContent = (props: Props) => {
           onClick={resetAllFilters}
           // sx={customStyles.primaryButtonOutlined}
           sx={{ width: "max-content" }}
+          color="secondary"
         >
           <DoNotDisturbAltOutlinedIcon />
 
@@ -507,10 +509,35 @@ const DashboardPrePostContent = (props: Props) => {
     </Stack>
   );
 
-  const loading = (
-    <Box sx={customStyles.loading}>
-      <CircularProgress sx={customStyles.loadingIcon} />
-    </Box>
+  const spinnerSection = (
+    <Stack
+      m={2}
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+      height={200}
+    >
+      <ProgressSpinner />
+    </Stack>
+  );
+
+  const noResponsesSection = (
+    <Stack
+      m={2}
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+      height={200}
+    >
+      <Typography
+        fontSize={18}
+        textTransform="uppercase"
+        color={"#1A1A1A"}
+        fontWeight={700}
+      >
+        There are no responses under above filters
+      </Typography>
+    </Stack>
   );
 
   useEffect(() => {
@@ -545,7 +572,7 @@ const DashboardPrePostContent = (props: Props) => {
 
         {!isLoading && questionnaireCharts}
 
-        {isLoading && loading}
+        {isLoading && spinnerSection}
       </Stack>
     </>
   );
