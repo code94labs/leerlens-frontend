@@ -49,6 +49,7 @@ import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
 ChartJS.register(
   CategoryScale,
@@ -232,6 +233,7 @@ const DashboardEvaluationContent = (props: Props) => {
           onClick={resetAllFilters}
           // sx={customStyles.primaryButtonOutlined}
           sx={{ width: "max-content" }}
+          color="secondary"
         >
           <DoNotDisturbAltOutlinedIcon />
 
@@ -385,8 +387,41 @@ const DashboardEvaluationContent = (props: Props) => {
     </Stack>
   );
 
+  const spinnerSection = (
+    <Stack
+      m={2}
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+      height={200}
+    >
+      <ProgressSpinner />
+    </Stack>
+  );
+
+  const noResponsesSection = (
+    <Stack
+      m={2}
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+      height={200}
+    >
+      <Typography
+        fontSize={18}
+        textTransform="uppercase"
+        color={"#1A1A1A"}
+        fontWeight={700}
+      >
+        There are no responses under above filters
+      </Typography>
+    </Stack>
+  );
+
   useEffect(() => {
     const fetchingEvaluationStatistics = async () => {
+      setIsLoading(true);
+
       // making the params object
       const params: GetStatisticsQueryParams = {
         age: filterAge !== 0 ? filterAge : undefined,
@@ -439,13 +474,17 @@ const DashboardEvaluationContent = (props: Props) => {
         {displayFiltersDiv && filtersDiv}
 
         <Grid container p={2} spacing={2}>
-          {statisticsData.map(
-            (stat: DashboardEvaluationChart, index: number) => (
-              <Grid item xs={4} key={stat.questionId}>
-                {getChartComponent(stat, index)}
-              </Grid>
-            )
-          )}
+          {isLoading
+            ? spinnerSection
+            : statisticsData.length < 1
+            ? noResponsesSection
+            : statisticsData.map(
+                (stat: DashboardEvaluationChart, index: number) => (
+                  <Grid item xs={4} key={stat.questionId}>
+                    {getChartComponent(stat, index)}
+                  </Grid>
+                )
+              )}
         </Grid>
       </Stack>
     </>
