@@ -214,7 +214,7 @@ const DashboardEvaluationContent = (props: Props) => {
   };
 
   const filterButtonDiv = (
-    <Stack px={2} py={3} direction="row" justifyContent="space-between">
+    <Stack px={2} py={2} direction="row" justifyContent="space-between">
       <Button
         variant="outlined"
         onClick={() => {
@@ -438,7 +438,7 @@ const DashboardEvaluationContent = (props: Props) => {
 
         {displayFiltersDiv && filtersDiv}
 
-        <Grid container px={2} spacing={2}>
+        <Grid container p={2} spacing={2}>
           {statisticsData.map(
             (stat: DashboardEvaluationChart, index: number) => (
               <Grid item xs={4} key={stat.questionId}>
