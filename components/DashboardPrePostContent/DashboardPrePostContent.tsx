@@ -251,6 +251,7 @@ const DashboardPrePostContent = (props: Props) => {
         }}
         startIcon={<FilterAltIcon />}
         sx={{ width: "max-content" }}
+        color="secondary"
       >
         Filter
       </Button>

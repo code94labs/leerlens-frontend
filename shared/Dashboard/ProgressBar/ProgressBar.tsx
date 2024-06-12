@@ -4,6 +4,7 @@ import { Box, Stack, Typography } from "@mui/material";
 import { livvic } from "../../../public/theme/theme";
 import { champBlackFontFamily } from "../../typography";
 
+
 type Props = {
   title: string;
   color: string;
@@ -52,8 +53,9 @@ const customStyles = {
     color: "white",
   },
   indicatorLabel: {
-    fontFamily: champBlackFontFamily,
+    fontFamily: livvic,
     fontSize: 24,
+    fontWeight: 500,
     m: 1,
   },
 };

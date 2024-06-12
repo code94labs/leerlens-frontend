@@ -2,7 +2,6 @@ import { Grid, Stack, Typography } from "@mui/material";
 import React from "react";
 
 import { Bar } from "react-chartjs-2";
-import { champBlackFontFamily } from "../../typography";
 import { Livvic } from "next/font/google";
 
 export const livvic = Livvic({
@@ -56,19 +55,6 @@ const VerticalBarChartType02 = ({
       legend: {
         display: false,
       },
-      // title: {
-      //   display: true,
-      //   text: title.toLocaleUpperCase(),
-      //   font: {
-      //     size: 15,
-      //     weight: 700,
-      //     family: livvic.style.fontFamily,
-      //   },
-      //   color: "#1A1A1A",
-      //   padding: {
-      //     bottom: 50,
-      //   },
-      // },
       datalabels: {
         display: dataLabelsVisible,
         backgroundColor: "black",
@@ -108,8 +94,9 @@ const VerticalBarChartType02 = ({
         ticks: {
           font: {
             size: dataLabelsVisible ? 12 : 25,
-            weight: dataLabelsVisible ? 400 : 900,
-            family: champBlackFontFamily,
+            weight: 500,
+            family: "Livvic, sans-serif",
+            color: "#333333",
           },
         },
       },
@@ -142,7 +129,11 @@ const VerticalBarChartType02 = ({
   };
 
   return (
-    <Stack sx={customStyles.stack} direction="column" justifyContent="space-between">
+    <Stack
+      sx={customStyles.stack}
+      direction="column"
+      justifyContent="space-between"
+    >
       <Typography sx={customStyles.title}>{title}</Typography>
 
       <Bar options={options} data={data} height="100%" />
