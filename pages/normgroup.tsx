@@ -22,12 +22,11 @@ const LandingPage = () => {
     <Stack>
       <Header />
 
-      <Stack sx={customStyles.stack}>
-        <FormCard
-          title="Teachers"
-          description="Great that you are participating in the learning scan! Completing the learning scan takes approximately five minutes. Answer the questions as honestly as possible: there is no right or wrong. With all the answers we collect we can investigate what you think about learning. Goodluck!"
-          pagePath="/teachers"
-          image="/images/img1.png"
+      <Stack sx={customStyles.stack} flexDirection="row" justifyContent="center">
+         <FormCard
+          title="Normgroup"
+          description="How cool that you did one or more training sessions with us. We have done our best to make it as fun and educational as possible for you and are very curious about what you thought of it. That's why we have a few questions for you. Answer them honestly, whether you are positive or negative about the training, we can learn from it! :)"
+          pagePath="/forms/normgroup"
         />
       </Stack>
     </Stack>

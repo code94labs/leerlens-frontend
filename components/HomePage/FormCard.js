@@ -23,6 +23,7 @@ import { useWindowSize } from "../../utils/hooks/useWindowSize";
 
 const customStyles = {
   card: {
+    maxWidth: 500,
     border: "1px #E6E6E6 solid",
     display: "flex",
     flexDirection: "column",
@@ -51,10 +52,7 @@ const customStyles = {
   },
   description: {
     color: "#4C4C4D",
-    width: {
-      xs: "100%",
-      md: "85%",
-    },
+    width: "100%",
     fontSize: {
       xs: 14,
       md: 16,
@@ -63,10 +61,7 @@ const customStyles = {
       xs: 2,
       md: 4,
     },
-    textAlign: {
-      xs: "justify",
-      md: "center",
-    },
+    textAlign: "justify",
   },
   boxBtn: {
     width: "100%",
@@ -228,18 +223,10 @@ const customStyles = {
   copyLinkBtn: {
     transform: "rotate(-45deg)",
   },
-  imageStack: {
-    mt: 2, 
-    mb: 4,
-    display: {
-      xs: "none",
-      md: "flex",
-    },
-  },
 };
 
 const FormCard = (props) => {
-  const { title, description, pagePath, image } = props;
+  const { title, description, pagePath } = props;
 
   const router = useRouter();
 
@@ -358,15 +345,11 @@ const FormCard = (props) => {
       sx={customStyles.card}
     >
       <Stack sx={customStyles.card}>
-        <Stack sx={customStyles.innerCard} alignItems="center">
+        <Stack sx={customStyles.innerCard}>
           <Typography variant="h4" sx={customStyles.title}>
             {title}
           </Typography>
           <Typography sx={customStyles.description}>{description}</Typography>
-
-          <Stack sx={customStyles.imageStack}>
-            <Image src={image} height={150} width={200} alt="img" />
-          </Stack>
 
           <Box sx={customStyles.boxBtn}>
             <Button
