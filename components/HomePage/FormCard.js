@@ -15,7 +15,6 @@ import {
   Alert,
 } from "@mui/material";
 import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import QRCode from "qrcode.react";
 
 import { champBlackFontFamily } from "../../shared/typography";
@@ -24,12 +23,13 @@ import { useWindowSize } from "../../utils/hooks/useWindowSize";
 
 const customStyles = {
   card: {
+    maxWidth: 500,
     border: "1px #E6E6E6 solid",
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "column",
     mx: {
       xs: 0,
-      md: 4,
+      md: 2,
     },
     p: {
       xs: 3,
@@ -52,10 +52,7 @@ const customStyles = {
   },
   description: {
     color: "#4C4C4D",
-    width: {
-      xs: "100%",
-      md: "85%",
-    },
+    width: "100%",
     fontSize: {
       xs: 14,
       md: 16,
@@ -64,16 +61,10 @@ const customStyles = {
       xs: 2,
       md: 4,
     },
-    textAlign: {
-      xs: "justify",
-      md: "left",
-    },
+    textAlign: "justify",
   },
   boxBtn: {
-    width: {
-      xs: "100%",
-      md: "80%",
-    },
+    width: "100%",
     display: "flex",
     flexDirection: {
       xs: "column",
@@ -232,16 +223,10 @@ const customStyles = {
   copyLinkBtn: {
     transform: "rotate(-45deg)",
   },
-  imageStack: {
-    display: {
-      xs: "none",
-      md: "flex",
-    },
-  },
 };
 
 const FormCard = (props) => {
-  const { title, description, pagePath, image } = props;
+  const { title, description, pagePath } = props;
 
   const router = useRouter();
 
@@ -360,7 +345,7 @@ const FormCard = (props) => {
       sx={customStyles.card}
     >
       <Stack sx={customStyles.card}>
-        <Stack>
+        <Stack sx={customStyles.innerCard}>
           <Typography variant="h4" sx={customStyles.title}>
             {title}
           </Typography>
@@ -387,10 +372,6 @@ const FormCard = (props) => {
               View QR Code
             </Button>
           </Box>
-        </Stack>
-
-        <Stack sx={customStyles.imageStack}>
-          <Image src={image} height={200} width={250} alt="img" />
         </Stack>
 
         <Modal

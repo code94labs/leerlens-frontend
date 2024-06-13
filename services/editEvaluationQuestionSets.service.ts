@@ -3,7 +3,6 @@ import {
   getRequest,
   patchRequest,
   postRequest,
-  updateRequest,
 } from "../api/requests";
 import { FormQuestion } from "../utils/types";
 
