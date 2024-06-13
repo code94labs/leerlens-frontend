@@ -210,7 +210,7 @@ const DashboardEvaluationContent = (props: Props) => {
           />
         );
       default:
-        console.log(`Sorry, we are out of charts.`);
+        // console.log(`Sorry, we are out of charts.`);
     }
   };
 

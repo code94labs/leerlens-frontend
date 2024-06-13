@@ -26,9 +26,10 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-} from "@mui/material";
-
-import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
+  } from "@mui/material";
+  
+  import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
+  import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
 import { champBlackFontFamily } from "../../shared/typography";
 
@@ -54,7 +55,7 @@ import {
   GetStatisticsQueryParams,
 } from "../../utils/types";
 import { getDateRange } from "../../utils/helper";
-import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
+import { APILoadingStates } from "../../utils/enum";
 
 ChartJS.register(
   CategoryScale,
@@ -124,7 +125,12 @@ const DashboardNormGroupContent = (props: Props) => {
   const [notificationMsg, setNotificationMsg] = useState<string>("");
 
   const [isError, setIsError] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+  ]);
 
   const getBackgroundColors = (index: number) =>
     barChartColorCombinations[index % barChartColorCombinations.length];
@@ -154,7 +160,11 @@ const DashboardNormGroupContent = (props: Props) => {
   };
 
   const fetchSummaryStat = async () => {
-    setIsLoading(true);
+    setIsLoading((prev) => {
+      let loadingArray = [...prev];
+      loadingArray[APILoadingStates.summaryCharts] = true;
+      return loadingArray;
+    });
 
     await getNormgroupSummaryStatistics()
       .then((res) => {
@@ -167,7 +177,11 @@ const DashboardNormGroupContent = (props: Props) => {
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoading((prev) => {
+          let loadingArray = [...prev];
+          loadingArray[APILoadingStates.summaryCharts] = false;
+          return loadingArray;
+        });
       });
   };
 
@@ -189,7 +203,11 @@ const DashboardNormGroupContent = (props: Props) => {
           : undefined,
     };
 
-    setIsLoading(true);
+    setIsLoading((prev) => {
+      let loadingArray = [...prev];
+      loadingArray[APILoadingStates.statisticalCharts] = true;
+      return loadingArray;
+    });
 
     await getNormgroupStatistics(params)
       .then((res) => {
@@ -202,16 +220,24 @@ const DashboardNormGroupContent = (props: Props) => {
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoading((prev) => {
+          let loadingArray = [...prev];
+          loadingArray[APILoadingStates.statisticalCharts] = false;
+          return loadingArray;
+        });
       });
   };
 
   const fetchAbsoluteStat = async () => {
-    setIsLoading(true);
+    setIsLoading((prev) => {
+      let loadingArray = [...prev];
+      loadingArray[APILoadingStates.abosoluteDifference] = true;
+      return loadingArray;
+    });
 
     await getNormgroupAbsoluteStat()
       .then((res) => {
-        console.log("absolute reponse:", res);
+        // console.log("absolute reponse:", res);
 
         setAbsoluteDifference(res);
       })
@@ -222,12 +248,20 @@ const DashboardNormGroupContent = (props: Props) => {
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoading((prev) => {
+          let loadingArray = [...prev];
+          loadingArray[APILoadingStates.abosoluteDifference] = false;
+          return loadingArray;
+        });
       });
   };
 
   const fetchRelativeStat = async () => {
-    setIsLoading(true);
+    setIsLoading((prev) => {
+      let loadingArray = [...prev];
+      loadingArray[APILoadingStates.relativeDifference] = true;
+      return loadingArray;
+    });
 
     await getNormgroupRelativeStat()
       .then((res) => {
@@ -240,7 +274,11 @@ const DashboardNormGroupContent = (props: Props) => {
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoading((prev) => {
+          let loadingArray = [...prev];
+          loadingArray[APILoadingStates.relativeDifference] = false;
+          return loadingArray;
+        });
       });
   };
 
@@ -415,100 +453,6 @@ const DashboardNormGroupContent = (props: Props) => {
     </Stack>
   );
 
-  const questionnaireCharts = (
-    <>
-      <Typography variant="h5" m={2} fontWeight={800}>
-        Questionnaires
-      </Typography>
-
-      <Grid container px={2} spacing={2}>
-        {statisticsData &&
-          statisticsData.map((data, index) => (
-            <Grid item xs={4} key={index}>
-              <VerticalBarChartType01
-                title={`${index + 1}. ${data.questionText}`}
-                labels={["Learning 1", "Learning 2"]}
-                datasets={[
-                  {
-                    data: [data.learningOne, data.learningTwo],
-                    backgroundColor: getBackgroundColors(index),
-                  },
-                ]}
-              />
-            </Grid>
-          ))}
-      </Grid>
-    </>
-  );
-
-  const summaryCharts = (
-    <Stack my={2}>
-      <Typography variant="h5" m={2} fontWeight={800}>
-        Summary charts
-      </Typography>
-
-      <Grid container px={2} spacing={2}>
-        {summaryData &&
-          summaryData.map((data, index) => (
-            <Grid item xs={4} key={index}>
-              <VerticalBarChartType01
-                title={`${index + 1}. ${data.questionText}`}
-                labels={["Learning 1", "Learning 2"]}
-                datasets={[
-                  {
-                    data: [data.learningOne, data.learningTwo],
-                    backgroundColor: getBackgroundColors(index),
-                  },
-                ]}
-              />
-            </Grid>
-          ))}
-      </Grid>
-    </Stack>
-  );
-
-  const statisticalCharts = (
-    <Stack my={2}>
-      <Typography variant="h5" m={2} fontWeight={800}>
-        Statistical charts
-      </Typography>
-
-      <Grid container spacing={2} px={2}>
-        {absoluteDifference && (
-          <Grid item xs={6}>
-            <VerticalBarChartType01
-              removeBarGaps
-              title="Absolute Difference"
-              labels={absoluteDifference.map((data) => data.title)}
-              datasets={[
-                {
-                  data: absoluteDifference.map((data) => data.value),
-                  backgroundColor: barChartGrouColorPallete,
-                },
-              ]}
-            />
-          </Grid>
-        )}
-
-        {relativeDifference && (
-          <Grid item xs={6}>
-            <VerticalBarChartType01
-              removeBarGaps
-              title="Relative Difference"
-              labels={relativeDifference.map((data) => data.title)}
-              datasets={[
-                {
-                  data: relativeDifference.map((data) => data.value),
-                  backgroundColor: barChartGrouColorPallete,
-                },
-              ]}
-            />
-          </Grid>
-        )}
-      </Grid>
-    </Stack>
-  );
-
   const spinnerSection = (
     <Stack
       m={2}
@@ -540,6 +484,114 @@ const DashboardNormGroupContent = (props: Props) => {
     </Stack>
   );
 
+  const questionnaireCharts = (
+    <>
+      <Typography variant="h5" m={2} fontWeight={800}>
+        Questionnaires
+      </Typography>
+
+      <Grid container px={2} spacing={2}>
+        {isLoading[APILoadingStates.statisticalCharts]
+          ? spinnerSection
+          : statisticsData.length < 1
+          ? noResponsesSection
+          : statisticsData.map((data, index) => (
+              <Grid item xs={4} key={index}>
+                <VerticalBarChartType01
+                  title={`${index + 1}. ${data.questionText}`}
+                  labels={["Learning 1", "Learning 2"]}
+                  datasets={[
+                    {
+                      data: [data.learningOne, data.learningTwo],
+                      backgroundColor: getBackgroundColors(index),
+                    },
+                  ]}
+                />
+              </Grid>
+            ))}
+      </Grid>
+    </>
+  );
+
+  const summaryCharts = (
+    <Stack my={2}>
+      <Typography variant="h5" m={2} fontWeight={800}>
+        Summary charts
+      </Typography>
+
+      <Grid container px={2} spacing={2}>
+        {isLoading[APILoadingStates.summaryCharts]
+          ? spinnerSection
+          : summaryData.length < 1
+          ? noResponsesSection
+          : summaryData.map((data, index) => (
+              <Grid item xs={4} key={index}>
+                <VerticalBarChartType01
+                  title={`${index + 1}. ${data.questionText}`}
+                  labels={["Learning 1", "Learning 2"]}
+                  datasets={[
+                    {
+                      data: [data.learningOne, data.learningTwo],
+                      backgroundColor: getBackgroundColors(index),
+                    },
+                  ]}
+                />
+              </Grid>
+            ))}
+      </Grid>
+    </Stack>
+  );
+
+  const statisticalCharts = (
+    <Stack my={2}>
+      <Typography variant="h5" m={2} fontWeight={800}>
+        Statistical charts
+      </Typography>
+
+      <Grid container spacing={2} px={2}>
+        {isLoading[APILoadingStates.abosoluteDifference] ? (
+          spinnerSection
+        ) : absoluteDifference.length < 1 ? (
+          noResponsesSection
+        ) : (
+          <Grid item xs={6}>
+            <VerticalBarChartType01
+              removeBarGaps
+              title="Absolute Difference"
+              labels={absoluteDifference.map((data) => data.title)}
+              datasets={[
+                {
+                  data: absoluteDifference.map((data) => data.value),
+                  backgroundColor: barChartGrouColorPallete,
+                },
+              ]}
+            />
+          </Grid>
+        )}
+
+        {isLoading[APILoadingStates.relativeDifference] ? (
+          spinnerSection
+        ) : relativeDifference.length < 1 ? (
+          noResponsesSection
+        ) : (
+          <Grid item xs={6}>
+            <VerticalBarChartType01
+              removeBarGaps
+              title="Relative Difference"
+              labels={relativeDifference.map((data) => data.title)}
+              datasets={[
+                {
+                  data: relativeDifference.map((data) => data.value),
+                  backgroundColor: barChartGrouColorPallete,
+                },
+              ]}
+            />
+          </Grid>
+        )}
+      </Grid>
+    </Stack>
+  );
+
   useEffect(() => {
     fetchQuestionnaireStat();
 
@@ -566,13 +618,11 @@ const DashboardNormGroupContent = (props: Props) => {
 
         {displayFiltersDiv && filtersDiv}
 
-        {!isLoading && summaryCharts}
+        {summaryCharts}
 
-        {!isLoading && statisticalCharts}
+        {statisticalCharts}
 
-        {!isLoading && questionnaireCharts}
-
-        {isLoading && spinnerSection}
+        {questionnaireCharts}
       </Stack>
     </>
   );

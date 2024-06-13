@@ -74,3 +74,11 @@ export enum ChartType {
   verticalBarChartTypeThree = 7, // individual bar chart (three bars)
   lineChart = 8,
 }
+
+// for managing loading states in dashboard pages
+export enum APILoadingStates {
+  summaryCharts = 0,
+  statisticalCharts = 1,
+  abosoluteDifference = 2,
+  relativeDifference = 3,
+}

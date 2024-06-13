@@ -61,7 +61,7 @@ export const getPrePostAbsoluteStat = async () => {
   try {
     const response = await getRequest(leerLensApi.prePostAbsoluteStat);
 
-    console.log("response", response);
+    // console.log("response", response);
 
     return response.data;
   } catch (error) {
@@ -78,7 +78,7 @@ export const getNormgroupAbsoluteStat = async () => {
   try {
     const response = await getRequest(leerLensApi.normGroupAbsoluteStat);
 
-    console.log("response", response);
+    // console.log("response", response);
 
     return response.data;
   } catch (error) {
