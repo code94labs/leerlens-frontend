@@ -15,7 +15,6 @@ import {
   Alert,
 } from "@mui/material";
 import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import QRCode from "qrcode.react";
 
 import { champBlackFontFamily } from "../../shared/typography";
@@ -26,10 +25,10 @@ const customStyles = {
   card: {
     border: "1px #E6E6E6 solid",
     display: "flex",
-    flexDirection: "row",
+    flexDirection: "column",
     mx: {
       xs: 0,
-      md: 4,
+      md: 2,
     },
     p: {
       xs: 3,
@@ -66,14 +65,11 @@ const customStyles = {
     },
     textAlign: {
       xs: "justify",
-      md: "left",
+      md: "center",
     },
   },
   boxBtn: {
-    width: {
-      xs: "100%",
-      md: "80%",
-    },
+    width: "100%",
     display: "flex",
     flexDirection: {
       xs: "column",
@@ -233,6 +229,8 @@ const customStyles = {
     transform: "rotate(-45deg)",
   },
   imageStack: {
+    mt: 2, 
+    mb: 4,
     display: {
       xs: "none",
       md: "flex",
@@ -360,11 +358,15 @@ const FormCard = (props) => {
       sx={customStyles.card}
     >
       <Stack sx={customStyles.card}>
-        <Stack>
+        <Stack sx={customStyles.innerCard} alignItems="center">
           <Typography variant="h4" sx={customStyles.title}>
             {title}
           </Typography>
           <Typography sx={customStyles.description}>{description}</Typography>
+
+          <Stack sx={customStyles.imageStack}>
+            <Image src={image} height={150} width={200} alt="img" />
+          </Stack>
 
           <Box sx={customStyles.boxBtn}>
             <Button
@@ -387,10 +389,6 @@ const FormCard = (props) => {
               View QR Code
             </Button>
           </Box>
-        </Stack>
-
-        <Stack sx={customStyles.imageStack}>
-          <Image src={image} height={200} width={250} alt="img" />
         </Stack>
 
         <Modal
