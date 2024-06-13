@@ -26,10 +26,10 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
-  } from "@mui/material";
-  
-  import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
-  import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
+} from "@mui/material";
+
+import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
+import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
 import { champBlackFontFamily } from "../../shared/typography";
 

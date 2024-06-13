@@ -106,6 +106,7 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
       },
       y: {
         display: false,
+        suggestedMax: 6,
         grid: {
           display: false,
         },
