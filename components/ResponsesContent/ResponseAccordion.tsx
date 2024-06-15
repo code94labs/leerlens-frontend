@@ -290,7 +290,9 @@ const ResponseAccordion = (props: Props) => {
     try {
       setIsLoading(true);
 
-      await deleteStudentResponseById(studentResponse.id);
+      console.log("Hi there", studentResponse.id);
+
+      // await deleteStudentResponseById(studentResponse.id);
 
       setNotificationMsg("Successfully deleted student response..");
       setDisplaySnackbarMsg(true);

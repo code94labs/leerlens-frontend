@@ -176,12 +176,7 @@ export const remindProgramList = [
     id: 7,
     sentence: "Remind in de middag / Ondersteuningsprogramma",
     questionSetId: 2,
-  },
-  {
-    id: 8,
-    sentence: "Studentenprogramma MBO/HBO",
-    questionSetId: 1,
-  },
+  }
 ];
 
 // remindLearningProgram for filter
