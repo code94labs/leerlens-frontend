@@ -102,7 +102,7 @@ const SuccessMessage = () => {
           />
 
           <Image
-            src='/images/img5.png'
+            src="/images/img5.png"
             height={200}
             width={250}
             alt="logo"
