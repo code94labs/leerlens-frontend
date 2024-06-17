@@ -19,6 +19,8 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import DoNotDisturbAltOutlinedIcon from "@mui/icons-material/DoNotDisturbAltOutlined";
+import Switch from "@mui/material/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import {
   CircularProgress,
   FormControl,
@@ -35,6 +37,7 @@ import { champBlackFontFamily } from "../../shared/typography";
 
 import {
   getNormgroupAbsoluteStat,
+  getNormgroupCompareSummaryStatistics,
   getNormgroupRelativeStat,
   getNormgroupStatistics,
   getNormgroupSummaryStatistics,
@@ -112,6 +115,8 @@ const DashboardNormGroupContent = (props: Props) => {
   >([]);
 
   const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
+  const [compareFiltersActivated, setCompareFiltersActivated] =
+    useState<boolean>(false);
   const [filterSchool, setFilterSchool] = useState<number>(schoolList[0].id);
   const [filterGrade, setFilterGrade] = useState<number>(gradeList[0].id);
   const [filterCourse, setFilterCourse] = useState<number>(
@@ -120,6 +125,20 @@ const DashboardNormGroupContent = (props: Props) => {
   const [filterAge, setFilterAge] = useState<number>(ageList[0].id);
   const [filterStudy, setFilterStudy] = useState<number>(studyFieldList[0].id);
   const [filterDate, setFilterDate] = useState<string>(dateFilterList[0]);
+
+  // group two filters
+  const [filterSchoolTwo, setFilterSchoolTwo] = useState<number>(
+    schoolList[0].id
+  );
+  const [filterGradeTwo, setFilterGradeTwo] = useState<number>(gradeList[0].id);
+  const [filterCourseTwo, setFilterCourseTwo] = useState<number>(
+    remindProgramListForFilters[0].id
+  );
+  const [filterAgeTwo, setFilterAgeTwo] = useState<number>(ageList[0].id);
+  const [filterStudyTwo, setFilterStudyTwo] = useState<number>(
+    studyFieldList[0].id
+  );
+  const [filterDateTwo, setFilterDateTwo] = useState<string>(dateFilterList[0]);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
   const [notificationMsg, setNotificationMsg] = useState<string>("");
@@ -159,35 +178,9 @@ const DashboardNormGroupContent = (props: Props) => {
     setFilterDate(dateFilterList[0]);
   };
 
-  const fetchSummaryStat = async () => {
-    setIsLoading((prev) => {
-      let loadingArray = [...prev];
-      loadingArray[APILoadingStates.summaryCharts] = true;
-      return loadingArray;
-    });
-
-    await getNormgroupSummaryStatistics()
-      .then((res) => {
-        setSummaryData(res);
-      })
-      .catch(() => {
-        setIsError(true);
-
-        setNotificationMsg("Error when fetching summary statistics...");
-        setDisplaySnackbarMsg(true);
-      })
-      .finally(() => {
-        setIsLoading((prev) => {
-          let loadingArray = [...prev];
-          loadingArray[APILoadingStates.summaryCharts] = false;
-          return loadingArray;
-        });
-      });
-  };
-
-  const fetchQuestionnaireStat = async () => {
+  const getFilterParams = () => {
     // making the params object
-    const params: GetStatisticsQueryParams = {
+    const filterParams: GetStatisticsQueryParams = {
       age: filterAge !== 0 ? filterAge : undefined,
       course: filterCourse !== 0 ? filterCourse : undefined,
       grade: filterGrade !== 0 ? filterGrade : undefined,
@@ -203,13 +196,103 @@ const DashboardNormGroupContent = (props: Props) => {
           : undefined,
     };
 
+    return filterParams;
+  };
+
+  const getCompareFilterParams = () => {
+    // making the params object
+    const groupOneFilterParams: GetStatisticsQueryParams = {
+      age: filterAge !== 0 ? filterAge : undefined,
+      course: filterCourse !== 0 ? filterCourse : undefined,
+      grade: filterGrade !== 0 ? filterGrade : undefined,
+      school: filterSchool !== 0 ? filterSchool : undefined,
+      study: filterStudy !== 0 ? filterStudy : undefined,
+      fromDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDate)[0].replace(/[/]/g, "-")
+          : undefined,
+      toDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDate)[1].replace(/[/]/g, "-")
+          : undefined,
+    };
+
+    const groupTwoFilterParams: GetStatisticsQueryParams = {
+      age: filterAgeTwo !== 0 ? filterAgeTwo : undefined,
+      course: filterCourseTwo !== 0 ? filterCourseTwo : undefined,
+      grade: filterGradeTwo !== 0 ? filterGradeTwo : undefined,
+      school: filterSchoolTwo !== 0 ? filterSchoolTwo : undefined,
+      study: filterStudyTwo !== 0 ? filterStudyTwo : undefined,
+      fromDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDateTwo)[0].replace(/[/]/g, "-")
+          : undefined,
+      toDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDateTwo)[1].replace(/[/]/g, "-")
+          : undefined,
+    };
+
+    return {
+      groupOneFilters: groupOneFilterParams,
+      groupTwoFilters: groupTwoFilterParams,
+    };
+  };
+
+  const fetchSummaryStat = async () => {
+    setIsLoading((prev) => {
+      let loadingArray = [...prev];
+      loadingArray[APILoadingStates.summaryCharts] = true;
+      return loadingArray;
+    });
+
+    if (!compareFiltersActivated) {
+      await getNormgroupSummaryStatistics(getFilterParams())
+        .then((res) => {
+          setSummaryData(res);
+        })
+        .catch(() => {
+          setIsError(true);
+
+          setNotificationMsg("Error when fetching summary statistics...");
+          setDisplaySnackbarMsg(true);
+        })
+        .finally(() => {
+          setIsLoading((prev) => {
+            let loadingArray = [...prev];
+            loadingArray[APILoadingStates.summaryCharts] = false;
+            return loadingArray;
+          });
+        });
+    } else {
+      await getNormgroupCompareSummaryStatistics(getCompareFilterParams())
+        .then((res) => {
+          setSummaryData(res);
+        })
+        .catch(() => {
+          setIsError(true);
+
+          setNotificationMsg("Error when fetching summary statistics...");
+          setDisplaySnackbarMsg(true);
+        })
+        .finally(() => {
+          setIsLoading((prev) => {
+            let loadingArray = [...prev];
+            loadingArray[APILoadingStates.summaryCharts] = false;
+            return loadingArray;
+          });
+        });
+    }
+  };
+
+  const fetchQuestionnaireStat = async () => {
     setIsLoading((prev) => {
       let loadingArray = [...prev];
       loadingArray[APILoadingStates.statisticalCharts] = true;
       return loadingArray;
     });
 
-    await getNormgroupStatistics(params)
+    await getNormgroupStatistics(getFilterParams())
       .then((res) => {
         setStatisticsData(res);
       })
@@ -235,7 +318,7 @@ const DashboardNormGroupContent = (props: Props) => {
       return loadingArray;
     });
 
-    await getNormgroupAbsoluteStat()
+    await getNormgroupAbsoluteStat(getFilterParams())
       .then((res) => {
         // console.log("absolute reponse:", res);
 
@@ -263,7 +346,7 @@ const DashboardNormGroupContent = (props: Props) => {
       return loadingArray;
     });
 
-    await getNormgroupRelativeStat()
+    await getNormgroupRelativeStat(getFilterParams())
       .then((res) => {
         setRelativeDifference(res);
       })
@@ -295,20 +378,37 @@ const DashboardNormGroupContent = (props: Props) => {
       >
         Filter
       </Button>
-      {!areFiltersActivated() && (
-        <Button
-          variant="outlined"
-          onClick={resetAllFilters}
-          sx={{ width: "max-content" }}
-          color="secondary"
-        >
-          <DoNotDisturbAltOutlinedIcon />
+      <Stack direction="row" gap={2}>
+        <FormControlLabel
+          value="start"
+          control={
+            <Switch
+              color="secondary"
+              checked={compareFiltersActivated}
+              onChange={() => setCompareFiltersActivated((prev) => !prev)}
+              inputProps={{ "aria-label": "controlled" }}
+            />
+          }
+          label="Compare with others"
+          labelPlacement="start"
+          sx={{ fontWeight: 500, color: "#1A1A1A" }}
+        />
 
-          <Typography fontWeight={800} mx={0.8}>
-            Reset filters
-          </Typography>
-        </Button>
-      )}
+        {!areFiltersActivated() && (
+          <Button
+            variant="outlined"
+            onClick={resetAllFilters}
+            sx={{ width: "max-content" }}
+            color="secondary"
+          >
+            <DoNotDisturbAltOutlinedIcon />
+
+            <Typography fontWeight={800} mx={0.8}>
+              Reset filters
+            </Typography>
+          </Button>
+        )}
+      </Stack>
     </Stack>
   );
 
@@ -436,6 +536,130 @@ const DashboardNormGroupContent = (props: Props) => {
     </Grid>
   );
 
+  const groupTwoFiltersDiv = (
+    <Grid container px={2} mt={2} gap={2}>
+      <Grid item xs={4}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>School</InputLabel>
+
+          <Select
+            value={String(filterSchoolTwo)}
+            label="School"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterSchoolTwo(Number(event.target.value));
+            }}
+          >
+            {schoolList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.schoolName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Grade</InputLabel>
+
+          <Select
+            value={String(filterGradeTwo)}
+            label="Grade"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterGradeTwo(Number(event.target.value));
+            }}
+          >
+            {gradeList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.grade}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Course</InputLabel>
+
+          <Select
+            value={String(filterCourseTwo)}
+            label="Course"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterCourseTwo(Number(event.target.value));
+            }}
+          >
+            {remindProgramListForFilters.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.sentence}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={3}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>What do you study</InputLabel>
+
+          <Select
+            value={String(filterStudyTwo)}
+            label="What do you study"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterStudyTwo(Number(event.target.value));
+            }}
+          >
+            {studyFieldList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.studyField}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Age</InputLabel>
+
+          <Select
+            value={String(filterAgeTwo)}
+            label="Age"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterAgeTwo(Number(event.target.value));
+            }}
+          >
+            {ageList.map((item) => (
+              <MenuItem value={item.id} key={item.age}>
+                {item.age}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={3}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Date</InputLabel>
+
+          <Select
+            value={filterDateTwo}
+            label="Date"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterDateTwo(event.target.value);
+            }}
+          >
+            {dateFilterList.map((item) => (
+              <MenuItem value={item} key={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+    </Grid>
+  );
+
   const titleSection = (
     <Stack mx={2} mt={3}>
       <Typography
@@ -528,7 +752,11 @@ const DashboardNormGroupContent = (props: Props) => {
               <Grid item xs={4} key={index}>
                 <VerticalBarChartType01
                   title={`${index + 1}. ${data.questionText}`}
-                  labels={["Learning 1", "Learning 2"]}
+                  labels={
+                    compareFiltersActivated
+                      ? ["Group 1", "Group 2"]
+                      : ["Learning 1", "Learning 2"]
+                  }
                   datasets={[
                     {
                       data: [data.learningOne, data.learningTwo],
@@ -607,6 +835,12 @@ const DashboardNormGroupContent = (props: Props) => {
     filterStudy,
     filterAge,
     filterDate,
+    filterSchoolTwo,
+    filterCourseTwo,
+    filterGradeTwo,
+    filterStudyTwo,
+    filterAgeTwo,
+    filterDateTwo,
   ]);
 
   return (
@@ -618,11 +852,13 @@ const DashboardNormGroupContent = (props: Props) => {
 
         {displayFiltersDiv && filtersDiv}
 
+        {displayFiltersDiv && compareFiltersActivated && groupTwoFiltersDiv}
+
         {summaryCharts}
 
-        {statisticalCharts}
+        {!compareFiltersActivated && statisticalCharts}
 
-        {questionnaireCharts}
+        {!compareFiltersActivated && questionnaireCharts}
       </Stack>
     </>
   );

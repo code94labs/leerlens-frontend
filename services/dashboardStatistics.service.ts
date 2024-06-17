@@ -30,9 +30,14 @@ export const getNormgroupStatistics = async (
   }
 };
 
-export const getPrePostSummaryStatistics = async () => {
+export const getPrePostSummaryStatistics = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.prePostSummaryStatistics);
+    const response = await getRequest(
+      leerLensApi.prePostSummaryStatistics,
+      params
+    );
 
     return response.data;
   } catch (error) {
@@ -45,9 +50,14 @@ export const getPrePostSummaryStatistics = async () => {
   }
 };
 
-export const getNormgroupSummaryStatistics = async () => {
+export const getNormgroupSummaryStatistics = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.normGroupSummaryStatistics);
+    const response = await getRequest(
+      leerLensApi.normGroupSummaryStatistics,
+      params
+    );
 
     return response.data;
   } catch (error) {
@@ -57,9 +67,29 @@ export const getNormgroupSummaryStatistics = async () => {
   }
 };
 
-export const getPrePostAbsoluteStat = async () => {
+export const getNormgroupCompareSummaryStatistics = async (params: {
+  groupOneFilters: GetStatisticsQueryParams;
+  groupTwoFilters: GetStatisticsQueryParams;
+}) => {
   try {
-    const response = await getRequest(leerLensApi.prePostAbsoluteStat);
+    const response = await getRequest(
+      leerLensApi.normGroupCompareSummaryStatistics,
+      params
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching normgroup compare summary statistics", error);
+
+    throw error;
+  }
+};
+
+export const getPrePostAbsoluteStat = async (
+  params: GetStatisticsQueryParams
+) => {
+  try {
+    const response = await getRequest(leerLensApi.prePostAbsoluteStat, params);
 
     // console.log("response", response);
 
@@ -74,9 +104,14 @@ export const getPrePostAbsoluteStat = async () => {
   }
 };
 
-export const getNormgroupAbsoluteStat = async () => {
+export const getNormgroupAbsoluteStat = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.normGroupAbsoluteStat);
+    const response = await getRequest(
+      leerLensApi.normGroupAbsoluteStat,
+      params
+    );
 
     // console.log("response", response);
 
@@ -88,9 +123,11 @@ export const getNormgroupAbsoluteStat = async () => {
   }
 };
 
-export const getPrePostRelativeStat = async () => {
+export const getPrePostRelativeStat = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.prePostRelativeStat);
+    const response = await getRequest(leerLensApi.prePostRelativeStat, params);
 
     return response.data;
   } catch (error) {
@@ -103,9 +140,14 @@ export const getPrePostRelativeStat = async () => {
   }
 };
 
-export const getNormgroupRelativeStat = async () => {
+export const getNormgroupRelativeStat = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.normGroupRelativeStat);
+    const response = await getRequest(
+      leerLensApi.normGroupRelativeStat,
+      params
+    );
 
     return response.data;
   } catch (error) {

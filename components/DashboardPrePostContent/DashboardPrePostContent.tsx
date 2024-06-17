@@ -158,6 +158,27 @@ const DashboardPrePostContent = (props: Props) => {
     setFilterDate(dateFilterList[0]);
   };
 
+  const getFilterParams = () => {
+    // making the params object
+    const filterParams: GetStatisticsQueryParams = {
+      age: filterAge !== 0 ? filterAge : undefined,
+      course: filterCourse !== 0 ? filterCourse : undefined,
+      grade: filterGrade !== 0 ? filterGrade : undefined,
+      school: filterSchool !== 0 ? filterSchool : undefined,
+      study: filterStudy !== 0 ? filterStudy : undefined,
+      fromDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDate)[0].replace(/[/]/g, "-")
+          : undefined,
+      toDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDate)[1].replace(/[/]/g, "-")
+          : undefined,
+    };
+
+    return filterParams;
+  };
+
   const fetchSummaryStat = async () => {
     setIsLoading((prev) => {
       let loadingArray = [...prev];
@@ -165,7 +186,7 @@ const DashboardPrePostContent = (props: Props) => {
       return loadingArray;
     });
 
-    await getPrePostSummaryStatistics()
+    await getPrePostSummaryStatistics(getFilterParams())
       .then((res) => {
         setSummaryData(res);
       })
@@ -191,24 +212,7 @@ const DashboardPrePostContent = (props: Props) => {
       return loadingArray;
     });
 
-    // making the params object
-    const params: GetStatisticsQueryParams = {
-      age: filterAge !== 0 ? filterAge : undefined,
-      course: filterCourse !== 0 ? filterCourse : undefined,
-      grade: filterGrade !== 0 ? filterGrade : undefined,
-      school: filterSchool !== 0 ? filterSchool : undefined,
-      study: filterStudy !== 0 ? filterStudy : undefined,
-      fromDate:
-        filterDate !== dateFilterList[0]
-          ? getDateRange(filterDate)[0].replace(/[/]/g, "-")
-          : undefined,
-      toDate:
-        filterDate !== dateFilterList[0]
-          ? getDateRange(filterDate)[1].replace(/[/]/g, "-")
-          : undefined,
-    };
-
-    await getPrePostStatistics(params)
+    await getPrePostStatistics(getFilterParams())
       .then((res) => {
         setStatisticsData(res);
       })
@@ -234,7 +238,7 @@ const DashboardPrePostContent = (props: Props) => {
       return loadingArray;
     });
 
-    await getPrePostAbsoluteStat()
+    await getPrePostAbsoluteStat(getFilterParams())
       .then((res) => {
         // console.log("absolute reponse:", res);
 
@@ -262,7 +266,7 @@ const DashboardPrePostContent = (props: Props) => {
       return loadingArray;
     });
 
-    await getPrePostRelativeStat()
+    await getPrePostRelativeStat(getFilterParams())
       .then((res) => {
         setRelativeDifference(res);
       })
@@ -495,7 +499,7 @@ const DashboardPrePostContent = (props: Props) => {
           ? spinnerSection
           : statisticsData.length < 1
           ? noResponsesSection
-          : statisticsData.map((data, index) => (
+          : (statisticsData || []).map((data, index) => (
               <Grid item xs={4} key={index}>
                 <VerticalBarChartType01
                   title={`${index + 1}. ${data.questionText}`}

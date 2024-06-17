@@ -32,6 +32,9 @@ export const leerLensApi = {
   normGroupAbsoluteStat: `${baseUrl}/dashboard/normgroup/absolute-statistics`,
   normGroupRelativeStat: `${baseUrl}/dashboard/normgroup/relative-statistics`,
 
+  normGroupCompareSummaryStatistics: `${baseUrl}/dashboard/normgroup/compare-summary-statistics`,
+
+
   evaluationStatistics: `${baseUrl}/dashboard/evaluation/statistics`,
 
   login: `${baseUrl}/auth/login`,
