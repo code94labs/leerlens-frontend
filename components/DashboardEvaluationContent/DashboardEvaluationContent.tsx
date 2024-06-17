@@ -210,7 +210,7 @@ const DashboardEvaluationContent = (props: Props) => {
           />
         );
       default:
-        // console.log(`Sorry, we are out of charts.`);
+      // console.log(`Sorry, we are out of charts.`);
     }
   };
 
@@ -418,6 +418,22 @@ const DashboardEvaluationContent = (props: Props) => {
     </Stack>
   );
 
+  const statisticsCharts = (
+    <Grid container p={2} spacing={2}>
+      {isLoading
+        ? spinnerSection
+        : statisticsData.length < 1
+        ? noResponsesSection
+        : statisticsData.map(
+            (stat: DashboardEvaluationChart, index: number) => (
+              <Grid item xs={4} key={stat.questionId}>
+                {getChartComponent(stat, index)}
+              </Grid>
+            )
+          )}
+    </Grid>
+  );
+
   useEffect(() => {
     const fetchingEvaluationStatistics = async () => {
       setIsLoading(true);
@@ -473,19 +489,7 @@ const DashboardEvaluationContent = (props: Props) => {
 
         {displayFiltersDiv && filtersDiv}
 
-        <Grid container p={2} spacing={2}>
-          {isLoading
-            ? spinnerSection
-            : statisticsData.length < 1
-            ? noResponsesSection
-            : statisticsData.map(
-                (stat: DashboardEvaluationChart, index: number) => (
-                  <Grid item xs={4} key={stat.questionId}>
-                    {getChartComponent(stat, index)}
-                  </Grid>
-                )
-              )}
-        </Grid>
+        {statisticsCharts}
       </Stack>
     </>
   );

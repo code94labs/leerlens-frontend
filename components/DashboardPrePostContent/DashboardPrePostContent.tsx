@@ -529,7 +529,7 @@ const DashboardPrePostContent = (props: Props) => {
           : summaryData.length < 1
           ? noResponsesSection
           : summaryData.map((data, index) => (
-              <Grid item xs={4} key={index}>
+              <Grid item xs={3} key={index}>
                 <VerticalBarChartType01
                   title={`${index + 1}. ${data.questionText}`}
                   labels={["Learning 1", "Learning 2"]}
@@ -539,6 +539,7 @@ const DashboardPrePostContent = (props: Props) => {
                       backgroundColor: getBackgroundColors(index),
                     },
                   ]}
+                  tightPadding
                 />
               </Grid>
             ))}
