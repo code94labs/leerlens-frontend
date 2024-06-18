@@ -4,9 +4,9 @@ import FormCard from "./FormCard";
 
 const customStyles = {
   stack: {
-    width: "90%",
+    // width: { md: "90%" },
     maxWidth: 1200,
-    margin: "0 auto",
+    mx: "auto",
     my: 4,
     gap: {
       xs: 2,
@@ -15,7 +15,7 @@ const customStyles = {
   },
   innerStack: {
     flexDirection: {
-      sx: "column",
+      sm: "column",
       md: "row",
     },
   },

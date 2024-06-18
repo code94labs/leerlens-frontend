@@ -23,7 +23,8 @@ import { useWindowSize } from "../../utils/hooks/useWindowSize";
 
 const customStyles = {
   card: {
-    maxWidth: 500,
+    maxWidth: 600,
+    height: "100%",
     border: "1px #E6E6E6 solid",
     display: "flex",
     flexDirection: "column",
@@ -31,11 +32,17 @@ const customStyles = {
       xs: 0,
       md: 2,
     },
-    p: {
-      xs: 3,
-      md: 5,
-    },
     borderRadius: 3,
+  },
+  innerCard: {
+    p: {
+      xs: 2,
+      md: 3,
+    },
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
   title: {
     fontWeight: 800,
@@ -342,7 +349,7 @@ const FormCard = (props) => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.5 }}
       transition={{ duration: 0.5 }}
-      sx={customStyles.card}
+      // sx={customStyles.card}
     >
       <Stack sx={customStyles.card}>
         <Stack sx={customStyles.innerCard}>
