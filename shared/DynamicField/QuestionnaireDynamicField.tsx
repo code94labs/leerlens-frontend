@@ -296,6 +296,7 @@ const QuestionnaireDynamicField = (props: Props) => {
         ? value.split(",").map((item) => Number(item))
         : value
     );
+    dispatch(setFormModified());
   };
 
   const handleQuestionDeleteDialogOpen = () => {
