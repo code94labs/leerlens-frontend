@@ -480,8 +480,7 @@ const EditPostInterventionForm = () => {
 
       <Button
         onClick={
-          // create another function and use a if retrun
-          tab < questionSetTabs.quesitonSetOne
+          tab === questionSetTabs.personalDetails
             ? handleUpdateAllPersonalDetailsQuestions
             : handleUpdateAllPostInterventionQuestions
         }

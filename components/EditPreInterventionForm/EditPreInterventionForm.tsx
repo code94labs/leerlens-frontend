@@ -12,6 +12,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import DynamicField from "../../shared/DynamicField/DynamicField";
 import AddNewField from "../../shared/AddNewField/AddNewField";
+import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
 
 import {
   resetForm,
@@ -47,7 +48,6 @@ import {
 } from "../../utils/types";
 
 import { champBlackFontFamily } from "../../shared/typography";
-import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
 import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
 import {
   moveItemDownInArray,
@@ -238,12 +238,15 @@ const EditPreInterventionForm = () => {
   };
 
   const handleUpdateAllPreInterventionQuestions = async () => {
-    const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const arrayToUpdate =
+      tab === questionSetTabs.quesitonSetOne
+        ? partOneQuestions
+        : partTwoQuestions;
 
     try {
       const response = await preInterventionQuesionsUpdateBulk(arrayToUpdate);
 
-      tab === 1
+      tab === questionSetTabs.quesitonSetOne
         ? setPartOneQuestions(
             response.filter(
               (item: FormQuestion) =>
@@ -326,7 +329,7 @@ const EditPreInterventionForm = () => {
       isNewlyAdded: true,
       questionSetId: 0,
       questionSection:
-        tab === 1
+        tab === questionSetTabs.quesitonSetOne
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
       summaryTypes,
@@ -439,7 +442,7 @@ const EditPreInterventionForm = () => {
 
       <Button
         onClick={
-          tab < 1
+          tab === questionSetTabs.personalDetails
             ? handleUpdateAllPersonalDetailsQuestions
             : handleUpdateAllPreInterventionQuestions
         }
@@ -453,7 +456,7 @@ const EditPreInterventionForm = () => {
 
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
-      case 0:
+      case questionSetTabs.personalDetails:
         return (
           <>
             <DynamicField
@@ -498,7 +501,7 @@ const EditPreInterventionForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 1:
+      case questionSetTabs.quesitonSetOne:
         return (
           <>
             {partOneQuestions
@@ -527,7 +530,7 @@ const EditPreInterventionForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 2:
+      case questionSetTabs.quesitonSetTwo:
         return (
           <>
             {partTwoQuestions
@@ -599,8 +602,9 @@ const EditPreInterventionForm = () => {
     </Stack>
   );
 
-  useMemo(() => {
+  useEffect(() => {
     const fetchPersonalDetailsQuestions = async () => {
+      setIsLoading(true);
       try {
         const studentFormInfoQuestions = await getStudentFormInfo();
 
@@ -614,9 +618,11 @@ const EditPreInterventionForm = () => {
       } catch (error) {
         console.log(error);
       }
+      setIsLoading(false);
     };
 
     const fetchPreInterventionsQuestions = async () => {
+      setIsLoading(true);
       try {
         const preInterventionQuestions = await getPreInterventionQuestions();
 
@@ -635,13 +641,12 @@ const EditPreInterventionForm = () => {
       } catch (error) {
         console.log(error);
       }
+      setIsLoading(false);
     };
 
     fetchPersonalDetailsQuestions();
     fetchPreInterventionsQuestions();
-  }, []);
 
-  useEffect(() => {
     dispatch(resetForm());
   }, []);
 
