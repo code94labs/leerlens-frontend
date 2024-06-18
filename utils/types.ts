@@ -24,6 +24,7 @@ export interface Question {
   maxValue: number;
   isDelete: boolean;
   isNewlyAdded: boolean;
+  filtrationType?: number;
 }
 
 export interface QuestionResponse extends Question {

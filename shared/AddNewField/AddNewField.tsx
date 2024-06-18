@@ -279,7 +279,9 @@ const AddNewField = (props: Props) => {
       {questionnaireType && (
         <Stack direction="row" justifyContent="flex-start" alignItems="center">
           <FormControl sx={{ width: 400 }}>
-            <InputLabel>Select Summary Type</InputLabel>
+            <InputLabel sx={{ backgroundColor: "white", pr: 1 }}>
+              Select Summary Type
+            </InputLabel>
             <Select
               label="Select Summary Type"
               id="summary-type-select"

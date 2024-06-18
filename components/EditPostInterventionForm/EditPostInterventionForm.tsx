@@ -12,6 +12,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import DynamicField from "../../shared/DynamicField/DynamicField";
 import AddNewField from "../../shared/AddNewField/AddNewField";
+import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
 
 import {
   resetForm,
@@ -41,7 +42,6 @@ import {
 } from "../../utils/types";
 
 import { champBlackFontFamily } from "../../shared/typography";
-import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
 import {
   getPostInterventionQuestions,
   postInterventionQuesionsUpdateBulk,
@@ -190,13 +190,13 @@ const EditPostInterventionForm = () => {
 
   const [tab, setTab] = useState(questionSetTabs.personalDetails);
 
-  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
   const [notificationMsg, setNotificationMsg] = useState("");
 
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
+  const [displayNewQuestion, setDisplayNewQuestion] = useState<boolean>(false);
 
   const [personalDetailsQuestions, setPersonalDetailsQuestions] = useState<
     QuestionResponse[]
@@ -310,7 +310,7 @@ const EditPostInterventionForm = () => {
     questionText: string;
     dropdownOptions: DropDownOptions[];
   }) => {
-    const newPositionOrderId = personalDetailsQuestions.length++;
+    const newPositionOrderId = personalDetailsQuestions.length + 1;
 
     const newQuestion: Question = {
       formType: FormEvaluation.PostInterventions,
@@ -325,17 +325,13 @@ const EditPostInterventionForm = () => {
       isNewlyAdded: true,
     };
 
-    await postStudentFormInfo(newQuestion).then(
-      (response: QuestionResponse) => {
-        const updatedQuestionsArr = [...personalDetailsQuestions];
+    const response: QuestionResponse = await postStudentFormInfo(newQuestion);
 
-        updatedQuestionsArr?.push(response);
+    const updatedQuestionsArr = [...personalDetailsQuestions, response];
 
-        setPersonalDetailsQuestions(updatedQuestionsArr as QuestionResponse[]);
+    setPersonalDetailsQuestions(updatedQuestionsArr);
 
-        setDisplayNewQuestion(false);
-      }
-    );
+    setDisplayNewQuestion(false);
   };
 
   const handleNewQuestionnaireQuestionSave = async ({
@@ -634,8 +630,9 @@ const EditPostInterventionForm = () => {
     </Stack>
   );
 
-  useMemo(() => {
+  useEffect(() => {
     const fetchPersonalDetailsQuestions = async () => {
+      setIsLoading(true);
       try {
         const studentFormInfoQuestions = await getStudentFormInfo();
 
@@ -649,9 +646,11 @@ const EditPostInterventionForm = () => {
       } catch (error) {
         console.log(error);
       }
+      setIsLoading(false);
     };
 
     const fetchPostInterventionsQuestions = async () => {
+      setIsLoading(true);
       try {
         const postInterventionQuestions = await getPostInterventionQuestions();
 
@@ -670,13 +669,12 @@ const EditPostInterventionForm = () => {
       } catch (error) {
         console.log(error);
       }
+      setIsLoading(false);
     };
 
     fetchPersonalDetailsQuestions();
     fetchPostInterventionsQuestions();
-  }, []);
 
-  useEffect(() => {
     dispatch(resetForm());
   }, []);
 
