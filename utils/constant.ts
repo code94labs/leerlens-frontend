@@ -1,4 +1,4 @@
-import { SummaryTypes } from "./enum";
+import { SentimentQuestionType, SummaryTypes } from "./enum";
 
 export const schoolList = [
   { id: 0, schoolName: "All" }, // for the dropdown options
@@ -228,6 +228,17 @@ export const summaryTypes = [
   { id: SummaryTypes.growthMindset, label: "Growth Mindset" },
   { id: SummaryTypes.ownership, label: "Ownership" },
 ];
+
+export const sentimentTypes = [
+  {
+    id: SentimentQuestionType.Positive,
+    label: "Positive",
+  },
+  {
+    id: SentimentQuestionType.Negative,
+    label: "Negative",
+  },
+]
 
 export const chartColors = ["#EB7200", "#F5477C", "#A879FF", "#00A88D"];
 
