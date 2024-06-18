@@ -343,8 +343,10 @@ const EditNormgroupForm = () => {
 
   const handleNewQuestionnaireQuestionSave = async ({
     questionText,
+    summaryTypes,
   }: {
     questionText: string;
+    summaryTypes: number[];
   }) => {
     const newPositionOrderId =
       tab === questionSetTabs.quesitonSetOne
@@ -363,6 +365,7 @@ const EditNormgroupForm = () => {
         tab === 1
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
+      summaryTypes,
     };
 
     const response = await postNormgroupQuestions(newQuestion);
@@ -631,6 +634,10 @@ const EditNormgroupForm = () => {
       )}
     </Stack>
   );
+
+  useEffect(() => {
+    dispatch(resetForm());
+  }, []);
 
   return (
     <>

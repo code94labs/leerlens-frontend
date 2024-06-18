@@ -86,7 +86,7 @@ const customStyles = {
       xs: 900,
       md: 1000,
     },
-    mb: 1,
+    // mb: 1,
     textTransform: "uppercase",
     fontFamily: champBlackFontFamily,
     color: "#1A1A1A",
@@ -560,8 +560,9 @@ const PostInterventionForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+        1 to {questionListPartOne.length} statements (1 = totally disagree, 2 =
+        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        totally agree).
       </Typography>
 
       <FormControl>
@@ -589,8 +590,9 @@ const PostInterventionForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to 23 statements (1 = completely disagree, 2 = disagree, 3 = somewhat
-        disagree, 4 = somewhat agree, 5 = agree, 6 = completely agree).
+        1 to {questionListPartTwo.length} statements (1 = totally disagree, 2 =
+        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        totally agree).
       </Typography>
 
       <FormControl>
@@ -654,7 +656,7 @@ const PostInterventionForm = () => {
           Post-Intervention Measurement
         </Typography>
 
-        <Typography variant="body1" sx={customStyles.body}>
+        <Typography variant="subtitle1" sx={customStyles.body}>
           Here are some general questions about you?
         </Typography>
       </Box>
@@ -747,7 +749,7 @@ const PostInterventionForm = () => {
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
                   disabled={
-                    activeStep === 2 && !allAnsweredPartTwo && isLoading
+                    activeStep === 2 && !allAnsweredPartTwo && !isLoading
                   }
                 >
                   {isLoading ? "Submitting..." : "Complete"}

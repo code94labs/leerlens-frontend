@@ -3,10 +3,10 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
 
+import { Theme, useTheme } from "@mui/material/styles";
 import {
   Box,
   Button,
-  FormControl,
   FormHelperText,
   IconButton,
   InputLabel,
@@ -19,10 +19,13 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import DoneIcon from "@mui/icons-material/Done";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Chip from "@mui/material/Chip";
 
 import { setFormModified } from "../../redux/slices/formSlice";
 
@@ -30,12 +33,33 @@ import { champBlackFontFamily } from "../typography";
 
 import DynamicDropdown from "../DynamicDropdown";
 
-import { FieldType } from "../../utils/enum";
+import { FieldType, SummaryTypes } from "../../utils/enum";
 import {
   DropDownOptions,
   FormQuestion,
   QuestionResponse,
 } from "../../utils/types";
+import { summaryTypes } from "../../utils/constant";
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+// function getStyles(name: string, personName: readonly string[], theme: Theme) {
+//   return {
+//     fontWeight:
+//       personName.indexOf(name) === -1
+//         ? theme.typography.fontWeightRegular
+//         : theme.typography.fontWeightMedium,
+//   };
+// }
 
 const customStyles = {
   textField: {
@@ -253,8 +277,27 @@ const QuestionnaireDynamicField = (props: Props) => {
   } = props;
 
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const [openDialog, setOpenDialog] = useState(false);
+  const [selectedSummaryTypes, setSelectedSummaryTypes] = useState<number[]>(
+    question?.summaryTypes ?? []
+  );
+
+  const handleChange = (
+    event: SelectChangeEvent<typeof selectedSummaryTypes>
+  ) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedSummaryTypes(
+      // On autofill we get a stringified value.
+      typeof value === "string"
+        ? value.split(",").map((item) => Number(item))
+        : value
+    );
+    dispatch(setFormModified());
+  };
 
   const handleQuestionDeleteDialogOpen = () => {
     setOpenDialog(true);
@@ -279,13 +322,14 @@ const QuestionnaireDynamicField = (props: Props) => {
       if (question && handleQuestionUpdate) {
         const newQuestion: FormQuestion = question;
         newQuestion.questionText = formik.values.questionText;
+        newQuestion.summaryTypes = selectedSummaryTypes;
 
         handleQuestionUpdate(newQuestion);
       }
     };
 
     handleSaveChanges();
-  }, [question, formik.values.questionText]);
+  }, [question, formik.values.questionText, selectedSummaryTypes]);
 
   const deleteQuestionDialogModel = (
     <Box sx={customStyles.modalContent}>
@@ -434,6 +478,44 @@ const QuestionnaireDynamicField = (props: Props) => {
           }
           sx={{ ...customStyles.textField, flex: 0.75 }}
         />
+      </Stack>
+
+      <Stack direction="row" justifyContent="flex-start" alignItems="center">
+        <FormControl sx={{ width: 400 }}>
+          <InputLabel>Select Summary Type</InputLabel>
+          <Select
+            label="Select Summary Type"
+            id="summary-type-select"
+            multiple
+            value={selectedSummaryTypes}
+            onChange={handleChange}
+            input={<OutlinedInput id="summary-type-select" label="Chip" />}
+            renderValue={(selected) => (
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                {selected.map((value) => (
+                  <Chip
+                    key={value}
+                    label={
+                      summaryTypes.find((item: any) => item.id === value)
+                        ?.label || ""
+                    }
+                  />
+                ))}
+              </Box>
+            )}
+            MenuProps={MenuProps}
+          >
+            {summaryTypes.map((item) => (
+              <MenuItem
+                key={item.id}
+                value={item.id}
+                // style={getStyles(item.label, selectedSummaryTypes, theme)}
+              >
+                {item.label}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Stack>
 
       <Stack

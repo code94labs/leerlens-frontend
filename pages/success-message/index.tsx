@@ -1,8 +1,6 @@
 import React from "react";
-import { Box, Container, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import Image from "next/image";
-import { useRouter } from "next/router";
-import Grid from "@mui/material/Unstable_Grid2";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import SocialMediaComponent from "../../components/SuccessMessage/SocialMediaComponent";
@@ -85,8 +83,6 @@ const customStyles = {
 };
 
 const SuccessMessage = () => {
-  const router = useRouter();
-
   const size = useWindowSize();
 
   return (
@@ -94,7 +90,7 @@ const SuccessMessage = () => {
       <Box sx={customStyles.card}>
         <Stack justifyContent="center" alignItems={"center"}>
           <Image
-            src="/Logo.png"
+            src="/Logo-HQ.png"
             height={40}
             width={130}
             alt="logo"
@@ -106,15 +102,15 @@ const SuccessMessage = () => {
           />
 
           <Image
-            src={`/images/img5.png`}
+            src="/images/img5.png"
             height={200}
             width={250}
+            alt="logo"
             style={{
               ...customStyles.icon,
               width: size?.width && size?.width > 900 ? 150 : 100,
               height: "auto",
             }}
-            alt="img"
           />
 
           <Typography

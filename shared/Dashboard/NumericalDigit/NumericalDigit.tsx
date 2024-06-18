@@ -9,20 +9,24 @@ type Props = {
 
 const customStyles = {
   title: {
-    fontWeight: 400,
-    fontFamily: champBlackFontFamily,
-    fontSize: 24,
+    fontWeight: 700,
+    fontSize: 16,
+    color: "#1A1A1A",
+    m: 4,
   },
   label: {
-    fontSize: 50,
+    fontSize: 40,
     fontWeight: 500,
+    fontFamily: champBlackFontFamily,
     color: "#333333",
     my: 6,
   },
   stack: {
     border: "2px #E6E6E6 solid",
     borderRadius: 2,
-    p: 3,
+    width: "100%",
+    height: "100%",
+    // p: 3,
   },
 };
 
@@ -33,7 +37,7 @@ const NumericalDigit = (props: Props) => {
     <Stack sx={customStyles.stack} alignItems="center">
       <Typography sx={customStyles.title}> {title}</Typography>
 
-      <Typography sx={customStyles.label}>{value}</Typography>
+      <Typography sx={customStyles.label}>{value.toFixed(1)}</Typography>
     </Stack>
   );
 };

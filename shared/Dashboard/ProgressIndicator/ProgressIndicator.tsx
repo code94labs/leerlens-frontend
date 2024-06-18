@@ -2,6 +2,7 @@ import React from "react";
 import { Stack, Typography } from "@mui/material";
 import { FieldType } from "../../../utils/enum";
 import { livvic } from "../../../public/theme/theme";
+import { champBlackFontFamily } from "../../typography";
 import { Gauge, gaugeClasses } from "@mui/x-charts/Gauge";
 
 type Props = {
@@ -14,24 +15,27 @@ type Props = {
 const customStyles = {
   stack: {
     border: "2px #E6E6E6 solid",
-    width: 450,
+    width: "100%",
+    height: "100%",
     borderRadius: 2,
-    p: 3,
+    // p: 3,
   },
   title: {
-    fontWeight: "bold",
-    fontSize: 18,
-    textTransform: "uppercase",
-    textAlign: "center",
+    fontWeight: 700,
+    fontSize: 16,
+    color: "#1A1A1A",
+    m: 4,
   },
   gaugeValueText: {
+    fontFamily: champBlackFontFamily,
     fontSize: 40,
     fontWeight: 700,
     transform: "translate(0px, -20px)",
-    fontFamily: livvic.style.fontFamily,
   },
   indicatorLabel: {
     fontSize: 24,
+    fontWeight: 500,
+    color: "#333333",
     m: 1,
   },
 };

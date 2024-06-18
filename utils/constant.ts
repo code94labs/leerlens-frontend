@@ -1,3 +1,5 @@
+import { SummaryTypes } from "./enum";
+
 export const QuestionSetMenuItems = [
   {
     id: 0,
@@ -30,6 +32,7 @@ export const questionSetTabs = {
 };
 
 export const schoolList = [
+  { id: 0, schoolName: "All" }, // for the dropdown options
   { id: 1, schoolName: "Aeres Hogeschool Dronten" },
   { id: 2, schoolName: "Aeres MBO Almere" },
   { id: 3, schoolName: "Aeres MBO Ede" },
@@ -151,6 +154,7 @@ export const schoolList = [
 ];
 
 export const studyFieldList = [
+  { id: 0, studyField: "All" }, // for dropdown options
   { id: 1, studyField: "Havo" },
   { id: 2, studyField: "VWO" },
   { id: 3, studyField: "Vmbo TL" },
@@ -159,12 +163,13 @@ export const studyFieldList = [
 ];
 
 export const gradeList = [
-  { id: 1, grade: 1 },
-  { id: 2, grade: 2 },
-  { id: 3, grade: 3 },
-  { id: 4, grade: 4 },
-  { id: 5, grade: 5 },
-  { id: 6, grade: 6 },
+  { id: 0, grade: "All" }, // for dropdown options
+  { id: 1, grade: "1" },
+  { id: 2, grade: "2" },
+  { id: 3, grade: "3" },
+  { id: 4, grade: "4" },
+  { id: 5, grade: "5" },
+  { id: 6, grade: "6" },
 ];
 
 export const remindProgramList = [
@@ -202,21 +207,27 @@ export const remindProgramList = [
     id: 7,
     sentence: "Remind in de middag / Ondersteuningsprogramma",
     questionSetId: 2,
-  },
+  }
+];
+
+// remindLearningProgram for filter
+export const remindProgramListForFilters = [
   {
-    id: 8,
-    sentence: "Studentenprogramma MBO/HBO",
+    id: 0,
+    sentence: "All",
     questionSetId: 1,
   },
+  ...remindProgramList,
 ];
 
 // TODO: GET THE ACTUAL DATA FOR THIS
 export const ageList = [
-  { id: 1, age: 17 },
-  { id: 2, age: 18 },
-  { id: 3, age: 19 },
-  { id: 4, age: 20 },
-  { id: 5, age: 21 },
+  { id: 0, age: "All" },
+  { id: 17, age: "17" },
+  { id: 18, age: "18" },
+  { id: 19, age: "19" },
+  { id: 20, age: "20" },
+  { id: 21, age: "21" },
 ];
 
 // TODO: GET THE ACTUAL DATA FOR THIS
@@ -233,7 +244,32 @@ export const classList = [];
 export const gmailAddress = "https://mail.google.com";
 
 export const dateFilterList = [
+  "All",
   "2024/01/01 - 2024/12/31",
   "2023/01/01 - 2023/12/31",
   "2022/01/01 - 2022/12/31",
 ];
+
+export const summaryTypes = [
+  { id: SummaryTypes.demograficalData, label: "Demografical Data" },
+  {
+    id: SummaryTypes.experimentingWithLearning,
+    label: "Experimenting With Learning",
+  },
+  { id: SummaryTypes.growthMindset, label: "Growth Mindset" },
+  { id: SummaryTypes.ownership, label: "Ownership" },
+];
+
+export const chartColors = ["#EB7200", "#F5477C", "#A879FF", "#00A88D"];
+
+// array of color combinations to be assigned for bar charts
+export const barChartColorCombinations = [
+  ["#F9C8A6", "#EB7200"],
+  ["#DCC9FF", "#A879FF"],
+  ["#FDB8CB", "#F5477C"],
+  ["#AEDCD1", "#05A88D"],
+];
+
+export const barChartGrouColorPallete = [
+  "#FFECAA", "#BDE5E5", "#CFC0D8", "#F8A0A0"
+]

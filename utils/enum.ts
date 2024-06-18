@@ -40,6 +40,13 @@ export enum RemindProgramQuestionSetID {
   QuestionSetTwo = 1,
 }
 
+export enum SummaryTypes {
+  demograficalData = 0,
+  experimentingWithLearning = 1,
+  growthMindset = 2,
+  ownership = 3,
+}
+
 export const fieldTypeTitles = {
   [FieldType.DropDown]: "Drop down",
   [FieldType.TextField]: "Text",
@@ -54,3 +61,24 @@ export const evaluationTypesTitles = {
   [FormEvaluation.Evaluation]: "Evaluation",
   [FormEvaluation.Normgroup]: "Normgroup",
 };
+
+// chart types for dashboard
+export enum ChartType {
+  numericalRepresentation = 0,
+  progressIndicatorTypeOne = 1, // horizontal progress indicator
+  progressIndicatorTypeTwo = 2, // semi circular progress indicator
+  horizontalBarChartTypeOne = 3, // common horizontal bar chart
+  horizontalBarChartTypeTwo = 4, // horizontal bar chart spanning both directions
+  verticalBarChartTypeOne = 5, // with two bars
+  verticalBarChartTypeTwo = 6, // with multiple bars(6/10) and with/without labels
+  verticalBarChartTypeThree = 7, // individual bar chart (three bars)
+  lineChart = 8,
+}
+
+// for managing loading states in dashboard pages
+export enum APILoadingStates {
+  summaryCharts = 0,
+  statisticalCharts = 1,
+  abosoluteDifference = 2,
+  relativeDifference = 3,
+}

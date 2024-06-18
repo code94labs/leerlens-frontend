@@ -5,6 +5,7 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   CircularProgress,
   Dialog,
   DialogActions,
@@ -16,10 +17,7 @@ import {
   FormControl,
   Grid,
   IconButton,
-  Input,
-  InputAdornment,
   InputLabel,
-  ListSubheader,
   Select,
   Snackbar,
   Stack,
@@ -30,8 +28,8 @@ import {
 import KeyboardArrowDownRoundedIcon from "@mui/icons-material/KeyboardArrowDownRounded";
 import BorderColorRoundedIcon from "@mui/icons-material/BorderColorRounded";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-import DyanmicListHeader from "./DyanmicListHeader";
-import DyanmicListContent from "./DyanmicListContent";
+import DynamicListHeader from "./DynamicListHeader";
+import DynamicListContent from "./DynamicListContent";
 import {
   StudentDetailsAnswer,
   StudentResponse,
@@ -46,16 +44,20 @@ import {
   evaluationTypesTitles,
 } from "../../utils/enum";
 import { formContentFiltering, formatTimeStamp } from "../../utils/helper";
-import { Fragment, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import {
   deleteStudentResponseById,
   updateStudentResponse,
 } from "../../services/response.service";
 import { champBlackFontFamily } from "../../shared/typography";
-import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
 import { CustomStepper } from "../../shared/Stepper/Stepper";
-import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
-import CustomScale from "../../shared/CustomScale/CustomScale";
 
 const customStyles = {
   mainBox: {
@@ -190,11 +192,17 @@ const customStyles = {
     borderRadius: 2,
     border: "none",
   },
+  checkBox: {
+    mr: 2,
+  },
 };
 
 type Props = {
+  showQuestionTypesTab?: boolean;
   response: StudentResponse;
-  setFilteredStudentResponses: any;
+  isSelectAllChecked: boolean;
+  setFilteredStudentResponses: Dispatch<SetStateAction<StudentResponse[]>>;
+  setSelectedResponseIds: Dispatch<SetStateAction<number[]>>;
 };
 
 const generalSteps = [
@@ -223,13 +231,21 @@ const dropdownPaperProp = {
 };
 
 const ResponseAccordion = (props: Props) => {
-  const { response: studentResponse, setFilteredStudentResponses } = props;
+  const {
+    showQuestionTypesTab,
+    isSelectAllChecked,
+    response: studentResponse,
+    setFilteredStudentResponses,
+    setSelectedResponseIds,
+  } = props;
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
 
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const [isChecked, setIsChecked] = useState(false);
 
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -274,7 +290,9 @@ const ResponseAccordion = (props: Props) => {
     try {
       setIsLoading(true);
 
-      await deleteStudentResponseById(studentResponse.id);
+      console.log("Hi there", studentResponse.id);
+
+      // await deleteStudentResponseById(studentResponse.id);
 
       setNotificationMsg("Successfully deleted student response..");
       setDisplaySnackbarMsg(true);
@@ -297,45 +315,6 @@ const ResponseAccordion = (props: Props) => {
     }
   };
 
-  const deleteResponseDialog = (
-    <Dialog
-      open={openDeleteDialog}
-      keepMounted
-      onClose={handleCloseDeleteDialog}
-    >
-      <DialogTitle>Are you sure?</DialogTitle>
-
-      <DialogContent>
-        <DialogContentText color="black">
-          The response item will be delete completely, however it can be
-          recovered when needed.
-        </DialogContentText>
-      </DialogContent>
-
-      <DialogActions>
-        <Button
-          onClick={handleCloseDeleteDialog}
-          sx={customStyles.cancelBtn}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-
-        <Button
-          onClick={handleDeleteConfirmation}
-          sx={customStyles.deleteBtn}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <CircularProgress size={25} sx={{ color: "white" }} />
-          ) : (
-            "Delete"
-          )}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-
   const totalSteps = () => {
     return isEvaluationForm() ? evaluationSteps.length : generalSteps.length;
   };
@@ -343,12 +322,10 @@ const ResponseAccordion = (props: Props) => {
   const handleBack = () => {
     if (activeStep === 0) {
       closeEditDialog();
+    } else if (activeStep === 3) {
+      setActiveStep(0);
     } else {
-      if (activeStep === 3) {
-        setActiveStep(0);
-      } else {
-        setActiveStep((prevActiveStep) => prevActiveStep - 1);
-      }
+      setActiveStep((prevActiveStep) => prevActiveStep - 1);
     }
   };
 
@@ -395,9 +372,24 @@ const ResponseAccordion = (props: Props) => {
     }
   };
 
-  const handleReset = () => {
-    setActiveStep(0);
-    setCompleted({});
+  const handleCheckBox = (event: ChangeEvent<HTMLInputElement>) => {
+    const isChecked = event.target.checked;
+
+    setIsChecked(isChecked);
+
+    if (!isChecked) {
+      setSelectedResponseIds((prev: number[]) => {
+        return prev.filter((stdId: number) => stdId !== studentResponse.id);
+      });
+    } else {
+      setSelectedResponseIds((prev: number[]) => {
+        return [...prev, studentResponse.id];
+      });
+    }
+  };
+
+  const disableExpand = (event: any) => {
+    event.stopPropagation();
   };
 
   const handleUpdate = async () => {
@@ -449,6 +441,45 @@ const ResponseAccordion = (props: Props) => {
       }
     });
   };
+
+  const deleteResponseDialog = (
+    <Dialog
+      open={openDeleteDialog}
+      keepMounted
+      onClose={handleCloseDeleteDialog}
+    >
+      <DialogTitle>Are you sure?</DialogTitle>
+
+      <DialogContent>
+        <DialogContentText color="black">
+          The response item will be delete completely, however it can be
+          recovered when needed.
+        </DialogContentText>
+      </DialogContent>
+
+      <DialogActions>
+        <Button
+          onClick={handleCloseDeleteDialog}
+          sx={customStyles.cancelBtn}
+          disabled={isLoading}
+        >
+          Cancel
+        </Button>
+
+        <Button
+          onClick={handleDeleteConfirmation}
+          sx={customStyles.deleteBtn}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <CircularProgress size={25} sx={{ color: "white" }} />
+          ) : (
+            "Delete"
+          )}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
 
   const formEditContent = (
     <Grid container rowSpacing={4} columnSpacing={4}>
@@ -637,16 +668,33 @@ const ResponseAccordion = (props: Props) => {
 
   const accordionSummary = (
     <AccordionSummary sx={customStyles.accordionSummary}>
-      <Typography sx={{ width: 200 }}>
+      <Checkbox
+        onChange={handleCheckBox}
+        onClick={disableExpand}
+        sx={customStyles.checkBox}
+        checked={isChecked}
+      />
+
+      <Typography sx={{ width: "14%", pt: 1 }}>
         {studentResponse.createdAt &&
           formatTimeStamp(new Date(studentResponse.createdAt).toDateString())}
       </Typography>
 
-      <Typography sx={{ flex: 1 }}>
-        {evaluationTypesTitles[studentResponse.formType]}
-      </Typography>
+      {showQuestionTypesTab && (
+        <Typography sx={{ pt: 1, width: "14%" }}>
+          {evaluationTypesTitles[studentResponse.formType]}
+        </Typography>
+      )}
 
-      <Box>
+      {studentResponse.studentDetails.slice(0, 4).map((studentInfo) => (
+        <Typography sx={{ pt: 1, width: "14%" }}>
+          {studentInfo.fieldType === FieldType.DropDown
+            ? studentInfo.dropdownTitle
+            : studentInfo.answer}
+        </Typography>
+      ))}
+
+      <Box sx={{ flex: 1, display: "flex", justifyContent: "end" }}>
         <IconButton>
           <KeyboardArrowDownRoundedIcon sx={customStyles.icon} />
         </IconButton>
@@ -664,13 +712,13 @@ const ResponseAccordion = (props: Props) => {
 
   const personalDetails = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Personal details" subTitle="Answers" />
+      <DynamicListHeader titles={["Personal details", "Answers"]}/>
 
       <Stack>
         {studentResponse.studentDetails
           .filter((item) => item.sectionType === SectionType.PersonalDetails)
           .map((studentInfo) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={studentInfo.questionId}
               question={studentInfo.questionTitle}
               answer={
@@ -686,7 +734,7 @@ const ResponseAccordion = (props: Props) => {
 
   const questionSetOne = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Question | Part 01" subTitle="Answers" />
+      <DynamicListHeader titles={["Question | Part 01", "Answers"]} />
 
       <Stack>
         {studentResponse.responses
@@ -695,7 +743,7 @@ const ResponseAccordion = (props: Props) => {
               item.questionSection === QuestionnaireSection.QuestionPartOne
           )
           .map((question) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={question.questionId}
               question={`${question.questionId}. ${question.questionTitle}`}
               answer={question.answerText}
@@ -707,7 +755,7 @@ const ResponseAccordion = (props: Props) => {
 
   const questionSetTwo = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Question | Part 02" subTitle="Answers" />
+      <DynamicListHeader titles={["Question | Part 02", "Answers"]} />
 
       <Stack>
         {studentResponse.responses
@@ -716,7 +764,7 @@ const ResponseAccordion = (props: Props) => {
               item.questionSection === QuestionnaireSection.QuestionPartTwo
           )
           .map((question, index) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={index}
               question={`${question.questionId}. ${question.questionTitle}`}
               answer={question.answerText}
@@ -728,7 +776,7 @@ const ResponseAccordion = (props: Props) => {
 
   const supervisorEvaluation = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Program and Supervisor" subTitle="Answers" />
+      <DynamicListHeader titles={["Program and Supervisor", "Answers"]} />
 
       <Stack>
         {studentResponse.studentDetails
@@ -736,7 +784,7 @@ const ResponseAccordion = (props: Props) => {
             (item) => item.sectionType === SectionType.ProgramAndSupervisor
           )
           .map((studentInfo) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={studentInfo.questionId}
               question={studentInfo.questionTitle}
               answer={
@@ -752,13 +800,13 @@ const ResponseAccordion = (props: Props) => {
 
   const final = (
     <Stack mt={-3}>
-      <DyanmicListHeader title="Final" subTitle="Answers" />
+      <DynamicListHeader titles={["Final", "Answers"]} />
 
       <Stack>
         {studentResponse.studentDetails
           .filter((item) => item.sectionType === SectionType.Final)
           .map((studentInfo) => (
-            <DyanmicListContent
+            <DynamicListContent
               key={studentInfo.questionId}
               question={studentInfo.questionTitle}
               answer={studentInfo.answer}
@@ -801,6 +849,10 @@ const ResponseAccordion = (props: Props) => {
       updates: initialStudentAnswerUpdates(),
     });
   }, [studentResponse]);
+
+  useEffect(() => {
+    setIsChecked(isSelectAllChecked);
+  }, [isSelectAllChecked]);
 
   return (
     <>

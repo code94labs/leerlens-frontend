@@ -69,8 +69,14 @@ const generateScaleArr = (min: number, max: number) => {
 };
 
 const CustomScale = (props: CustomScaleProps) => {
-  const { questionText, minValue, maxValue, positionOrderId, updateAnswer, isDisabled } =
-    props;
+  const {
+    questionText,
+    minValue,
+    maxValue,
+    positionOrderId,
+    updateAnswer,
+    isDisabled,
+  } = props;
 
   const [selectedValue, setSelectedValue] = useState(0);
 
@@ -102,7 +108,7 @@ const CustomScale = (props: CustomScaleProps) => {
           Totally disagree
         </Typography>
         <Typography color="grey" sx={customStyles.scaleText}>
-          Totally disagree
+          Totally agree
         </Typography>
       </Stack>
 
@@ -111,6 +117,7 @@ const CustomScale = (props: CustomScaleProps) => {
         alignItems="center"
         gap={2}
         justifyContent="space-between"
+        sx={{ width: maxValue === 6 ? 650 : 900 }}
       >
         <Typography
           color="grey"
@@ -146,7 +153,7 @@ const CustomScale = (props: CustomScaleProps) => {
             md: "flex",
           }}
         >
-          Totally disagree
+          Totally agree
         </Typography>
       </Stack>
     </Stack>

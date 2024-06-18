@@ -340,8 +340,10 @@ const EditPostInterventionForm = () => {
 
   const handleNewQuestionnaireQuestionSave = async ({
     questionText,
+    summaryTypes,
   }: {
     questionText: string;
+    summaryTypes: number[];
   }) => {
     const newPositionOrderId =
       tab === questionSetTabs.quesitonSetOne
@@ -360,6 +362,7 @@ const EditPostInterventionForm = () => {
         tab === questionSetTabs.quesitonSetOne
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
+      summaryTypes,
     };
 
     const response: FormQuestion = await postPostInterventionQuestions(
@@ -671,6 +674,10 @@ const EditPostInterventionForm = () => {
 
     fetchPersonalDetailsQuestions();
     fetchPostInterventionsQuestions();
+  }, []);
+
+  useEffect(() => {
+    dispatch(resetForm());
   }, []);
 
   return (

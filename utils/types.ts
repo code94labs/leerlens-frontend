@@ -1,4 +1,10 @@
-import { FieldType, FormEvaluation, SectionType } from "./enum";
+import {
+  ChartType,
+  FieldType,
+  FormEvaluation,
+  SectionType,
+  SummaryTypes,
+} from "./enum";
 
 export type DropDownOptions = {
   id: number;
@@ -31,10 +37,12 @@ export type FormQuestion = {
   minValue: number;
   maxValue: number;
   isDelete: boolean;
-  isNewlyAdded?: boolean;
+  isNewlyAdded: boolean;
   questionSetId: number;
   questionSection: number;
   answer?: number | string;
+  summaryTypes: SummaryTypes[];
+  chartType?: ChartType;
 };
 
 export type PersonalDetails = {
@@ -72,9 +80,60 @@ export type UpdateQuestionResponse = {
 };
 
 export type UpdateStudentResponse = {
-  studentDetails: UpdateQuestionResponse[]
-}
+  studentDetails: UpdateQuestionResponse[];
+};
+
+export type BulkUpdateClassName = {
+  newClass: string;
+  responseIds: number[];
+};
+
+export type BulkUpdateCourse = {
+  newCourseId: number;
+  responseIds: number[];
+};
 
 export type StudentResponse = CreateStudentResponse & {
   id: number;
+};
+
+export type GetResponsesQueryParams = {
+  formType?: number;
+  age?: number;
+  course?: number;
+  fromDate?: string;
+  toDate?: string;
+  grade?: number;
+  school?: number;
+  study?: number;
+  page?: number;
+  limit?: number;
+};
+
+export type GetStatisticsQueryParams = {
+  age?: number;
+  course?: number;
+  fromDate?: string;
+  toDate?: string;
+  grade?: number;
+  school?: number;
+  study?: number;
+};
+
+export type DashboardBarChart = {
+  questionText: string;
+  learningOne: number;
+  learningTwo: number;
+};
+
+export type DashboardStatistics = {
+  title: string;
+  value: number;
+};
+
+export type DashboardEvaluationChart = {
+  questionId: number;
+  questionText: string;
+  chartType: ChartType;
+  answerStatistics: number[];
 };

@@ -1,5 +1,5 @@
-export const baseUrl = "http://localhost:5000";
-// export const baseUrl = "http://leerlens-backend-nestjs-env-env.eba-4m4wcq8f.us-east-1.elasticbeanstalk.com"
+// export const baseUrl = "http://localhost:5000";
+export const baseUrl = "https://leerlens.nl";
 
 export const leerLensApi = {
   studentFormInfo: `${baseUrl}/studentFormInfo`,
@@ -10,7 +10,7 @@ export const leerLensApi = {
 
   postIntervention: `${baseUrl}/questionnaire/post-intervention`,
   postInterventionSoftDelete: `${baseUrl}/questionnaire/post-intervention/soft-delete`,
-  
+
   evaluation: `${baseUrl}/questionnaire/evaluation`,
   evaluationSoftDelete: `${baseUrl}/questionnaire/evaluation/soft-delete`,
 
@@ -18,6 +18,24 @@ export const leerLensApi = {
   normgroupSoftDelete: `${baseUrl}/questionnaire/normgroup/soft-delete`,
 
   response: `${baseUrl}/response`,
+  responseFilter: `${baseUrl}/response/filter`,
+  responseBulkClass: `${baseUrl}/response/bulk-class`,
+  responseBulkCourse: `${baseUrl}/response/bulk-course`,
+
+  prePostStatistics: `${baseUrl}/dashboard/pre-post/statistics`,
+  prePostSummaryStatistics: `${baseUrl}/dashboard/pre-post/summary-statistics`,
+  prePostAbsoluteStat: `${baseUrl}/dashboard/pre-post/absolute-statistics`,
+  prePostRelativeStat: `${baseUrl}/dashboard/pre-post/relative-statistics`,
+
+  normGroupStatistics: `${baseUrl}/dashboard/normgroup/statistics`,
+  normGroupSummaryStatistics: `${baseUrl}/dashboard/normgroup/summary-statistics`,
+  normGroupAbsoluteStat: `${baseUrl}/dashboard/normgroup/absolute-statistics`,
+  normGroupRelativeStat: `${baseUrl}/dashboard/normgroup/relative-statistics`,
+
+  normGroupCompareSummaryStatistics: `${baseUrl}/dashboard/normgroup/compare-summary-statistics`,
+
+
+  evaluationStatistics: `${baseUrl}/dashboard/evaluation/statistics`,
 
   login: `${baseUrl}/auth/login`,
   forgotPassword: `${baseUrl}/auth/forgot-password`,

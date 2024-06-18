@@ -4,7 +4,7 @@ export enum MenuType {
 
 export type RoutePath = {
   text: string;
-  path?: string;
+  path: string;
   type?: MenuType;
   sub?: RoutePath[];
   iconPath?: string;
@@ -15,6 +15,20 @@ export const pages: RoutePath[] = [
     text: "Learning Scan Report",
     path: "/admin/dashboard",
     iconPath: "/images/admin-icons/reports.png",
+    sub: [
+      {
+        text: "Pre-Post Interventions",
+        path: "/admin/dashboard/pre-post-interventions",
+      },
+      {
+        text: "NormGroup",
+        path: "/admin/dashboard/norm-group",
+      },
+      {
+        text: "Evaluation",
+        path: "/admin/dashboard/evaluation",
+      },
+    ],
   },
   {
     text: "Responses",
@@ -23,6 +37,7 @@ export const pages: RoutePath[] = [
   },
   {
     text: "Question Set",
+    path: "/admin/question-set",
     iconPath: "/images/admin-icons/questions.png",
     sub: [
       {
@@ -50,9 +65,8 @@ export const pages: RoutePath[] = [
   },
 ];
 
-
 export const breadcrumbMap: { [key: string]: string } = {
-  "/admin/dashboard": "Learning Scan Report",
+  "/dashboard": "Learning Scan Report",
   "/admin/responses": "Responses",
   "/admin/question-set/pre-intervention": "Pre-Intervention",
   "/admin/question-set/post-intervention": "Post-Intervention",

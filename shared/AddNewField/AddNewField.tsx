@@ -20,6 +20,9 @@ import * as yup from "yup";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Chip from "@mui/material/Chip";
+import { Theme, useTheme } from "@mui/material/styles";
 
 import { champBlackFontFamily } from "../typography";
 
@@ -27,6 +30,31 @@ import DynamicDropdown from "../DynamicDropdown";
 
 import { FieldType } from "../../utils/enum";
 import { DropDownOptions, QuestionResponse } from "../../utils/types";
+import { summaryTypes } from "../../utils/constant";
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
+// function getStyles(
+//   name: string,
+//   summaryTypes: readonly number[],
+//   theme: Theme
+// ) {
+//   return {
+//     fontWeight:
+//       summaryTypes.indexOf(name) === -1
+//         ? theme.typography.fontWeightRegular
+//         : theme.typography.fontWeightMedium,
+//   };
+// }
 
 const customStyles = {
   textField: {
@@ -105,12 +133,16 @@ type Props = {
     fieldType: FieldType;
     questionText: string;
     dropdownOptions: DropDownOptions[];
+    summaryTypes: number[];
   }) => void;
   questionnaireType?: boolean;
 };
 
 const AddNewField = (props: Props) => {
-  const { handleNewQuestionDelete, handleNewQuestionSave, questionnaireType } = props;
+  const theme = useTheme();
+
+  const { handleNewQuestionDelete, handleNewQuestionSave, questionnaireType } =
+    props;
 
   const [questionType, setQuestionType] = useState(
     questionnaireType ? FieldType.Scale1to6 : FieldType.TextField
@@ -119,6 +151,24 @@ const AddNewField = (props: Props) => {
   const [options, setOptions] = useState<DropDownOptions[] | undefined>(
     undefined
   );
+
+  const [selectedSummaryTypes, setSelectedSummaryTypes] = useState<number[]>(
+    []
+  );
+
+  const handleChange = (
+    event: SelectChangeEvent<typeof selectedSummaryTypes>
+  ) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedSummaryTypes(
+      // On autofill we get a stringified value.
+      typeof value === "string"
+        ? value.split(",").map((item) => Number(item))
+        : value
+    );
+  };
 
   const formik = useFormik({
     initialValues: {
@@ -142,6 +192,7 @@ const AddNewField = (props: Props) => {
         fieldType: questionType,
         questionText,
         dropdownOptions: options ?? [],
+        summaryTypes: selectedSummaryTypes,
       });
   };
 
@@ -224,6 +275,46 @@ const AddNewField = (props: Props) => {
           sx={{ ...customStyles.textField, flex: 0.75 }}
         />
       </Stack>
+
+      {questionnaireType && (
+        <Stack direction="row" justifyContent="flex-start" alignItems="center">
+          <FormControl sx={{ width: 400 }}>
+            <InputLabel>Select Summary Type</InputLabel>
+            <Select
+              label="Select Summary Type"
+              id="summary-type-select"
+              multiple
+              value={selectedSummaryTypes}
+              onChange={handleChange}
+              input={<OutlinedInput id="summary-type-select" label="Chip" />}
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip
+                      key={value}
+                      label={
+                        summaryTypes.find((item: any) => item.id === value)
+                          ?.label || ""
+                      }
+                    />
+                  ))}
+                </Box>
+              )}
+              MenuProps={MenuProps}
+            >
+              {summaryTypes.map((item) => (
+                <MenuItem
+                  key={item.id}
+                  value={item.id}
+                  // style={getStyles(item.label, selectedSummaryTypes, theme)}
+                >
+                  {item.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
+      )}
 
       <Stack
         direction="row"
