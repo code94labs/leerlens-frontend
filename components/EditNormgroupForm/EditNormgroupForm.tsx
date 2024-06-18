@@ -715,6 +715,10 @@ const EditNormgroupForm = () => {
     </Stack>
   );
 
+  useEffect(() => {
+    dispatch(resetForm());
+  }, []);
+
   return (
     <>
       <Stack flexDirection="row">

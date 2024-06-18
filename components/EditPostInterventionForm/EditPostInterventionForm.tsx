@@ -780,6 +780,10 @@ const EditPostInterventionForm = () => {
     </Stack>
   );
 
+  useEffect(() => {
+    dispatch(resetForm());
+  }, []);
+
   return (
     <>
       <Stack flexDirection="row">
