@@ -1154,7 +1154,7 @@ const RemindEvaluationForm = () => {
                     !(
                       finalQuestionsFormik.isValid && finalQuestionsFormik.dirty
                     ) &&
-                    isLoading
+                    !isLoading
                   }
                 >
                   {isLoading ? "Submitting..." : "Complete"}

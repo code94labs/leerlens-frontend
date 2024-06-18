@@ -556,8 +556,8 @@ const PostInterventionForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartOne.length} statements (1 = totally disagree, 2
-        = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        1 to {questionListPartOne.length} statements (1 = totally disagree, 2 =
+        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
         totally agree).
       </Typography>
 
@@ -745,7 +745,7 @@ const PostInterventionForm = () => {
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
                   disabled={
-                    activeStep === 2 && !allAnsweredPartTwo && isLoading
+                    activeStep === 2 && !allAnsweredPartTwo && !isLoading
                   }
                 >
                   {isLoading ? "Submitting..." : "Complete"}
