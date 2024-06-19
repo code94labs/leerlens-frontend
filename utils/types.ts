@@ -44,6 +44,7 @@ export type FormQuestion = {
   answer?: number | string;
   summaryTypes: SummaryTypes[];
   chartType?: ChartType;
+  sentiment: boolean;
 };
 
 export type PersonalDetails = {

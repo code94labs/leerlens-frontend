@@ -369,9 +369,11 @@ const EditEvaluationForm = () => {
   const handleNewQuestionnaireQuestionSave = async ({
     questionText,
     summaryTypes,
+    sentiment,
   }: {
     questionText: string;
     summaryTypes: number[];
+    sentiment: number;
   }) => {
     const newPositionOrderId =
       tab === questionSetTabs.quesitonSetOne
@@ -391,6 +393,7 @@ const EditEvaluationForm = () => {
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
       summaryTypes,
+      sentiment: !!sentiment,
     };
 
     const response = await postEvaluationQuestions(newQuestion);

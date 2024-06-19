@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
@@ -33,13 +33,17 @@ import { champBlackFontFamily } from "../typography";
 
 import DynamicDropdown from "../DynamicDropdown";
 
-import { FieldType, SummaryTypes } from "../../utils/enum";
+import {
+  FieldType,
+  SentimentQuestionType,
+  SummaryTypes,
+} from "../../utils/enum";
 import {
   DropDownOptions,
   FormQuestion,
   QuestionResponse,
 } from "../../utils/types";
-import { summaryTypes } from "../../utils/constant";
+import { sentimentTypes, summaryTypes } from "../../utils/constant";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -280,6 +284,11 @@ const QuestionnaireDynamicField = (props: Props) => {
   const [selectedSummaryTypes, setSelectedSummaryTypes] = useState<number[]>(
     question?.summaryTypes ?? []
   );
+  const [selectedSentimentTypes, setSelectedSentimentTypes] = useState<number>(
+    question?.sentiment
+      ? SentimentQuestionType.Positive
+      : SentimentQuestionType.Negative
+  );
 
   const handleChange = (
     event: SelectChangeEvent<typeof selectedSummaryTypes>
@@ -295,6 +304,10 @@ const QuestionnaireDynamicField = (props: Props) => {
     );
     dispatch(setFormModified());
   };
+
+  const onHandleSentimentUpdate = (event: any) => {
+    setSelectedSentimentTypes(event.target.value);
+  }
 
   const handleQuestionDeleteDialogOpen = () => {
     setOpenDialog(true);
@@ -513,6 +526,19 @@ const QuestionnaireDynamicField = (props: Props) => {
               >
                 {item.label}
               </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+
+        <FormControl sx={{ width: 150, ml: 2 }}>
+          <InputLabel>
+            Sentiment Type
+            <span style={customStyles.dropdownAsterisk}> * </span>
+          </InputLabel>
+
+          <Select defaultValue={selectedSentimentTypes} onChange={onHandleSentimentUpdate}>
+            {sentimentTypes.map((sentiment) => (
+              <MenuItem value={sentiment.id}>{sentiment.label}</MenuItem>
             ))}
           </Select>
         </FormControl>
