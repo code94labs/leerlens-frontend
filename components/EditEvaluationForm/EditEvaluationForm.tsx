@@ -166,15 +166,15 @@ const EditEvaluationForm = () => {
 
   const formDetails = useSelector(selectForm);
 
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(questionSetTabs.personalDetails);
 
-  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
-  const [notificationMsg, setNotificationMsg] = useState("");
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
+  const [notificationMsg, setNotificationMsg] = useState<string>("");
 
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
+  const [displayNewQuestion, setDisplayNewQuestion] = useState<boolean>(false);
 
   const [personalDetailsQuestions, setPersonalDetailsQuestions] = useState<
     QuestionResponse[]
@@ -195,23 +195,6 @@ const EditEvaluationForm = () => {
     const response: QuestionResponse[] = await studentFormInfoItemSoftDelete(
       id
     );
-
-    // const targetArray =
-    //   tab === 0
-    //     ? personalDetailsQuestions
-    //     : tab === 3
-    //     ? programAndSupervisorsQuestions
-    //     : finalQuestions;
-
-    // const newQuestionArr = [...targetArray];
-
-    // for (let i = orderId; i < newQuestionArr.length; i++) {
-    //   newQuestionArr[i].positionOrderId--;
-    // }
-
-    // const updatedQuestionsArr = newQuestionArr.filter(
-    //   (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
-    // );
 
     if (tab === questionSetTabs.personalDetails) {
       setPersonalDetailsQuestions(response);
@@ -258,22 +241,22 @@ const EditEvaluationForm = () => {
 
   const handleUpdateAllPersonalDetailsQuestions = async () => {
     const arrayToUpdate =
-      tab === 0
+      tab === questionSetTabs.personalDetails
         ? personalDetailsQuestions
-        : tab === 3
+        : tab === questionSetTabs.programAndSupervisor
         ? programAndSupervisorsQuestions
         : finalQuestions;
 
     try {
       const response = await studentFormInfoItemUpdateBulk(arrayToUpdate);
 
-      tab === 0
+      tab === questionSetTabs.personalDetails
         ? setPersonalDetailsQuestions(
             (response as QuestionResponse[]).filter(
               (q) => q.sectionType === SectionType.PersonalDetails
             )
           )
-        : tab === 3
+        : tab === questionSetTabs.programAndSupervisor
         ? setProgramAndSupervisorsQuestions(
             (response as QuestionResponse[]).filter(
               (q) => q.sectionType === SectionType.ProgramAndSupervisor
@@ -293,12 +276,15 @@ const EditEvaluationForm = () => {
   };
 
   const handleUpdateAllEvaluationQuestions = async () => {
-    const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const arrayToUpdate =
+      tab === questionSetTabs.personalDetails
+        ? partOneQuestions
+        : partTwoQuestions;
 
     try {
       const response = await evaluationQuesionsUpdateBulk(arrayToUpdate);
 
-      tab === 1
+      tab === questionSetTabs.personalDetails
         ? setPartOneQuestions(
             response.filter(
               (item: FormQuestion) =>
@@ -350,9 +336,9 @@ const EditEvaluationForm = () => {
       questionText: questionText,
       fieldType: fieldType,
       sectionType:
-        tab === 0
+        tab === questionSetTabs.personalDetails
           ? SectionType.PersonalDetails
-          : tab === 3
+          : tab === questionSetTabs.programAndSupervisor
           ? SectionType.ProgramAndSupervisor
           : SectionType.Final,
       positionOrderId: newPositionOrderId,
@@ -388,7 +374,9 @@ const EditEvaluationForm = () => {
     summaryTypes: number[];
   }) => {
     const newPositionOrderId =
-      tab === 1 ? partOneQuestions.length + 1 : partTwoQuestions.length + 1;
+      tab === questionSetTabs.quesitonSetOne
+        ? partOneQuestions.length + 1
+        : partTwoQuestions.length + 1;
 
     const newQuestion: FormQuestion = {
       questionText: questionText,
@@ -399,7 +387,7 @@ const EditEvaluationForm = () => {
       isNewlyAdded: true,
       questionSetId: 0,
       questionSection:
-        tab === 1
+        tab === questionSetTabs.quesitonSetOne
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
       summaryTypes,
@@ -539,7 +527,9 @@ const EditEvaluationForm = () => {
 
       <Button
         onClick={
-          tab === 0 || tab === 3 || tab === 4
+          tab === questionSetTabs.personalDetails ||
+          tab === questionSetTabs.programAndSupervisor ||
+          tab === questionSetTabs.final
             ? handleUpdateAllPersonalDetailsQuestions
             : handleUpdateAllEvaluationQuestions
         }
@@ -553,7 +543,7 @@ const EditEvaluationForm = () => {
 
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
-      case 0:
+      case questionSetTabs.personalDetails:
         return (
           <>
             <DynamicField
@@ -598,7 +588,7 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 1:
+      case questionSetTabs.quesitonSetOne:
         return (
           <>
             {partOneQuestions
@@ -627,7 +617,7 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 2:
+      case questionSetTabs.quesitonSetTwo:
         return (
           <>
             {partTwoQuestions
@@ -656,7 +646,7 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 3:
+      case questionSetTabs.programAndSupervisor:
         return (
           <>
             {programAndSupervisorsQuestions
@@ -686,7 +676,7 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 4:
+      case questionSetTabs.final:
         return (
           <>
             {finalQuestions
@@ -753,8 +743,9 @@ const EditEvaluationForm = () => {
     </Stack>
   );
 
-  useMemo(() => {
+  useEffect(() => {
     const fetchPersonalDetailsQuestions = async () => {
+      setIsLoading(true);
       try {
         const studentFormInfoQuestions = await getStudentFormInfo();
 
@@ -782,9 +773,11 @@ const EditEvaluationForm = () => {
       } catch (error) {
         console.log(error);
       }
+      setIsLoading(false);
     };
 
     const fetchEvaluationsQuestions = async () => {
+      setIsLoading(true);
       try {
         const evaluationQuestions = await getEvaluationQuestions();
 
@@ -803,13 +796,12 @@ const EditEvaluationForm = () => {
       } catch (error) {
         console.log(error);
       }
+      setIsLoading(false);
     };
 
     fetchPersonalDetailsQuestions();
     fetchEvaluationsQuestions();
-  }, []);
 
-  useEffect(() => {
     dispatch(resetForm());
   }, []);
 
