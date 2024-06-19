@@ -261,12 +261,9 @@ type Props = {
   label?: string;
   question?: FormQuestion;
   handleQuestionUpdate?: (question: FormQuestion) => void;
-  handleQuestionSoftDelete?: (id: number, orderId: number) => void;
-  moveItemUp: (orderId: number | undefined, questionnaireType: boolean) => void;
-  moveItemDown: (
-    orderId: number | undefined,
-    questionnaireType: boolean
-  ) => void;
+  handleQuestionSoftDelete?: (id: number) => void;
+  moveItemUp: (orderId: number | undefined) => void;
+  moveItemDown: (orderId: number | undefined) => void;
 };
 
 const QuestionnaireDynamicField = (props: Props) => {
@@ -305,6 +302,7 @@ const QuestionnaireDynamicField = (props: Props) => {
         ? value.split(",").map((item) => Number(item))
         : value
     );
+    dispatch(setFormModified());
   };
 
   const onHandleSentimentUpdate = (event: any) => {
@@ -343,7 +341,7 @@ const QuestionnaireDynamicField = (props: Props) => {
     handleSaveChanges();
   }, [question, formik.values.questionText, selectedSummaryTypes]);
 
-  const deleteQuestionDialogModel = (
+  const deleteQuestionDialogModal = (
     <Box sx={customStyles.modalContent}>
       <Typography variant="h6" sx={customStyles.modalTitle}>
         Delete Question
@@ -383,7 +381,7 @@ const QuestionnaireDynamicField = (props: Props) => {
           onClick={() => {
             handleQuestionSoftDelete &&
               question?.id &&
-              handleQuestionSoftDelete(question?.id, question.positionOrderId);
+              handleQuestionSoftDelete(question?.id);
             setOpenDialog(false);
           }}
           disableElevation
@@ -425,7 +423,7 @@ const QuestionnaireDynamicField = (props: Props) => {
           <Tooltip title="Move the question down the order">
             <IconButton
               sx={customStyles.button}
-              onClick={() => moveItemDown(question?.positionOrderId, true)}
+              onClick={() => moveItemDown(question?.positionOrderId)}
             >
               <KeyboardArrowDownIcon fontSize="small" />
             </IconButton>
@@ -434,7 +432,7 @@ const QuestionnaireDynamicField = (props: Props) => {
           <Tooltip title="Move the question up the order">
             <IconButton
               sx={customStyles.button}
-              onClick={() => moveItemUp(question?.positionOrderId, true)}
+              onClick={() => moveItemUp(question?.positionOrderId)}
             >
               <KeyboardArrowUpIcon fontSize="small" />
             </IconButton>
@@ -448,7 +446,7 @@ const QuestionnaireDynamicField = (props: Props) => {
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        {deleteQuestionDialogModel}
+        {deleteQuestionDialogModal}
       </Modal>
 
       <Stack flexDirection="row" mt={1}>
@@ -494,7 +492,10 @@ const QuestionnaireDynamicField = (props: Props) => {
 
       <Stack direction="row" justifyContent="flex-start" alignItems="center">
         <FormControl sx={{ width: 400 }}>
-          <InputLabel>Select Summary Type</InputLabel>
+          <InputLabel sx={{ backgroundColor: "white", pr: 1 }}>
+            Select Summary Type{" "}
+            <span style={customStyles.dropdownAsterisk}> * </span>
+          </InputLabel>
           <Select
             label="Select Summary Type"
             id="summary-type-select"

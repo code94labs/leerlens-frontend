@@ -18,6 +18,15 @@ import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import {
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
+import DoNotDisturbAltOutlinedIcon from "@mui/icons-material/DoNotDisturbAltOutlined";
 
 import VerticalBarChartType01 from "../../shared/Dashboard/VerticalBarChartType01/VerticalBarChartType01";
 
@@ -29,11 +38,23 @@ import {
 } from "../../services/dashboardStatistics.service";
 import { champBlackFontFamily } from "../../shared/typography";
 import {
+  ageList,
   barChartColorCombinations,
   barChartGrouColorPallete,
+  dateFilterList,
+  gradeList,
+  remindProgramListForFilters,
+  schoolList,
+  studyFieldList,
 } from "../../utils/constant";
-import { CircularProgress } from "@mui/material";
-import { DashboardBarChart, DashboardStatistics } from "../../utils/types";
+import {
+  DashboardBarChart,
+  DashboardStatistics,
+  GetStatisticsQueryParams,
+} from "../../utils/types";
+import { getDateRange } from "../../utils/helper";
+import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
+import { APILoadingStates } from "../../utils/enum";
 
 ChartJS.register(
   CategoryScale,
@@ -60,6 +81,20 @@ const customStyles = {
   loadingIcon: {
     color: "#A879FF",
   },
+  dropdown: {
+    width: "100%",
+    mb: 2,
+    mr: 2,
+    "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+      borderColor: "grey !important",
+    },
+    "& .MuiInputBase-input": {
+      fontWeight: 600,
+    },
+    "& .MuiInputLabel-root.Mui-focused": {
+      color: "grey",
+    },
+  },
 };
 
 type Props = {};
@@ -75,19 +110,83 @@ const DashboardPrePostContent = (props: Props) => {
     DashboardStatistics[]
   >([]);
 
+  const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
+  const [filterSchool, setFilterSchool] = useState<number>(schoolList[0].id);
+  const [filterGrade, setFilterGrade] = useState<number>(gradeList[0].id);
+  const [filterCourse, setFilterCourse] = useState<number>(
+    remindProgramListForFilters[0].id
+  );
+  const [filterAge, setFilterAge] = useState<number>(ageList[0].id);
+  const [filterStudy, setFilterStudy] = useState<number>(studyFieldList[0].id);
+  const [filterDate, setFilterDate] = useState<string>(dateFilterList[0]);
+
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
   const [notificationMsg, setNotificationMsg] = useState<string>("");
 
   const [isError, setIsError] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+  ]);
 
   const getBackgroundColors = (index: number) =>
     barChartColorCombinations[index % barChartColorCombinations.length];
 
-  const fetchSummaryStat = async () => {
-    setIsLoading(true);
+  const areFiltersActivated = () => {
+    if (
+      filterSchool !== schoolList[0].id ||
+      filterGrade !== gradeList[0].id ||
+      filterCourse !== remindProgramListForFilters[0].id ||
+      filterAge !== ageList[0].id ||
+      filterStudy !== studyFieldList[0].id ||
+      filterDate !== dateFilterList[0]
+    ) {
+      return false;
+    } else {
+      return true;
+    }
+  };
 
-    await getPrePostSummaryStatistics()
+  const resetAllFilters = () => {
+    setFilterSchool(schoolList[0].id);
+    setFilterGrade(gradeList[0].id);
+    setFilterCourse(remindProgramListForFilters[0].id);
+    setFilterAge(ageList[0].id);
+    setFilterStudy(studyFieldList[0].id);
+    setFilterDate(dateFilterList[0]);
+  };
+
+  const getFilterParams = () => {
+    // making the params object
+    const filterParams: GetStatisticsQueryParams = {
+      age: filterAge !== 0 ? filterAge : undefined,
+      course: filterCourse !== 0 ? filterCourse : undefined,
+      grade: filterGrade !== 0 ? filterGrade : undefined,
+      school: filterSchool !== 0 ? filterSchool : undefined,
+      study: filterStudy !== 0 ? filterStudy : undefined,
+      fromDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDate)[0].replace(/[/]/g, "-")
+          : undefined,
+      toDate:
+        filterDate !== dateFilterList[0]
+          ? getDateRange(filterDate)[1].replace(/[/]/g, "-")
+          : undefined,
+    };
+
+    return filterParams;
+  };
+
+  const fetchSummaryStat = async () => {
+    setIsLoading((prev) => {
+      let loadingArray = [...prev];
+      loadingArray[APILoadingStates.summaryCharts] = true;
+      return loadingArray;
+    });
+
+    await getPrePostSummaryStatistics(getFilterParams())
       .then((res) => {
         setSummaryData(res);
       })
@@ -98,14 +197,22 @@ const DashboardPrePostContent = (props: Props) => {
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoading((prev) => {
+          let loadingArray = [...prev];
+          loadingArray[APILoadingStates.summaryCharts] = false;
+          return loadingArray;
+        });
       });
   };
 
   const fetchQuestionnaireStat = async () => {
-    setIsLoading(true);
+    setIsLoading((prev) => {
+      let loadingArray = [...prev];
+      loadingArray[APILoadingStates.statisticalCharts] = true;
+      return loadingArray;
+    });
 
-    await getPrePostStatistics()
+    await getPrePostStatistics(getFilterParams())
       .then((res) => {
         setStatisticsData(res);
       })
@@ -116,16 +223,24 @@ const DashboardPrePostContent = (props: Props) => {
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoading((prev) => {
+          let loadingArray = [...prev];
+          loadingArray[APILoadingStates.statisticalCharts] = false;
+          return loadingArray;
+        });
       });
   };
 
   const fetchAbsoluteStat = async () => {
-    setIsLoading(true);
+    setIsLoading((prev) => {
+      let loadingArray = [...prev];
+      loadingArray[APILoadingStates.abosoluteDifference] = true;
+      return loadingArray;
+    });
 
-    await getPrePostAbsoluteStat()
+    await getPrePostAbsoluteStat(getFilterParams())
       .then((res) => {
-        console.log("absolute reponse:", res);
+        // console.log("absolute reponse:", res);
 
         setAbsoluteDifference(res);
       })
@@ -136,14 +251,22 @@ const DashboardPrePostContent = (props: Props) => {
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoading((prev) => {
+          let loadingArray = [...prev];
+          loadingArray[APILoadingStates.abosoluteDifference] = false;
+          return loadingArray;
+        });
       });
   };
 
   const fetchRelativeStat = async () => {
-    setIsLoading(true);
+    setIsLoading((prev) => {
+      let loadingArray = [...prev];
+      loadingArray[APILoadingStates.relativeDifference] = true;
+      return loadingArray;
+    });
 
-    await getPrePostRelativeStat()
+    await getPrePostRelativeStat(getFilterParams())
       .then((res) => {
         setRelativeDifference(res);
       })
@@ -154,20 +277,167 @@ const DashboardPrePostContent = (props: Props) => {
         setDisplaySnackbarMsg(true);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsLoading((prev) => {
+          let loadingArray = [...prev];
+          loadingArray[APILoadingStates.relativeDifference] = false;
+          return loadingArray;
+        });
       });
   };
 
-  const filterButton = (
-    <Stack px={2} py={3}>
+  const filterButtonDiv = (
+    <Stack px={2} py={3} direction="row" justifyContent="space-between">
       <Button
         variant="outlined"
+        onClick={() => {
+          setDisplayFiltersDiv((prev) => !prev);
+        }}
         startIcon={<FilterAltIcon />}
         sx={{ width: "max-content" }}
+        color="secondary"
       >
         Filter
       </Button>
+      {!areFiltersActivated() && (
+        <Button
+          variant="outlined"
+          onClick={resetAllFilters}
+          // sx={customStyles.primaryButtonOutlined}
+          sx={{ width: "max-content" }}
+          color="secondary"
+        >
+          <DoNotDisturbAltOutlinedIcon />
+
+          <Typography fontWeight={800} mx={0.8}>
+            Reset filters
+          </Typography>
+        </Button>
+      )}
     </Stack>
+  );
+
+  const filtersDiv = (
+    <Grid container px={2} gap={2}>
+      <Grid item xs={4}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>School</InputLabel>
+
+          <Select
+            value={String(filterSchool)}
+            label="School"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterSchool(Number(event.target.value));
+            }}
+          >
+            {schoolList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.schoolName}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Grade</InputLabel>
+
+          <Select
+            value={String(filterGrade)}
+            label="Grade"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterGrade(Number(event.target.value));
+            }}
+          >
+            {gradeList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.grade}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Course</InputLabel>
+
+          <Select
+            value={String(filterCourse)}
+            label="Course"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterCourse(Number(event.target.value));
+            }}
+          >
+            {remindProgramListForFilters.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.sentence}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={3}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>What do you study</InputLabel>
+
+          <Select
+            value={String(filterStudy)}
+            label="What do you study"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterStudy(Number(event.target.value));
+            }}
+          >
+            {studyFieldList.map((item) => (
+              <MenuItem value={item.id} key={item.id}>
+                {item.studyField}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={2}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Age</InputLabel>
+
+          <Select
+            value={String(filterAge)}
+            label="Age"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterAge(Number(event.target.value));
+            }}
+          >
+            {ageList.map((item) => (
+              <MenuItem value={item.id} key={item.age}>
+                {item.age}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+      <Grid item xs={3}>
+        <FormControl sx={customStyles.dropdown}>
+          <InputLabel>Date</InputLabel>
+
+          <Select
+            value={filterDate}
+            label="Date"
+            onChange={(event: SelectChangeEvent) => {
+              setFilterDate(event.target.value);
+            }}
+          >
+            {dateFilterList.map((item) => (
+              <MenuItem value={item} key={item}>
+                {item}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+    </Grid>
   );
 
   const titleSection = (
@@ -187,6 +457,37 @@ const DashboardPrePostContent = (props: Props) => {
     </Stack>
   );
 
+  const spinnerSection = (
+    <Stack
+      m={2}
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+      height={200}
+    >
+      <ProgressSpinner />
+    </Stack>
+  );
+
+  const noResponsesSection = (
+    <Stack
+      m={2}
+      alignItems="center"
+      justifyContent="center"
+      width="100%"
+      height={200}
+    >
+      <Typography
+        fontSize={18}
+        textTransform="uppercase"
+        color={"#1A1A1A"}
+        fontWeight={700}
+      >
+        There are no responses under above filters
+      </Typography>
+    </Stack>
+  );
+
   const questionnaireCharts = (
     <>
       <Typography variant="h5" m={2} fontWeight={800}>
@@ -194,21 +495,24 @@ const DashboardPrePostContent = (props: Props) => {
       </Typography>
 
       <Grid container px={2} spacing={2}>
-        {statisticsData &&
-          statisticsData.map((data, index) => (
-            <Grid item xs={4} key={index}>
-              <VerticalBarChartType01
-                title={`${index + 1}. ${data.questionText}`}
-                labels={["Learning 1", "Learning 2"]}
-                datasets={[
-                  {
-                    data: [data.learningOne, data.learningTwo],
-                    backgroundColor: getBackgroundColors(index),
-                  },
-                ]}
-              />
-            </Grid>
-          ))}
+        {isLoading[APILoadingStates.statisticalCharts]
+          ? spinnerSection
+          : statisticsData.length < 1
+          ? noResponsesSection
+          : (statisticsData || []).map((data, index) => (
+              <Grid item xs={4} key={index}>
+                <VerticalBarChartType01
+                  title={`${index + 1}. ${data.questionText}`}
+                  labels={["Learning 1", "Learning 2"]}
+                  datasets={[
+                    {
+                      data: [data.learningOne, data.learningTwo],
+                      backgroundColor: getBackgroundColors(index),
+                    },
+                  ]}
+                />
+              </Grid>
+            ))}
       </Grid>
     </>
   );
@@ -220,21 +524,25 @@ const DashboardPrePostContent = (props: Props) => {
       </Typography>
 
       <Grid container px={2} spacing={2}>
-        {summaryData &&
-          summaryData.map((data, index) => (
-            <Grid item xs={4} key={index}>
-              <VerticalBarChartType01
-                title={`${index + 1}. ${data.questionText}`}
-                labels={["Learning 1", "Learning 2"]}
-                datasets={[
-                  {
-                    data: [data.learningOne, data.learningTwo],
-                    backgroundColor: getBackgroundColors(index),
-                  },
-                ]}
-              />
-            </Grid>
-          ))}
+        {isLoading[APILoadingStates.summaryCharts]
+          ? spinnerSection
+          : summaryData.length < 1
+          ? noResponsesSection
+          : summaryData.map((data, index) => (
+              <Grid item xs={3} key={index}>
+                <VerticalBarChartType01
+                  title={`${index + 1}. ${data.questionText}`}
+                  labels={["Learning 1", "Learning 2"]}
+                  datasets={[
+                    {
+                      data: [data.learningOne, data.learningTwo],
+                      backgroundColor: getBackgroundColors(index),
+                    },
+                  ]}
+                  tightPadding
+                />
+              </Grid>
+            ))}
       </Grid>
     </Stack>
   );
@@ -246,7 +554,11 @@ const DashboardPrePostContent = (props: Props) => {
       </Typography>
 
       <Grid container spacing={2} px={2}>
-        {absoluteDifference && (
+        {isLoading[APILoadingStates.abosoluteDifference] ? (
+          spinnerSection
+        ) : absoluteDifference.length < 1 ? (
+          noResponsesSection
+        ) : (
           <Grid item xs={6}>
             <VerticalBarChartType01
               removeBarGaps
@@ -262,7 +574,11 @@ const DashboardPrePostContent = (props: Props) => {
           </Grid>
         )}
 
-        {relativeDifference && (
+        {isLoading[APILoadingStates.relativeDifference] ? (
+          spinnerSection
+        ) : relativeDifference.length < 1 ? (
+          noResponsesSection
+        ) : (
           <Grid item xs={6}>
             <VerticalBarChartType01
               removeBarGaps
@@ -281,12 +597,6 @@ const DashboardPrePostContent = (props: Props) => {
     </Stack>
   );
 
-  const loading = (
-    <Box sx={customStyles.loading}>
-      <CircularProgress sx={customStyles.loadingIcon} />
-    </Box>
-  );
-
   useEffect(() => {
     fetchQuestionnaireStat();
 
@@ -295,22 +605,29 @@ const DashboardPrePostContent = (props: Props) => {
     fetchAbsoluteStat();
 
     fetchRelativeStat();
-  }, []);
+  }, [
+    filterSchool,
+    filterCourse,
+    filterGrade,
+    filterStudy,
+    filterAge,
+    filterDate,
+  ]);
 
   return (
     <>
       <Stack sx={customStyles.stack}>
         {titleSection}
 
-        {filterButton}
+        {filterButtonDiv}
 
-        {!isLoading && summaryCharts}
+        {displayFiltersDiv && filtersDiv}
 
-        {!isLoading && statisticalCharts}
+        {summaryCharts}
 
-        {!isLoading && questionnaireCharts}
+        {statisticalCharts}
 
-        {isLoading && loading}
+        {questionnaireCharts}
       </Stack>
     </>
   );

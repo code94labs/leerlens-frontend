@@ -66,12 +66,12 @@ export enum FilterationType {
   Grade = 3,
   RemindProgram = 4,
   Class = 5,
-  Age = 6
-};
+  Age = 6,
+}
 
 export enum SentimentQuestionType {
   Positive = 1,
-  Negative = 0
+  Negative = 0,
 }
 
 export const fieldTypeTitles = {
@@ -88,3 +88,11 @@ export const evaluationTypesTitles = {
   [FormEvaluation.Evaluation]: "Evaluation",
   [FormEvaluation.Normgroup]: "Normgroup",
 };
+
+// for managing loading states in dashboard pages
+export enum APILoadingStates {
+  summaryCharts = 0,
+  statisticalCharts = 1,
+  abosoluteDifference = 2,
+  relativeDifference = 3,
+}

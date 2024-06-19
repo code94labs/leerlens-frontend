@@ -24,6 +24,7 @@ export interface Question {
   maxValue: number;
   isDelete: boolean;
   isNewlyAdded: boolean;
+  filtrationType?: number;
 }
 
 export interface QuestionResponse extends Question {
@@ -109,6 +110,16 @@ export type GetResponsesQueryParams = {
   study?: number;
   page?: number;
   limit?: number;
+};
+
+export type GetStatisticsQueryParams = {
+  age?: number;
+  course?: number;
+  fromDate?: string;
+  toDate?: string;
+  grade?: number;
+  school?: number;
+  study?: number;
 };
 
 export type DashboardBarChart = {

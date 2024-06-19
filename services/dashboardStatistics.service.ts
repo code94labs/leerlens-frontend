@@ -1,9 +1,12 @@
 import { leerLensApi } from "../api/api";
 import { getRequest } from "../api/requests";
+import { GetStatisticsQueryParams } from "../utils/types";
 
-export const getPrePostStatistics = async () => {
+export const getPrePostStatistics = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.prePostStatistics);
+    const response = await getRequest(leerLensApi.prePostStatistics, params);
 
     return response.data;
   } catch (error) {
@@ -13,9 +16,11 @@ export const getPrePostStatistics = async () => {
   }
 };
 
-export const getNormgroupStatistics = async () => {
+export const getNormgroupStatistics = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.normGroupStatistics);
+    const response = await getRequest(leerLensApi.normGroupStatistics, params);
 
     return response.data;
   } catch (error) {
@@ -25,21 +30,34 @@ export const getNormgroupStatistics = async () => {
   }
 };
 
-export const getPrePostSummaryStatistics = async () => {
+export const getPrePostSummaryStatistics = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.prePostSummaryStatistics);
+    const response = await getRequest(
+      leerLensApi.prePostSummaryStatistics,
+      params
+    );
 
     return response.data;
   } catch (error) {
-    console.error("Error fetching Pre Post Interventions summary statistics", error);
+    console.error(
+      "Error fetching Pre Post Interventions summary statistics",
+      error
+    );
 
     throw error;
   }
 };
 
-export const getNormgroupSummaryStatistics = async () => {
+export const getNormgroupSummaryStatistics = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.normGroupSummaryStatistics);
+    const response = await getRequest(
+      leerLensApi.normGroupSummaryStatistics,
+      params
+    );
 
     return response.data;
   } catch (error) {
@@ -49,25 +67,53 @@ export const getNormgroupSummaryStatistics = async () => {
   }
 };
 
-export const getPrePostAbsoluteStat = async () => {
+export const getNormgroupCompareSummaryStatistics = async (params: {
+  groupOneFilters: GetStatisticsQueryParams;
+  groupTwoFilters: GetStatisticsQueryParams;
+}) => {
   try {
-    const response = await getRequest(leerLensApi.prePostAbsoluteStat);
-
-    console.log("response", response);
+    const response = await getRequest(
+      leerLensApi.normGroupCompareSummaryStatistics,
+      params
+    );
 
     return response.data;
   } catch (error) {
-    console.error("Error fetching Pre Post Interventions absolute statistics", error);
+    console.error("Error fetching normgroup compare summary statistics", error);
 
     throw error;
   }
 };
 
-export const getNormgroupAbsoluteStat = async () => {
+export const getPrePostAbsoluteStat = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.normGroupAbsoluteStat);
+    const response = await getRequest(leerLensApi.prePostAbsoluteStat, params);
 
-    console.log("response", response);
+    // console.log("response", response);
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error fetching Pre Post Interventions absolute statistics",
+      error
+    );
+
+    throw error;
+  }
+};
+
+export const getNormgroupAbsoluteStat = async (
+  params: GetStatisticsQueryParams
+) => {
+  try {
+    const response = await getRequest(
+      leerLensApi.normGroupAbsoluteStat,
+      params
+    );
+
+    // console.log("response", response);
 
     return response.data;
   } catch (error) {
@@ -77,21 +123,31 @@ export const getNormgroupAbsoluteStat = async () => {
   }
 };
 
-export const getPrePostRelativeStat = async () => {
+export const getPrePostRelativeStat = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.prePostRelativeStat);
+    const response = await getRequest(leerLensApi.prePostRelativeStat, params);
 
     return response.data;
   } catch (error) {
-    console.error("Error fetching Pre Post Interventions relative statistics", error);
+    console.error(
+      "Error fetching Pre Post Interventions relative statistics",
+      error
+    );
 
     throw error;
   }
 };
 
-export const getNormgroupRelativeStat = async () => {
+export const getNormgroupRelativeStat = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.normGroupRelativeStat);
+    const response = await getRequest(
+      leerLensApi.normGroupRelativeStat,
+      params
+    );
 
     return response.data;
   } catch (error) {
@@ -101,9 +157,11 @@ export const getNormgroupRelativeStat = async () => {
   }
 };
 
-export const getEvaluationStatistics = async () => {
+export const getEvaluationStatistics = async (
+  params: GetStatisticsQueryParams
+) => {
   try {
-    const response = await getRequest(leerLensApi.evaluationStatistics);
+    const response = await getRequest(leerLensApi.evaluationStatistics, params);
 
     return response.data;
   } catch (error) {

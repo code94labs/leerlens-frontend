@@ -1,5 +1,5 @@
-export const baseUrl = "http://localhost:5001";
-// export const baseUrl = "https://leerlens.nl";
+// export const baseUrl = "http://localhost:5000";
+export const baseUrl = "https://leerlens.nl";
 
 export const leerLensApi = {
   studentFormInfo: `${baseUrl}/studentFormInfo`,
@@ -31,6 +31,9 @@ export const leerLensApi = {
   normGroupSummaryStatistics: `${baseUrl}/dashboard/normgroup/summary-statistics`,
   normGroupAbsoluteStat: `${baseUrl}/dashboard/normgroup/absolute-statistics`,
   normGroupRelativeStat: `${baseUrl}/dashboard/normgroup/relative-statistics`,
+
+  normGroupCompareSummaryStatistics: `${baseUrl}/dashboard/normgroup/compare-summary-statistics`,
+
 
   evaluationStatistics: `${baseUrl}/dashboard/evaluation/statistics`,
 

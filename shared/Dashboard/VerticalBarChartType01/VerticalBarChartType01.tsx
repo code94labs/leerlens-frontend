@@ -36,10 +36,17 @@ interface VerticalBarChartType01Props {
   labels?: string[];
   datasets: Dataset[];
   removeBarGaps?: boolean;
+  tightPadding?: boolean;
 }
 
 const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
-  const { title, labels, datasets, removeBarGaps = false } = props;
+  const {
+    title,
+    labels,
+    datasets,
+    removeBarGaps = false,
+    tightPadding = false,
+  } = props;
 
   const options = {
     responsive: true,
@@ -106,6 +113,7 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
       },
       y: {
         display: false,
+        suggestedMax: 6,
         grid: {
           display: false,
         },
@@ -113,8 +121,8 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
     },
     layout: {
       padding: {
-        left: 120,
-        right: 120,
+        left: tightPadding ? 80 : 120,
+        right: tightPadding ? 80 : 120,
         top: 30,
         bottom: 10,
       },
@@ -141,7 +149,7 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
     >
       <Typography sx={customStyles.title}>{title}</Typography>
 
-      <Bar options={options} data={data} height={200} />
+      <Bar options={options} data={data} height={tightPadding ? 250 : 200} />
     </Stack>
   );
 };

@@ -467,8 +467,8 @@ const NormGroupForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartOne.length} statements (1 = totally disagree, 2
-        = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        1 to {questionListPartOne.length} statements (1 = totally disagree, 2 =
+        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
         totally agree).
       </Typography>
 
@@ -495,8 +495,8 @@ const NormGroupForm = () => {
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartTwo.length} statements (1 = totally disagree, 2
-        = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
+        1 to {questionListPartTwo.length} statements (1 = totally disagree, 2 =
+        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
         totally agree).
       </Typography>
 
@@ -734,7 +734,7 @@ const NormGroupForm = () => {
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
                   disabled={
-                    activeStep === 2 && !allAnsweredPartTwo && isLoading
+                    activeStep === 2 && !allAnsweredPartTwo && !isLoading
                   }
                 >
                   {isLoading ? "Submitting..." : "Complete"}
@@ -746,8 +746,7 @@ const NormGroupForm = () => {
                   sx={customStyles.primaryButton}
                   disabled={
                     activeStep === 0
-                      ? // ? !(formik.isValid && formik.dirty)
-                        !formik.isValid
+                      ? !(formik.isValid && formik.dirty)
                       : !allAnsweredPartOne
                   }
                 >
