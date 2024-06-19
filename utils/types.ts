@@ -24,6 +24,7 @@ export interface Question {
   maxValue: number;
   isDelete: boolean;
   isNewlyAdded: boolean;
+  filtrationType?: number;
 }
 
 export interface QuestionResponse extends Question {
@@ -43,6 +44,7 @@ export type FormQuestion = {
   answer?: number | string;
   summaryTypes: SummaryTypes[];
   chartType?: ChartType;
+  sentiment: boolean;
 };
 
 export type PersonalDetails = {

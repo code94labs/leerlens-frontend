@@ -28,9 +28,9 @@ import { champBlackFontFamily } from "../typography";
 
 import DynamicDropdown from "../DynamicDropdown";
 
-import { FieldType } from "../../utils/enum";
+import { FieldType, SentimentQuestionType } from "../../utils/enum";
 import { DropDownOptions, QuestionResponse } from "../../utils/types";
-import { summaryTypes } from "../../utils/constant";
+import { sentimentTypes, summaryTypes } from "../../utils/constant";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -134,6 +134,7 @@ type Props = {
     questionText: string;
     dropdownOptions: DropDownOptions[];
     summaryTypes: number[];
+    sentiment: number;
   }) => void;
   questionnaireType?: boolean;
 };
@@ -155,6 +156,14 @@ const AddNewField = (props: Props) => {
   const [selectedSummaryTypes, setSelectedSummaryTypes] = useState<number[]>(
     []
   );
+
+  const [selectedSentimentTypes, setSelectedSentimentTypes] = useState<number>(
+    SentimentQuestionType.Positive
+  );
+
+  const onHandleSentimentUpdate = (event: any) => {
+    setSelectedSentimentTypes(event.target.value);
+  };
 
   const handleChange = (
     event: SelectChangeEvent<typeof selectedSummaryTypes>
@@ -193,6 +202,7 @@ const AddNewField = (props: Props) => {
         questionText,
         dropdownOptions: options ?? [],
         summaryTypes: selectedSummaryTypes,
+        sentiment: selectedSentimentTypes,
       });
   };
 
@@ -279,7 +289,9 @@ const AddNewField = (props: Props) => {
       {questionnaireType && (
         <Stack direction="row" justifyContent="flex-start" alignItems="center">
           <FormControl sx={{ width: 400 }}>
-            <InputLabel>Select Summary Type</InputLabel>
+            <InputLabel sx={{ backgroundColor: "white", pr: 1 }}>
+              Select Summary Type
+            </InputLabel>
             <Select
               label="Select Summary Type"
               id="summary-type-select"
@@ -310,6 +322,22 @@ const AddNewField = (props: Props) => {
                 >
                   {item.label}
                 </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl sx={{ width: 150, ml: 2 }}>
+            <InputLabel>
+              Sentiment Type
+              <span style={customStyles.dropdownAsterisk}> * </span>
+            </InputLabel>
+
+            <Select
+              defaultValue={selectedSentimentTypes}
+              onChange={onHandleSentimentUpdate}
+            >
+              {sentimentTypes.map((sentiment) => (
+                <MenuItem value={sentiment.id}>{sentiment.label}</MenuItem>
               ))}
             </Select>
           </FormControl>

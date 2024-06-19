@@ -39,6 +39,7 @@ import {
   Question,
   QuestionResponse,
 } from "../../utils/types";
+import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
 
 import { champBlackFontFamily } from "../../shared/typography";
 import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
@@ -48,6 +49,19 @@ import {
   getEvaluationQuestions,
   postEvaluationQuestions,
 } from "../../services/editEvaluationQuestionSets.service";
+import {
+  moveItemDownInArray,
+  moveItemUpInArray,
+  updateArrayByIndex,
+} from "../../utils/helper";
+
+// constants
+
+const indexNotFound = -1;
+
+const topMostIndex = 1;
+
+// custom styles
 
 const customStyles = {
   snackbarAlert: {
@@ -147,43 +161,20 @@ const customStyles = {
   },
 };
 
-const menuItems = [
-  {
-    id: 0,
-    title: "Personal Details",
-  },
-  {
-    id: 1,
-    title: "Question | Part 01",
-  },
-  {
-    id: 2,
-    title: "Question | Part 02",
-  },
-  {
-    id: 3,
-    title: "Program and the supervisors",
-  },
-  {
-    id: 4,
-    title: "Final",
-  },
-];
-
 const EditEvaluationForm = () => {
   const dispatch = useDispatch();
 
   const formDetails = useSelector(selectForm);
 
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(questionSetTabs.personalDetails);
 
-  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
-  const [notificationMsg, setNotificationMsg] = useState("");
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
+  const [notificationMsg, setNotificationMsg] = useState<string>("");
 
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
+  const [displayNewQuestion, setDisplayNewQuestion] = useState<boolean>(false);
 
   const [personalDetailsQuestions, setPersonalDetailsQuestions] = useState<
     QuestionResponse[]
@@ -195,223 +186,77 @@ const EditEvaluationForm = () => {
   const [partOneQuestions, setPartOneQuestions] = useState<FormQuestion[]>([]);
   const [partTwoQuestions, setPartTwoQuestions] = useState<FormQuestion[]>([]);
 
-  useMemo(() => {
-    const fetchPersonalDetailsQuestions = async () => {
-      try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
-
-        setPersonalDetailsQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.PersonalDetails &&
-              item.formType === FormEvaluation.Evaluation
-          )
-        );
-        setProgramAndSupervisorsQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.ProgramAndSupervisor &&
-              item.formType === FormEvaluation.Evaluation
-          )
-        );
-        setFinalQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.Final &&
-              item.formType === FormEvaluation.Evaluation
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchEvaluationsQuestions = async () => {
-      try {
-        const evaluationQuestions = await getEvaluationQuestions();
-
-        setPartOneQuestions(
-          evaluationQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartOne
-          )
-        );
-        setPartTwoQuestions(
-          evaluationQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartTwo
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchPersonalDetailsQuestions();
-    fetchEvaluationsQuestions();
-  }, []);
-
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     dispatch(resetForm());
     setTab(newValue);
   };
 
-  const handlePersonalDetailsSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
-
-    const targetArray =
-      tab === 0
-        ? personalDetailsQuestions
-        : tab === 3
-        ? programAndSupervisorsQuestions
-        : finalQuestions;
-
-    const newQuestionArr = [...targetArray];
-
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
+  const handlePersonalDetailsSoftDelete = async (id: number) => {
+    const response: QuestionResponse[] = await studentFormInfoItemSoftDelete(
+      id
     );
 
-    tab === 0
-      ? setPersonalDetailsQuestions(updatedQuestionsArr)
-      : tab === 3
-      ? setProgramAndSupervisorsQuestions(updatedQuestionsArr)
-      : setFinalQuestions(updatedQuestionsArr);
+    if (tab === questionSetTabs.personalDetails) {
+      setPersonalDetailsQuestions(response);
+    } else if (tab === questionSetTabs.programAndSupervisor) {
+      setProgramAndSupervisorsQuestions(response);
+    } else if (tab === questionSetTabs.final) {
+      setFinalQuestions(response);
+    }
   };
 
-  const handleEvaluationSoftDelete = async (id: number, orderId: number) => {
-    const response: FormQuestion = await evaluationQuestionFormSoftDelete(id);
+  const handleEvaluationSoftDelete = async (id: number) => {
+    const response: FormQuestion[] = await evaluationQuestionFormSoftDelete(id);
 
-    const newQuestionArr =
-      tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
-
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: FormQuestion) => item.id !== (response as FormQuestion).id
-    );
-
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+    tab === questionSetTabs.quesitonSetOne
+      ? setPartOneQuestions(response)
+      : setPartTwoQuestions(response);
   };
 
   // function to update the state of this(parent) component
   const handlePersonalDetailsQuestionUpdate = async (
     question: QuestionResponse
   ) => {
-    tab === 0
-      ? setPersonalDetailsQuestions((prevQuestions) => {
-          const updatedQuestionsArr = [...prevQuestions];
-
-          const index = updatedQuestionsArr.findIndex(
-            (q) => q.id === question.id
-          );
-
-          if (index !== -1) {
-            updatedQuestionsArr[index] = question;
-          } else {
-            console.error(`Question with id ${question.id} not found`);
-          }
-
-          return updatedQuestionsArr;
-        })
-      : tab === 3
-      ? setProgramAndSupervisorsQuestions((prevQuestions) => {
-          const updatedQuestionsArr = [...prevQuestions];
-
-          const index = updatedQuestionsArr.findIndex(
-            (q) => q.id === question.id
-          );
-
-          if (index !== -1) {
-            updatedQuestionsArr[index] = question;
-          } else {
-            console.error(`Question with id ${question.id} not found`);
-          }
-
-          return updatedQuestionsArr;
-        })
-      : setFinalQuestions((prevQuestions) => {
-          const updatedQuestionsArr = [...prevQuestions];
-
-          const index = updatedQuestionsArr.findIndex(
-            (q) => q.id === question.id
-          );
-
-          if (index !== -1) {
-            updatedQuestionsArr[index] = question;
-          } else {
-            console.error(`Question with id ${question.id} not found`);
-          }
-
-          return updatedQuestionsArr;
-        });
+    if (question.sectionType === SectionType.PersonalDetails) {
+      setPersonalDetailsQuestions(
+        updateArrayByIndex([...personalDetailsQuestions], question)
+      );
+    } else if (question.sectionType === SectionType.ProgramAndSupervisor) {
+      setProgramAndSupervisorsQuestions(
+        updateArrayByIndex([...programAndSupervisorsQuestions], question)
+      );
+    } else {
+      setFinalQuestions(updateArrayByIndex([...finalQuestions], question));
+    }
   };
 
+  // function to update the state of this(parent) component
   const handleEvaluationQuestionUpdate = async (question: FormQuestion) => {
-    if (tab === 1) {
-      setPartOneQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+    if (question.questionSection === QuestionnaireSection.QuestionPartOne) {
+      setPartOneQuestions(updateArrayByIndex([...partOneQuestions], question));
     } else {
-      setPartTwoQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+      setPartTwoQuestions(updateArrayByIndex([...partTwoQuestions], question));
     }
   };
 
   const handleUpdateAllPersonalDetailsQuestions = async () => {
     const arrayToUpdate =
-      tab === 0
+      tab === questionSetTabs.personalDetails
         ? personalDetailsQuestions
-        : tab === 3
+        : tab === questionSetTabs.programAndSupervisor
         ? programAndSupervisorsQuestions
         : finalQuestions;
 
     try {
       const response = await studentFormInfoItemUpdateBulk(arrayToUpdate);
 
-      tab === 0
+      tab === questionSetTabs.personalDetails
         ? setPersonalDetailsQuestions(
             (response as QuestionResponse[]).filter(
               (q) => q.sectionType === SectionType.PersonalDetails
             )
           )
-        : tab === 3
+        : tab === questionSetTabs.programAndSupervisor
         ? setProgramAndSupervisorsQuestions(
             (response as QuestionResponse[]).filter(
               (q) => q.sectionType === SectionType.ProgramAndSupervisor
@@ -425,17 +270,21 @@ const EditEvaluationForm = () => {
 
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 
   const handleUpdateAllEvaluationQuestions = async () => {
-    const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const arrayToUpdate =
+      tab === questionSetTabs.personalDetails
+        ? partOneQuestions
+        : partTwoQuestions;
 
     try {
       const response = await evaluationQuesionsUpdateBulk(arrayToUpdate);
 
-      tab === 1
+      tab === questionSetTabs.personalDetails
         ? setPartOneQuestions(
             response.filter(
               (item: FormQuestion) =>
@@ -451,7 +300,8 @@ const EditEvaluationForm = () => {
 
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 
@@ -461,7 +311,6 @@ const EditEvaluationForm = () => {
 
   const handleNewQuestionDelete = () => {
     setDisplayNewQuestion(false);
-    // setNewQuestion(initialNewQuestionContent);
   };
 
   const handleNewPersonalDetailsQuestionSave = async ({
@@ -474,9 +323,9 @@ const EditEvaluationForm = () => {
     dropdownOptions: DropDownOptions[];
   }) => {
     const targetArray =
-      tab === 0
+      tab === questionSetTabs.personalDetails
         ? personalDetailsQuestions
-        : tab === 3
+        : tab === questionSetTabs.programAndSupervisor
         ? programAndSupervisorsQuestions
         : finalQuestions;
 
@@ -487,9 +336,9 @@ const EditEvaluationForm = () => {
       questionText: questionText,
       fieldType: fieldType,
       sectionType:
-        tab === 0
+        tab === questionSetTabs.personalDetails
           ? SectionType.PersonalDetails
-          : tab === 3
+          : tab === questionSetTabs.programAndSupervisor
           ? SectionType.ProgramAndSupervisor
           : SectionType.Final,
       positionOrderId: newPositionOrderId,
@@ -500,15 +349,19 @@ const EditEvaluationForm = () => {
       isNewlyAdded: true,
     };
 
-    const response = await postStudentFormInfo(newQuestion);
+    const response: QuestionResponse = await postStudentFormInfo(newQuestion);
 
-    const updatedQuestionsArr = targetArray;
+    const updatedQuestionsArr = [...targetArray];
+
     updatedQuestionsArr?.push(response);
-    tab === 0
-      ? setPersonalDetailsQuestions(updatedQuestionsArr)
-      : tab === 3
-      ? setProgramAndSupervisorsQuestions(updatedQuestionsArr)
-      : setFinalQuestions(updatedQuestionsArr);
+
+    if (response.sectionType === SectionType.PersonalDetails) {
+      setPersonalDetailsQuestions(updatedQuestionsArr);
+    } else if (response.sectionType === SectionType.ProgramAndSupervisor) {
+      setProgramAndSupervisorsQuestions(updatedQuestionsArr);
+    } else {
+      setFinalQuestions(updatedQuestionsArr);
+    }
 
     setDisplayNewQuestion(false);
   };
@@ -516,12 +369,16 @@ const EditEvaluationForm = () => {
   const handleNewQuestionnaireQuestionSave = async ({
     questionText,
     summaryTypes,
+    sentiment,
   }: {
     questionText: string;
     summaryTypes: number[];
+    sentiment: number;
   }) => {
     const newPositionOrderId =
-      tab === 1 ? partOneQuestions.length + 1 : partTwoQuestions.length + 1;
+      tab === questionSetTabs.quesitonSetOne
+        ? partOneQuestions.length + 1
+        : partTwoQuestions.length + 1;
 
     const newQuestion: FormQuestion = {
       questionText: questionText,
@@ -532,116 +389,84 @@ const EditEvaluationForm = () => {
       isNewlyAdded: true,
       questionSetId: 0,
       questionSection:
-        tab === 1
+        tab === questionSetTabs.quesitonSetOne
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
       summaryTypes,
+      sentiment: !!sentiment,
     };
 
     const response = await postEvaluationQuestions(newQuestion);
 
-    const updatedQuestionsArr = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const updatedQuestionsArr =
+      tab === questionSetTabs.quesitonSetOne
+        ? [...partOneQuestions]
+        : [...partTwoQuestions];
+
     updatedQuestionsArr?.push(response);
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+
+    if (response.questionSection === QuestionnaireSection.QuestionPartOne) {
+      setPartOneQuestions(updatedQuestionsArr);
+    } else {
+      setPartTwoQuestions(updatedQuestionsArr);
+    }
 
     setDisplayNewQuestion(false);
   };
 
   // Function to handle moving an item up in the array
-  const moveItemUp = (
-    orderId: number | undefined,
-    questionnaireType: boolean
-  ) => {
+  const moveItemUp = (orderId: number | undefined) => {
     if (!orderId) return;
-    if (orderId <= 1) return; // Already at the top, can't move up
-    if (!questionnaireType) {
-      if (tab === 0) {
-        const newQuestionArr = [...personalDetailsQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-        newQuestionArr[orderId - 2].positionOrderId = orderId;
+    if (orderId <= topMostIndex) return; // Already at the top, can't move up
 
-        setPersonalDetailsQuestions(newQuestionArr);
-      } else if (tab === 3) {
-        const newQuestionArr = [...programAndSupervisorsQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-        newQuestionArr[orderId - 2].positionOrderId = orderId;
-
-        setProgramAndSupervisorsQuestions(newQuestionArr);
-      } else if (tab === 4) {
-        const newQuestionArr = [...finalQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-        newQuestionArr[orderId - 2].positionOrderId = orderId;
-
-        setFinalQuestions(newQuestionArr);
-      }
-    } else {
-      if (tab === 1) {
-        const newQuestionArr = [...partOneQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-        newQuestionArr[orderId - 2].positionOrderId = orderId;
-
-        setPartOneQuestions(newQuestionArr);
-      } else if (tab === 2) {
-        const newQuestionArr = [...partTwoQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-        newQuestionArr[orderId - 2].positionOrderId = orderId;
-
-        setPartTwoQuestions(newQuestionArr);
-      }
+    if (tab === questionSetTabs.personalDetails) {
+      setPersonalDetailsQuestions(
+        moveItemUpInArray([...personalDetailsQuestions], orderId)
+      );
+    } else if (tab === questionSetTabs.quesitonSetOne) {
+      setPartOneQuestions(moveItemUpInArray([...partOneQuestions], orderId));
+    } else if (tab === questionSetTabs.quesitonSetTwo) {
+      setPartTwoQuestions(moveItemUpInArray([...partTwoQuestions], orderId));
+    } else if (tab === questionSetTabs.programAndSupervisor) {
+      setProgramAndSupervisorsQuestions(
+        moveItemUpInArray([...programAndSupervisorsQuestions], orderId)
+      );
+    } else if (tab === questionSetTabs.final) {
+      setFinalQuestions(moveItemUpInArray([...finalQuestions], orderId));
     }
+
     dispatch(setFormModified());
   };
 
   // Function to handle moving an item down in the array
-  const moveItemDown = (
-    orderId: number | undefined,
-    questionnaireType: boolean
-  ) => {
+  const moveItemDown = (orderId: number | undefined) => {
     if (!orderId) return;
-    if (!questionnaireType) {
-      if (tab === 0) {
-        if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
-        const newQuestionArr = [...personalDetailsQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-        newQuestionArr[orderId].positionOrderId = orderId;
+    if (tab === questionSetTabs.personalDetails) {
+      if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
 
-        setPersonalDetailsQuestions(newQuestionArr);
-      } else if (tab === 3) {
-        if (orderId >= programAndSupervisorsQuestions.length) return; // Already at the bottom, can't move down
-        const newQuestionArr = [...programAndSupervisorsQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-        newQuestionArr[orderId].positionOrderId = orderId;
+      setPersonalDetailsQuestions(
+        moveItemDownInArray([...personalDetailsQuestions], orderId)
+      );
+    } else if (tab === questionSetTabs.quesitonSetOne) {
+      if (orderId >= partOneQuestions.length) return; // Already at the bottom, can't move down
 
-        setProgramAndSupervisorsQuestions(newQuestionArr);
-      } else if (tab === 4) {
-        if (orderId >= finalQuestions.length) return; // Already at the bottom, can't move down
-        const newQuestionArr = [...finalQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-        newQuestionArr[orderId].positionOrderId = orderId;
+      setPartOneQuestions(moveItemDownInArray([...partOneQuestions], orderId));
+    } else if (tab === questionSetTabs.quesitonSetTwo) {
+      if (orderId >= partTwoQuestions.length) return; // Already at the bottom, can't move down
 
-        setFinalQuestions(newQuestionArr);
-      }
-    } else {
-      if (tab === 1) {
-        if (orderId >= partOneQuestions.length) return; // Already at the bottom, can't move down
+      setPartTwoQuestions(moveItemDownInArray([...partTwoQuestions], orderId));
+    } else if (tab === questionSetTabs.programAndSupervisor) {
+      if (orderId >= programAndSupervisorsQuestions.length) return; // Already at the bottom, can't move down
 
-        const newQuestionArr = [...partOneQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-        newQuestionArr[orderId].positionOrderId = orderId;
+      setProgramAndSupervisorsQuestions(
+        moveItemDownInArray([...programAndSupervisorsQuestions], orderId)
+      );
+    } else if (tab === questionSetTabs.final) {
+      if (orderId >= finalQuestions.length) return; // Already at the bottom, can't move down
 
-        setPartOneQuestions(newQuestionArr);
-      } else if (tab === 2) {
-        if (orderId >= partTwoQuestions.length) return; // Already at the bottom, can't move down
-
-        const newQuestionArr = [...partTwoQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-        newQuestionArr[orderId].positionOrderId = orderId;
-
-        setPartTwoQuestions(newQuestionArr);
-      }
+      setFinalQuestions(moveItemDownInArray([...finalQuestions], orderId));
     }
+
     dispatch(setFormModified());
   };
 
@@ -705,7 +530,9 @@ const EditEvaluationForm = () => {
 
       <Button
         onClick={
-          tab === 0 || tab === 3 || tab === 4
+          tab === questionSetTabs.personalDetails ||
+          tab === questionSetTabs.programAndSupervisor ||
+          tab === questionSetTabs.final
             ? handleUpdateAllPersonalDetailsQuestions
             : handleUpdateAllEvaluationQuestions
         }
@@ -719,7 +546,7 @@ const EditEvaluationForm = () => {
 
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
-      case 0:
+      case questionSetTabs.personalDetails:
         return (
           <>
             <DynamicField
@@ -764,7 +591,7 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 1:
+      case questionSetTabs.quesitonSetOne:
         return (
           <>
             {partOneQuestions
@@ -793,7 +620,7 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 2:
+      case questionSetTabs.quesitonSetTwo:
         return (
           <>
             {partTwoQuestions
@@ -822,7 +649,7 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 3:
+      case questionSetTabs.programAndSupervisor:
         return (
           <>
             {programAndSupervisorsQuestions
@@ -852,7 +679,7 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 4:
+      case questionSetTabs.final:
         return (
           <>
             {finalQuestions
@@ -895,7 +722,7 @@ const EditEvaluationForm = () => {
         orientation="vertical"
         sx={customStyles.tabs}
       >
-        {menuItems.map((item) => (
+        {QuestionSetMenuItems.map((item) => (
           <Tab
             value={item.id}
             label={item.title}
@@ -918,6 +745,68 @@ const EditEvaluationForm = () => {
       )}
     </Stack>
   );
+
+  useEffect(() => {
+    const fetchPersonalDetailsQuestions = async () => {
+      setIsLoading(true);
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setPersonalDetailsQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.PersonalDetails &&
+              item.formType === FormEvaluation.Evaluation
+          )
+        );
+        setProgramAndSupervisorsQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.ProgramAndSupervisor &&
+              item.formType === FormEvaluation.Evaluation
+          )
+        );
+        setFinalQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.Final &&
+              item.formType === FormEvaluation.Evaluation
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+      setIsLoading(false);
+    };
+
+    const fetchEvaluationsQuestions = async () => {
+      setIsLoading(true);
+      try {
+        const evaluationQuestions = await getEvaluationQuestions();
+
+        setPartOneQuestions(
+          evaluationQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
+          )
+        );
+        setPartTwoQuestions(
+          evaluationQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchPersonalDetailsQuestions();
+    fetchEvaluationsQuestions();
+
+    dispatch(resetForm());
+  }, []);
 
   return (
     <>

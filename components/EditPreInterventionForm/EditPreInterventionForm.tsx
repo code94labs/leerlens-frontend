@@ -12,6 +12,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import DynamicField from "../../shared/DynamicField/DynamicField";
 import AddNewField from "../../shared/AddNewField/AddNewField";
+import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
 
 import {
   resetForm,
@@ -47,7 +48,18 @@ import {
 } from "../../utils/types";
 
 import { champBlackFontFamily } from "../../shared/typography";
-import QuestionnaireDynamicField from "../../shared/DynamicField/QuestionnaireDynamicField";
+import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
+import {
+  moveItemDownInArray,
+  moveItemUpInArray,
+  updateArrayByIndex,
+} from "../../utils/helper";
+
+// constants
+
+const topMostIndex = 1;
+
+// styles
 
 const customStyles = {
   snackbarAlert: {
@@ -147,38 +159,12 @@ const customStyles = {
   },
 };
 
-const menuItems = [
-  {
-    id: 0,
-    title: "Personal Details",
-  },
-  {
-    id: 1,
-    title: "Question | Part 01",
-  },
-  {
-    id: 2,
-    title: "Question | Part 02",
-  },
-];
-
-export const loading = (
-  <Stack
-    flexDirection="row"
-    alignItems="center"
-    justifyContent="center"
-    height="50vh"
-  >
-    <CircularProgress sx={{ color: "#A879FF" }} />
-  </Stack>
-);
-
 const EditPreInterventionForm = () => {
   const dispatch = useDispatch();
 
   const formDetails = useSelector(selectForm);
 
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(questionSetTabs.personalDetails);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
@@ -195,150 +181,45 @@ const EditPreInterventionForm = () => {
   const [partOneQuestions, setPartOneQuestions] = useState<FormQuestion[]>([]);
   const [partTwoQuestions, setPartTwoQuestions] = useState<FormQuestion[]>([]);
 
-  useMemo(() => {
-    const fetchPersonalDetailsQuestions = async () => {
-      try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
-
-        setPersonalDetailsQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.PersonalDetails &&
-              item.formType === FormEvaluation.PreInterventions
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchPreInterventionsQuestions = async () => {
-      try {
-        const preInterventionQuestions = await getPreInterventionQuestions();
-
-        setPartOneQuestions(
-          preInterventionQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartOne
-          )
-        );
-        setPartTwoQuestions(
-          preInterventionQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartTwo
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchPersonalDetailsQuestions();
-    fetchPreInterventionsQuestions();
-  }, []);
-
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     dispatch(resetForm());
     setTab(newValue);
   };
 
-  const handlePersonalDetailsSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: QuestionResponse = await studentFormInfoItemSoftDelete(id);
-
-    const newQuestionArr = [...personalDetailsQuestions];
-
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
-
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: QuestionResponse) => item.id !== (response as QuestionResponse).id
-    );
-
-    setPersonalDetailsQuestions(updatedQuestionsArr);
-  };
-
-  const handlePreInterventionSoftDelete = async (
-    id: number,
-    orderId: number
-  ) => {
-    const response: FormQuestion = await preInterventionQuestionFormSoftDelete(
+  const handlePersonalDetailsSoftDelete = async (id: number) => {
+    const response: QuestionResponse[] = await studentFormInfoItemSoftDelete(
       id
     );
 
-    const newQuestionArr =
-      tab === 1 ? [...partOneQuestions] : [...partTwoQuestions];
+    setPersonalDetailsQuestions(response);
+  };
 
-    for (let i = orderId; i < newQuestionArr.length; i++) {
-      newQuestionArr[i].positionOrderId--;
-    }
+  const handlePreInterventionSoftDelete = async (id: number) => {
+    const response: FormQuestion[] =
+      await preInterventionQuestionFormSoftDelete(id);
 
-    const updatedQuestionsArr = newQuestionArr.filter(
-      (item: FormQuestion) => item.id !== (response as FormQuestion).id
-    );
-
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+    tab === questionSetTabs.quesitonSetOne
+      ? setPartOneQuestions(response)
+      : setPartTwoQuestions(response);
   };
 
   // function to update the state of this(parent) component
   const handlePersonalDetailsQuestionUpdate = async (
     question: QuestionResponse
   ) => {
-    setPersonalDetailsQuestions((prevQuestions) => {
-      const updatedQuestionsArr = [...prevQuestions];
-
-      const index = updatedQuestionsArr.findIndex((q) => q.id === question.id);
-
-      if (index !== -1) {
-        updatedQuestionsArr[index] = question;
-      } else {
-        console.error(`Question with id ${question.id} not found`);
-      }
-
-      return updatedQuestionsArr;
-    });
+    setPersonalDetailsQuestions(
+      updateArrayByIndex([...personalDetailsQuestions], question)
+    );
   };
 
+  // function to update the state of this(parent) component
   const handlePreInterventionQuestionUpdate = async (
     question: FormQuestion
   ) => {
-    if (tab === 1) {
-      setPartOneQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+    if (question.questionSection === QuestionnaireSection.QuestionPartOne) {
+      setPartOneQuestions(updateArrayByIndex([...partOneQuestions], question));
     } else {
-      setPartTwoQuestions((prevQuestions) => {
-        const updatedQuestionsArr = [...prevQuestions];
-
-        const index = updatedQuestionsArr.findIndex(
-          (q) => q.id === question.id
-        );
-
-        if (index !== -1) {
-          updatedQuestionsArr[index] = question;
-        } else {
-          console.error(`Question with id ${question.id} not found`);
-        }
-
-        return updatedQuestionsArr;
-      });
+      setPartTwoQuestions(updateArrayByIndex([...partTwoQuestions], question));
     }
   };
 
@@ -351,17 +232,21 @@ const EditPreInterventionForm = () => {
       setPersonalDetailsQuestions(response);
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 
   const handleUpdateAllPreInterventionQuestions = async () => {
-    const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const arrayToUpdate =
+      tab === questionSetTabs.quesitonSetOne
+        ? partOneQuestions
+        : partTwoQuestions;
 
     try {
       const response = await preInterventionQuesionsUpdateBulk(arrayToUpdate);
 
-      tab === 1
+      tab === questionSetTabs.quesitonSetOne
         ? setPartOneQuestions(
             response.filter(
               (item: FormQuestion) =>
@@ -377,7 +262,8 @@ const EditPreInterventionForm = () => {
 
       dispatch(resetForm());
     } catch (error) {
-      console.error("Error updating questions:", error);
+      setNotificationMsg("Error updating the questions. Please try again");
+      setDisplaySnackbarMsg(true);
     }
   };
 
@@ -387,7 +273,6 @@ const EditPreInterventionForm = () => {
 
   const handleNewQuestionDelete = () => {
     setDisplayNewQuestion(false);
-    // setNewQuestion(initialNewQuestionContent);
   };
 
   const handleNewPersonalDetailsQuestionSave = async ({
@@ -426,12 +311,16 @@ const EditPreInterventionForm = () => {
   const handleNewQuestionnaireQuestionSave = async ({
     questionText,
     summaryTypes,
+    sentiment,
   }: {
     questionText: string;
     summaryTypes: number[];
+    sentiment: number;
   }) => {
     const newPositionOrderId =
-      tab === 1 ? partOneQuestions.length + 1 : partTwoQuestions.length + 1;
+      tab === questionSetTabs.quesitonSetOne
+        ? partOneQuestions.length + 1
+        : partTwoQuestions.length + 1;
 
     const newQuestion: FormQuestion = {
       questionText: questionText,
@@ -442,86 +331,68 @@ const EditPreInterventionForm = () => {
       isNewlyAdded: true,
       questionSetId: 0,
       questionSection:
-        tab === 1
+        tab === questionSetTabs.quesitonSetOne
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
       summaryTypes,
+      sentiment: !!sentiment,
     };
 
     const response = await postPreInterventionQuestions(newQuestion);
 
-    const updatedQuestionsArr = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const updatedQuestionsArr =
+      tab === questionSetTabs.quesitonSetOne
+        ? [...partOneQuestions]
+        : [...partTwoQuestions];
+
     updatedQuestionsArr?.push(response);
-    tab === 1
-      ? setPartOneQuestions(updatedQuestionsArr)
-      : setPartTwoQuestions(updatedQuestionsArr);
+
+    if (response.questionSection === QuestionnaireSection.QuestionPartOne) {
+      setPartOneQuestions(updatedQuestionsArr);
+    } else {
+      setPartTwoQuestions(updatedQuestionsArr);
+    }
 
     setDisplayNewQuestion(false);
   };
 
   // Function to handle moving an item up in the array
-  const moveItemUp = (
-    orderId: number | undefined,
-    questionnaireType: boolean
-  ) => {
+  const moveItemUp = (orderId: number | undefined) => {
     if (!orderId) return;
-    if (orderId <= 1) return; // Already at the top, can't move up
-    if (!questionnaireType) {
-      const newQuestionArr = [...personalDetailsQuestions];
-      newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-      newQuestionArr[orderId - 2].positionOrderId = orderId;
+    if (orderId <= topMostIndex) return; // Already at the top, can't move up
 
-      setPersonalDetailsQuestions(newQuestionArr);
-    } else {
-      if (tab === 1) {
-        const newQuestionArr = [...partOneQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-        newQuestionArr[orderId - 2].positionOrderId = orderId;
-
-        setPartOneQuestions(newQuestionArr);
-      } else if (tab === 2) {
-        const newQuestionArr = [...partTwoQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId - 1;
-        newQuestionArr[orderId - 2].positionOrderId = orderId;
-
-        setPartTwoQuestions(newQuestionArr);
-      }
+    if (tab === questionSetTabs.personalDetails) {
+      setPersonalDetailsQuestions(
+        moveItemUpInArray([...personalDetailsQuestions], orderId)
+      );
+    } else if (tab === questionSetTabs.quesitonSetOne) {
+      setPartOneQuestions(moveItemUpInArray([...partOneQuestions], orderId));
+    } else if (tab === questionSetTabs.quesitonSetTwo) {
+      setPartTwoQuestions(moveItemUpInArray([...partTwoQuestions], orderId));
     }
+
     dispatch(setFormModified());
   };
 
   // Function to handle moving an item down in the array
-  const moveItemDown = (
-    orderId: number | undefined,
-    questionnaireType: boolean
-  ) => {
+  const moveItemDown = (orderId: number | undefined) => {
     if (!orderId) return;
-    if (!questionnaireType) {
+    if (tab === questionSetTabs.personalDetails) {
       if (orderId >= personalDetailsQuestions.length) return; // Already at the bottom, can't move down
-      const newQuestionArr = [...personalDetailsQuestions];
-      newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-      newQuestionArr[orderId].positionOrderId = orderId;
 
-      setPersonalDetailsQuestions(newQuestionArr);
-    } else {
-      if (tab === 1) {
-        if (orderId >= partOneQuestions.length) return; // Already at the bottom, can't move down
+      setPersonalDetailsQuestions(
+        moveItemDownInArray([...personalDetailsQuestions], orderId)
+      );
+    } else if (tab === questionSetTabs.quesitonSetOne) {
+      if (orderId >= partOneQuestions.length) return; // Already at the bottom, can't move down
 
-        const newQuestionArr = [...partOneQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-        newQuestionArr[orderId].positionOrderId = orderId;
+      setPartOneQuestions(moveItemDownInArray([...partOneQuestions], orderId));
+    } else if (tab === questionSetTabs.quesitonSetTwo) {
+      if (orderId >= partTwoQuestions.length) return; // Already at the bottom, can't move down
 
-        setPartOneQuestions(newQuestionArr);
-      } else if (tab === 2) {
-        if (orderId >= partTwoQuestions.length) return; // Already at the bottom, can't move down
-
-        const newQuestionArr = [...partTwoQuestions];
-        newQuestionArr[orderId - 1].positionOrderId = orderId + 1;
-        newQuestionArr[orderId].positionOrderId = orderId;
-
-        setPartTwoQuestions(newQuestionArr);
-      }
+      setPartTwoQuestions(moveItemDownInArray([...partTwoQuestions], orderId));
     }
+
     dispatch(setFormModified());
   };
 
@@ -574,7 +445,7 @@ const EditPreInterventionForm = () => {
 
       <Button
         onClick={
-          tab < 1
+          tab === questionSetTabs.personalDetails
             ? handleUpdateAllPersonalDetailsQuestions
             : handleUpdateAllPreInterventionQuestions
         }
@@ -588,7 +459,7 @@ const EditPreInterventionForm = () => {
 
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
-      case 0:
+      case questionSetTabs.personalDetails:
         return (
           <>
             <DynamicField
@@ -633,7 +504,7 @@ const EditPreInterventionForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 1:
+      case questionSetTabs.quesitonSetOne:
         return (
           <>
             {partOneQuestions
@@ -662,7 +533,7 @@ const EditPreInterventionForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 2:
+      case questionSetTabs.quesitonSetTwo:
         return (
           <>
             {partTwoQuestions
@@ -704,10 +575,21 @@ const EditPreInterventionForm = () => {
         orientation="vertical"
         sx={customStyles.tabs}
       >
-        {menuItems.map((item) => (
+        {QuestionSetMenuItems.slice(0, 3).map((item) => (
           <Tab value={item.id} label={item.title} key={item.id} />
         ))}
       </Tabs>
+    </Stack>
+  );
+
+  const loading = (
+    <Stack
+      flexDirection="row"
+      alignItems="center"
+      justifyContent="center"
+      height="50vh"
+    >
+      <CircularProgress sx={{ color: "#A879FF" }} />
     </Stack>
   );
 
@@ -722,6 +604,54 @@ const EditPreInterventionForm = () => {
       )}
     </Stack>
   );
+
+  useEffect(() => {
+    const fetchPersonalDetailsQuestions = async () => {
+      setIsLoading(true);
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setPersonalDetailsQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.PersonalDetails &&
+              item.formType === FormEvaluation.PreInterventions
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+      setIsLoading(false);
+    };
+
+    const fetchPreInterventionsQuestions = async () => {
+      setIsLoading(true);
+      try {
+        const preInterventionQuestions = await getPreInterventionQuestions();
+
+        setPartOneQuestions(
+          preInterventionQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
+          )
+        );
+        setPartTwoQuestions(
+          preInterventionQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchPersonalDetailsQuestions();
+    fetchPreInterventionsQuestions();
+
+    dispatch(resetForm());
+  }, []);
 
   return (
     <>

@@ -1,4 +1,35 @@
-import { SummaryTypes } from "./enum";
+import { SentimentQuestionType, SummaryTypes } from "./enum";
+
+export const QuestionSetMenuItems = [
+  {
+    id: 0,
+    title: "Personal Details",
+  },
+  {
+    id: 1,
+    title: "Question | Part 01",
+  },
+  {
+    id: 2,
+    title: "Question | Part 02",
+  },
+  {
+    id: 3,
+    title: "Program and the supervisors",
+  },
+  {
+    id: 4,
+    title: "Final",
+  },
+];
+
+export const questionSetTabs = {
+  personalDetails: 0,
+  quesitonSetOne: 1,
+  quesitonSetTwo: 2,
+  programAndSupervisor: 3,
+  final: 4,
+};
 
 export const schoolList = [
   { id: 0, schoolName: "All" }, // for the dropdown options
@@ -228,6 +259,17 @@ export const summaryTypes = [
   { id: SummaryTypes.growthMindset, label: "Growth Mindset" },
   { id: SummaryTypes.ownership, label: "Ownership" },
 ];
+
+export const sentimentTypes = [
+  {
+    id: SentimentQuestionType.Positive,
+    label: "Positive",
+  },
+  {
+    id: SentimentQuestionType.Negative,
+    label: "Negative",
+  },
+]
 
 export const chartColors = ["#EB7200", "#F5477C", "#A879FF", "#00A88D"];
 
