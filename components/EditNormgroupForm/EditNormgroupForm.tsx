@@ -49,7 +49,11 @@ import {
   postNormgroupQuestions,
 } from "../../services/editNormgroupQuestionSets.service";
 import { QuestionSetMenuItems, questionSetTabs } from "../../utils/constant";
-import { moveItemDownInArray, moveItemUpInArray, updateArrayByIndex } from "../../utils/helper";
+import {
+  moveItemDownInArray,
+  moveItemUpInArray,
+  updateArrayByIndex,
+} from "../../utils/helper";
 
 // constants
 
@@ -162,15 +166,15 @@ const EditNormgroupForm = () => {
 
   const formDetails = useSelector(selectForm);
 
-  const [tab, setTab] = useState(0);
+  const [tab, setTab] = useState(questionSetTabs.personalDetails);
 
-  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
+  const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState<boolean>(false);
   const [notificationMsg, setNotificationMsg] = useState("");
 
-  const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [displayNewQuestion, setDisplayNewQuestion] = useState(false);
+  const [displayNewQuestion, setDisplayNewQuestion] = useState<boolean>(false);
 
   const [personalDetailsQuestions, setPersonalDetailsQuestions] = useState<
     QuestionResponse[]
@@ -178,48 +182,6 @@ const EditNormgroupForm = () => {
 
   const [partOneQuestions, setPartOneQuestions] = useState<FormQuestion[]>([]);
   const [partTwoQuestions, setPartTwoQuestions] = useState<FormQuestion[]>([]);
-
-  useMemo(() => {
-    const fetchPersonalDetailsQuestions = async () => {
-      try {
-        const studentFormInfoQuestions = await getStudentFormInfo();
-
-        setPersonalDetailsQuestions(
-          studentFormInfoQuestions.filter(
-            (item: Question) =>
-              item.sectionType === SectionType.PersonalDetails &&
-              item.formType === FormEvaluation.Normgroup
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    const fetchNormgroupQuestions = async () => {
-      try {
-        const normgroupQuestions = await getNormgroupQuestions();
-
-        setPartOneQuestions(
-          normgroupQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartOne
-          )
-        );
-        setPartTwoQuestions(
-          normgroupQuestions.filter(
-            (item: FormQuestion) =>
-              item.questionSection === QuestionnaireSection.QuestionPartTwo
-          )
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchPersonalDetailsQuestions();
-    fetchNormgroupQuestions();
-  }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     dispatch(resetForm());
@@ -274,7 +236,10 @@ const EditNormgroupForm = () => {
   };
 
   const handleUpdateAllNormgroupQuestions = async () => {
-    const arrayToUpdate = tab === 1 ? partOneQuestions : partTwoQuestions;
+    const arrayToUpdate =
+      tab === questionSetTabs.quesitonSetOne
+        ? partOneQuestions
+        : partTwoQuestions;
 
     try {
       const response = await normgroupQuesionsUpdateBulk(arrayToUpdate);
@@ -362,7 +327,7 @@ const EditNormgroupForm = () => {
       isNewlyAdded: true,
       questionSetId: 0,
       questionSection:
-        tab === 1
+        tab === questionSetTabs.quesitonSetOne
           ? QuestionnaireSection.QuestionPartOne
           : QuestionnaireSection.QuestionPartTwo,
       summaryTypes,
@@ -486,7 +451,7 @@ const EditNormgroupForm = () => {
 
       <Button
         onClick={
-          tab < 1
+          tab === questionSetTabs.personalDetails
             ? handleUpdateAllPersonalDetailsQuestions
             : handleUpdateAllNormgroupQuestions
         }
@@ -500,7 +465,7 @@ const EditNormgroupForm = () => {
 
   const renderTabContent = (tabValue: number) => {
     switch (tabValue) {
-      case 0:
+      case questionSetTabs.personalDetails:
         return (
           <>
             <DynamicField
@@ -545,7 +510,7 @@ const EditNormgroupForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 1:
+      case questionSetTabs.quesitonSetOne:
         return (
           <>
             {partOneQuestions
@@ -574,7 +539,7 @@ const EditNormgroupForm = () => {
             {updateButtonGroup}
           </>
         );
-      case 2:
+      case questionSetTabs.quesitonSetTwo:
         return (
           <>
             {partTwoQuestions
@@ -636,6 +601,50 @@ const EditNormgroupForm = () => {
   );
 
   useEffect(() => {
+    const fetchPersonalDetailsQuestions = async () => {
+      setIsLoading(true);
+      try {
+        const studentFormInfoQuestions = await getStudentFormInfo();
+
+        setPersonalDetailsQuestions(
+          studentFormInfoQuestions.filter(
+            (item: Question) =>
+              item.sectionType === SectionType.PersonalDetails &&
+              item.formType === FormEvaluation.Normgroup
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+      setIsLoading(false);
+    };
+
+    const fetchNormgroupQuestions = async () => {
+      setIsLoading(true);
+      try {
+        const normgroupQuestions = await getNormgroupQuestions();
+
+        setPartOneQuestions(
+          normgroupQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartOne
+          )
+        );
+        setPartTwoQuestions(
+          normgroupQuestions.filter(
+            (item: FormQuestion) =>
+              item.questionSection === QuestionnaireSection.QuestionPartTwo
+          )
+        );
+      } catch (error) {
+        console.log(error);
+      }
+      setIsLoading(false);
+    };
+
+    fetchPersonalDetailsQuestions();
+    fetchNormgroupQuestions();
+
     dispatch(resetForm());
   }, []);
 
