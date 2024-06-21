@@ -176,6 +176,13 @@ const DashboardNormGroupContent = (props: Props) => {
     setFilterAge(ageList[0].id);
     setFilterStudy(studyFieldList[0].id);
     setFilterDate(dateFilterList[0]);
+
+    setFilterSchoolTwo(schoolList[0].id);
+    setFilterGradeTwo(gradeList[0].id);
+    setFilterCourseTwo(remindProgramListForFilters[0].id);
+    setFilterAgeTwo(ageList[0].id);
+    setFilterStudyTwo(studyFieldList[0].id);
+    setFilterDateTwo(dateFilterList[0]);
   };
 
   const getFilterParams = () => {
@@ -842,6 +849,7 @@ const DashboardNormGroupContent = (props: Props) => {
     filterStudyTwo,
     filterAgeTwo,
     filterDateTwo,
+    compareFiltersActivated,
   ]);
 
   return (
