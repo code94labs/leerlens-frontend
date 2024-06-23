@@ -59,6 +59,7 @@ import {
 } from "../../utils/types";
 import { getDateRange } from "../../utils/helper";
 import { APILoadingStates } from "../../utils/enum";
+import HorizontalBarChart from "../../shared/Dashboard/HorizontalBarChart/HorizontalBarChart";
 
 ChartJS.register(
   CategoryScale,
@@ -785,12 +786,12 @@ const DashboardNormGroupContent = (props: Props) => {
       </Typography>
 
       <Grid container spacing={2} px={2}>
-        {isLoading[APILoadingStates.abosoluteDifference] ? (
-          spinnerSection
-        ) : absoluteDifference.length < 1 ? (
-          noResponsesSection
-        ) : (
-          <Grid item xs={6}>
+        <Grid item xs={6}>
+          {isLoading[APILoadingStates.abosoluteDifference] ? (
+            spinnerSection
+          ) : absoluteDifference.length < 1 ? (
+            noResponsesSection
+          ) : (
             <VerticalBarChartType01
               removeBarGaps
               title="Absolute Difference"
@@ -802,28 +803,28 @@ const DashboardNormGroupContent = (props: Props) => {
                 },
               ]}
             />
-          </Grid>
-        )}
+          )}
+        </Grid>
 
-        {isLoading[APILoadingStates.relativeDifference] ? (
-          spinnerSection
-        ) : relativeDifference.length < 1 ? (
-          noResponsesSection
-        ) : (
-          <Grid item xs={6}>
-            <VerticalBarChartType01
-              removeBarGaps
+        <Grid item xs={6}>
+          {isLoading[APILoadingStates.relativeDifference] ? (
+            spinnerSection
+          ) : relativeDifference.length < 1 ? (
+            noResponsesSection
+          ) : (
+            <HorizontalBarChart
               title="Relative Difference"
-              labels={relativeDifference.map((data) => data.title)}
-              datasets={[
-                {
-                  data: relativeDifference.map((data) => data.value),
-                  backgroundColor: barChartGrouColorPallete,
-                },
-              ]}
+              // labels={relativeDifference.map((data) => data.title)}
+              datasets={relativeDifference.map((data, index) => {
+                return {
+                  label: data.title,
+                  data: [data.value],
+                  backgroundColor: [barChartGrouColorPallete[index]],
+                };
+              })}
             />
-          </Grid>
-        )}
+          )}
+        </Grid>
       </Grid>
     </Stack>
   );
