@@ -11,6 +11,8 @@ import {
   Legend,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -180,6 +182,64 @@ const DashboardPrePostContent = (props: Props) => {
     return filterParams;
   };
 
+  const generatePDF = () => {
+    const input = document.getElementById("contentToConvert");
+
+    // Specify the fixed width and height for the canvas
+    const canvasOptions = {
+      width: 1350, // Fixed width
+      height: 4500, // Fixed height
+      scale: 1,
+    };
+
+    if (input) {
+      html2canvas(input, canvasOptions)
+        .then((canvas) => {
+          const imgData = canvas.toDataURL("image/png");
+
+          // Create a new PDF with the dimensions based on the canvas
+          const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "px",
+            format: [canvasOptions.width, canvasOptions.height],
+          });
+
+          // Add the image to the PDF
+          pdf.addImage(
+            imgData,
+            "PNG",
+            0,
+            0,
+            canvasOptions.width,
+            canvasOptions.height
+          );
+
+          // Add a new page for the full-page image
+          pdf.addPage();
+
+          // // Load the image from the public folder
+          // const logo = new Image();
+          // logo.src = `code94labs.jpeg`;
+          // logo.onload = () => {
+          //   // Get the PDF dimensions
+          //   const pageWidth = pdf.internal.pageSize.getWidth();
+          //   const pageHeight = pdf.internal.pageSize.getHeight();
+
+          //   // Add the logo image to the new page, covering the full page
+          //   pdf.addImage(logo, "PNG", 0, 0, pageWidth, pageHeight);
+
+          //   // Save the PDF after the logo has been added
+          pdf.save("download.pdf");
+          // };
+        })
+        .catch((error) => {
+          console.error("Error generating PDF:", error);
+        });
+    } else {
+      console.error("Element with ID 'contentToConvert' not found.");
+    }
+  };
+
   const fetchSummaryStat = async () => {
     setIsLoading((prev) => {
       let loadingArray = [...prev];
@@ -298,6 +358,15 @@ const DashboardPrePostContent = (props: Props) => {
         color="secondary"
       >
         Filter
+      </Button>
+      <Button
+        variant="outlined"
+        onClick={generatePDF}
+        // startIcon={<FilterAltIcon />}
+        sx={{ width: "max-content" }}
+        color="secondary"
+      >
+        Generate PDF
       </Button>
       {!areFiltersActivated() && (
         <Button
@@ -617,7 +686,7 @@ const DashboardPrePostContent = (props: Props) => {
 
   return (
     <>
-      <Stack sx={customStyles.stack}>
+      <Stack sx={customStyles.stack} id="contentToConvert">
         {titleSection}
 
         {filterButtonDiv}
