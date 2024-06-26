@@ -3,13 +3,14 @@ import React from "react";
 
 import { Bar } from "react-chartjs-2";
 import { champBlackFontFamily } from "../../typography";
+import { generateEmptyLabels } from "../../../utils/helper";
 
 const customStyles = {
   title: {
-    fontWeight: 400,
-    fontFamily: champBlackFontFamily,
-    fontSize: 24,
-    mb: 3
+    fontWeight: 700,
+    fontSize: 16,
+    color: "#1A1A1A",
+    m: 4,
   },
   label: {
     fontSize: 50,
@@ -18,15 +19,34 @@ const customStyles = {
     my: 6,
   },
   stack: {
-    alignItems: 'center',
     border: "2px #E6E6E6 solid",
     borderRadius: 2,
-    p: 3,
-    width: 800
+    height: "100%",
+    justifyContent: "space-between",
+  },
+  innerStack: {
+    height: "100%",
+    justifyContent: "center",
   },
 };
 
-const HorizontalBarChart = () => {
+type Dataset = {
+  label: string;
+  data: number[];
+  backgroundColor: string[];
+};
+
+interface HorizontalBarChartProps {
+  title?: string;
+  labels?: string[];
+  datasets: Dataset[];
+}
+
+const HorizontalBarChart = ({
+  title,
+  labels,
+  datasets,
+}: HorizontalBarChartProps) => {
   const options = {
     indexAxis: "y" as "y" | "x" | undefined,
     responsive: true,
@@ -36,6 +56,7 @@ const HorizontalBarChart = () => {
         labels: {
           usePointStyle: true,
         },
+        
       },
       datalabels: {
         anchor: (context: any) => {
@@ -99,47 +120,22 @@ const HorizontalBarChart = () => {
         borderRadius: 10,
       },
     },
-    barPercentage: 1.0,
+    barPercentage: 0.8,
     categoryPercentage: 1.0,
   };
 
-  const labels = ["January", "February", "March"];
-
   const data = {
-    labels,
-    datasets: [
-      {
-        label: "Dataset 1",
-        data: [100, 50],
-        borderColor: "#EB7200",
-        backgroundColor: "#EB7200",
-      },
-      {
-        label: "Dataset 2",
-        data: [-150, -30],
-        borderColor: "#A879FF",
-        backgroundColor: "#A879FF",
-      },
-      {
-        label: "Dataset 3",
-        data: [150, 45],
-        borderColor: "#00A88D",
-        backgroundColor: "#00A88D",
-      },
-      {
-        label: "Dataset 4",
-        data: [-170, -80],
-        borderColor: "#F5477C",
-        backgroundColor: "#F5477C",
-      },
-    ],
+    labels: labels ?? generateEmptyLabels(datasets[0].data.length),
+    datasets,
   };
 
   return (
     <Stack sx={customStyles.stack}>
-      <Typography sx={customStyles.title}>ABSOLUTE DIFFERENCE</Typography>
+      <Typography sx={customStyles.title}>{title}</Typography>
 
-      <Bar options={options} data={data} />
+      <Stack sx={customStyles.innerStack}>
+        <Bar options={options} data={data} />
+      </Stack>
     </Stack>
   );
 };
