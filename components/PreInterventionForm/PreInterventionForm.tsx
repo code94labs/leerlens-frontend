@@ -23,7 +23,7 @@ import React, { Fragment, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as yup from "yup";
-
+import { useTranslation } from 'next-i18next';
 import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
@@ -211,15 +211,14 @@ const Input = React.forwardRef(function CustomInput(
     />
   );
 });
-
-const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
-
+//const steps = ["1","2","3"];
 const questionSectionOne = 0;
 const questionSectionTwo = 1;
 
 const PreInterventionForm = () => {
+  const { t } = useTranslation('common');
+  const steps = [t('pre-intervention-form.Pre-Intervention Measurement.Personal Details'), t('pre-intervention-form.Pre-Intervention Measurement.Part 01 Questions'), t('pre-intervention-form.Pre-Intervention Measurement.Part 02 Questions')];
   const router = useRouter();
-
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
 
@@ -560,8 +559,7 @@ const PreInterventionForm = () => {
           mb: 1,
         }}
       >
-        Below are a number of statements. You can answer these statements on a
-        scale from 1 to 6
+        {t('pre-intervention-form.Part 01.Description')}
       </Typography>
 
       <Typography
@@ -576,9 +574,7 @@ const PreInterventionForm = () => {
           mb: 4,
         }}
       >
-        1 to {questionListPartOne.length} statements (1 = totally disagree, 2 =
-        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
-        totally agree).
+        {t('pre-intervention-form.Part 01.Pre-Description')} {questionListPartOne.length} {t('pre-intervention-form.Part 01.Post-Description')}
       </Typography>
 
       <FormControl
@@ -619,8 +615,7 @@ const PreInterventionForm = () => {
           mb: 1,
         }}
       >
-        Below are a number of statements. You can answer these statements on a
-        scale from 1 to 6
+        {t('pre-intervention-form.Part 02.Description')}
       </Typography>
 
       <Typography
@@ -635,9 +630,7 @@ const PreInterventionForm = () => {
           mb: 4,
         }}
       >
-        1 to {questionListPartTwo.length} statements (1 = totally disagree, 2 =
-        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
-        totally agree).
+         {t('pre-intervention-form.Part 02.Pre-Description')} {questionListPartTwo.length} {t('pre-intervention-form.Part 02.Post-Description')}
       </Typography>
 
       <FormControl
@@ -785,16 +778,16 @@ const PreInterventionForm = () => {
 
     fetchDataStudentInfo();
   }, []);
-
+  
   return (
     <Stack sx={customStyles.stack}>
       <Box sx={customStyles.titleBox}>
         <Typography variant="h5" sx={customStyles.title}>
-          Pre-Intervention Measurement
+        {t('pre-intervention-form.Pre-Intervention Measurement')}
         </Typography>
 
         <Typography variant="subtitle1" sx={customStyles.body}>
-          Here are some general questions about you?
+        {t('pre-intervention-form.Pre-Intervention Measurement.subtitle')}
         </Typography>
       </Box>
 
@@ -879,7 +872,7 @@ const PreInterventionForm = () => {
                     onClick={handleBack}
                     sx={customStyles.secondaryButton}
                   >
-                    Cancel
+                    {t('pre-intervention-form.Pre-Intervention Measurement.Cancel')}
                   </Button>
                 ) : (
                   <Button
@@ -888,7 +881,7 @@ const PreInterventionForm = () => {
                     onClick={handleBack}
                     sx={customStyles.secondaryButton}
                   >
-                    Back
+                    {t('pre-intervention-form.Pre-Intervention Measurement.Back')}
                   </Button>
                 )}
 
@@ -903,7 +896,7 @@ const PreInterventionForm = () => {
                       activeStep === 2 && !allAnsweredPartTwo && !isLoading
                     }
                   >
-                    {isLoading ? "Submitting..." : "Complete"}
+                    {isLoading ? t('pre-intervention-form.Pre-Intervention Measurement.Submit'): t('pre-intervention-form.Pre-Intervention Measurement.Complete')}
                   </Button>
                 ) : (
                   <Button
@@ -916,7 +909,7 @@ const PreInterventionForm = () => {
                         : !allAnsweredPartOne
                     }
                   >
-                    Next
+                    {t('pre-intervention-form.Pre-Intervention Measurement.Next')}
                   </Button>
                 )}
               </Box>

@@ -1,11 +1,22 @@
 import React from "react";
 import { Box, Stack, Typography } from "@mui/material";
 import Image from "next/image";
-
+import { useTranslation } from 'next-i18next';
 import { champBlackFontFamily } from "../../shared/typography";
 import SocialMediaComponent from "../../components/SuccessMessage/SocialMediaComponent";
 
 import { useWindowSize } from "../../utils/hooks/useWindowSize";
+import { GetStaticProps } from 'next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common', 'footer'])),
+    },
+  };
+};
+
 
 const customStyles = {
   background: {
@@ -83,6 +94,7 @@ const customStyles = {
 };
 
 const SuccessMessage = () => {
+  const { t } = useTranslation('common');
   const size = useWindowSize();
 
   return (
@@ -117,30 +129,30 @@ const SuccessMessage = () => {
             sx={customStyles.thankYouMessage}
             fontFamily={champBlackFontFamily}
           >
-            Thank you for submitting your answers to the questions.
+            {t('Success Message.Topic')}
           </Typography>
 
           <Typography sx={customStyles.bodyText}>
-            We appreciate your valuable time.
+          {t('Success Message.Description 1')}
           </Typography>
           <Typography sx={customStyles.bodyText}>
-            Good luck with your learning, and greetings from all
+          {t('Success Message.Description 2')}
           </Typography>
-          <Typography sx={customStyles.bodyText}>Remind trainers!</Typography>
+          <Typography sx={customStyles.bodyText}>{t('Success Message.Description 3')}</Typography>
 
           <Box sx={customStyles.box}>
             <SocialMediaComponent
-              label={"Follow us on Facebook"}
+              label={t('Success Message.Facebook')}
               image={"/images/facebook.png"}
             />
 
             <SocialMediaComponent
-              label={"Follow us on Instagram"}
+              label={t('Success Message.Instagram')}
               image={"/images/instagram.png"}
             />
 
             <SocialMediaComponent
-              label={"Follow us on Tik Tok"}
+              label={t('Success Message.Tiktok')}
               image={"/images/tikTok.png"}
             />
           </Box>

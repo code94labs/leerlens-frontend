@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { useTranslation } from 'next-i18next';
 
 const customStyles = {
   stack: {
@@ -69,6 +70,7 @@ const generateScaleArr = (min: number, max: number) => {
 };
 
 const CustomScale = (props: CustomScaleProps) => {
+  const { t } = useTranslation('common');
   const {
     questionText,
     minValue,
@@ -127,7 +129,7 @@ const CustomScale = (props: CustomScaleProps) => {
             md: "flex",
           }}
         >
-          Totally disagree
+          {t('Custome Scale.Disagree')}
         </Typography>
 
         {scale.map((scaleValue, index) => (
@@ -153,7 +155,7 @@ const CustomScale = (props: CustomScaleProps) => {
             md: "flex",
           }}
         >
-          Totally agree
+          {t('Custome Scale.Agree')}
         </Typography>
       </Stack>
     </Stack>

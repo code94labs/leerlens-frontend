@@ -16,6 +16,44 @@
         "title": "Teachers",
         "description": "Great that you are participating in the learning scan! Completing the learning scan takes approximately five minutes. Answer the questions as honestly as possible: there is no right or wrong. With all the answers we collect we can investigate what you think about learning. Goodluck!"
       }
+    },
+
+    "pre-intervention-form": {
+        "Pre-Intervention Measurement": "Pre-Intervention Measurement",
+        "Pre-Intervention Measurement.subtitle": "Here are some general questions about you?",
+        "Pre-Intervention Measurement.Personal Details": "Personal Details",
+        "Pre-Intervention Measurement.Part 01 Questions": "Part 01 Questions",
+        "Pre-Intervention Measurement.Part 02 Questions": "Part 02 Questions",
+        "Pre-Intervention Measurement.Next": "Next",
+        "Pre-Intervention Measurement.Cancel": "Cancel",
+        "Pre-Intervention Measurement.Complete": "Complete",
+        "Pre-Intervention Measurement.Back": "Back",
+        "Pre-Intervention Measurement.Submit": "Submitting...",
+        "Part 01.Description": "Below are a number of statements. You can answer these statements on a scale from 1 to 6",
+        "Part 01.Pre-Description": "1 to ",
+        "Part 01.Post-Description": "statements (1 = totally disagree, 2 = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 = totally agree).",
+        "Part 02.Description": "Below are a number of statements. You can answer these statements on a scale from 1 to 6",
+        "Part 02.Pre-Description": "1 to ",
+        "Part 02.Post-Description": "statements (1 = totally disagree, 2 = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 = totally agree)."
+
+
+    },
+
+    "Custome Scale": {
+      "Disagree": "Totally disagree",
+      "Agree": "Totally agree"
+    },
+
+    "Success Message": {
+      "Topic": "Thank you for submitting your answers to the questions.",
+      "Description 1": "We appreciate your valuable time.",
+      "Description 2": "Good luck with your learning, and greetings from all",
+      "Description 3": "Remind trainers!",
+      "Facebook": "Follow us on Facebook",
+      "Instagram": "Follow us on Instagram",
+      "Tiktok": "Follow us on Tik Tok"
+
+
     }
 }
   
