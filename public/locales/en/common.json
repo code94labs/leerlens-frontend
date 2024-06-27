@@ -1,0 +1,16 @@
+{
+    "home": {
+      "pre-intervention": {
+        "title": "Pre-intervention",
+        "description": "This is the pre-intervention phase."
+      },
+      "post-intervention": {
+        "title": "Post-intervention",
+        "description": "This is the post-intervention phase."
+      },
+      "welcome": "Welcome to the home page"
+    },
+    "about": {
+      "description": "This is an English description."
+    }
+  }

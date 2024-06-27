@@ -1,0 +1,16 @@
+{
+    "home": {
+      "pre-intervention": {
+        "title": "Pre-interventie",
+        "description": "Dit is de pre-interventie fase."
+      },
+      "post-intervention": {
+        "title": "Post-interventie",
+        "description": "Dit is de post-interventie fase."
+      },
+      "welcome": "Welkom op de startpagina"
+    },
+    "about": {
+      "description": "Dit is een Nederlandse beschrijving."
+    }
+  }

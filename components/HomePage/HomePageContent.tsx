@@ -1,6 +1,8 @@
 import { Stack } from "@mui/material";
 import React from "react";
 import FormCard from "./FormCard";
+import { GetStaticProps } from 'next';
+import { useTranslation } from 'next-i18next';
 
 const customStyles = {
   stack: {
@@ -22,17 +24,18 @@ const customStyles = {
 };
 
 const HomePageContent = () => {
+  const { t } = useTranslation('common');
   return (
     <Stack sx={customStyles.stack}>
       <Stack flexDirection="row" sx={customStyles.innerStack}>
         <FormCard
-          title="Pre-Intervention"
+          title={t('home.pre-intervention.title')}
           description="Great that you are participating in the learning scan! Completing the learning scan takes approximately five minutes. Answer the questions as honestly as possible: there is no right or wrong. With all the answers we collect we can investigate what you think about learning. Goodluck!"
           pagePath="/forms/pre-intervention"
         />
 
         <FormCard
-          title="Post-Intervention"
+          title={t('home.post-intervention.title')}
           description="Great that you are participating in the learning scan! Completing the learning scan takes approximately five minutes. Answer the questions as honestly as possible: there is no right or wrong. With all the answers we collect we can investigate what you think about learning. Goodluck!"
           pagePath="/forms/post-intervention"
         />

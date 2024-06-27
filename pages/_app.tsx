@@ -2,7 +2,7 @@ import { AppProps } from "next/app";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { ThemeProvider } from "@mui/material/styles";
-
+import { appWithTranslation } from 'next-i18next'
 import store, { persistor } from "../redux/store";
 import theme from "../public/theme/theme";
 
@@ -20,4 +20,4 @@ function MyApp({ Component, pageProps }: AppProps) {
   );
 }
 
-export default MyApp;
+export default appWithTranslation(MyApp)
