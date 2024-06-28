@@ -725,9 +725,9 @@ const DashboardNormGroupContent = (props: Props) => {
       <Grid container px={2} spacing={2}>
         {isLoading[APILoadingStates.statisticalCharts]
           ? spinnerSection
-          : statisticsData.length < 1
+          : statisticsData && statisticsData.length < 1
           ? noResponsesSection
-          : statisticsData.map((data, index) => (
+          : (statisticsData || []).map((data, index) => (
               <Grid item xs={4} key={index}>
                 <VerticalBarChartType01
                   title={`${index + 1}. ${data.questionText}`}
@@ -754,9 +754,9 @@ const DashboardNormGroupContent = (props: Props) => {
       <Grid container px={2} spacing={2}>
         {isLoading[APILoadingStates.summaryCharts]
           ? spinnerSection
-          : summaryData.length < 1
+          : summaryData && summaryData.length < 1
           ? noResponsesSection
-          : summaryData.map((data, index) => (
+          : (summaryData || []).map((data, index) => (
               <Grid item xs={3} key={index}>
                 <VerticalBarChartType01
                   title={`${index + 1}. ${data.questionText}`}
@@ -789,19 +789,20 @@ const DashboardNormGroupContent = (props: Props) => {
         <Grid item xs={6}>
           {isLoading[APILoadingStates.abosoluteDifference] ? (
             spinnerSection
-          ) : absoluteDifference.length < 1 ? (
+          ) : absoluteDifference && absoluteDifference.length < 1 ? (
             noResponsesSection
           ) : (
             <VerticalBarChartType01
               removeBarGaps
               title="Absolute Difference"
-              labels={absoluteDifference.map((data) => data.title)}
+              labels={(absoluteDifference || []).map((data) => data.title)}
               datasets={[
                 {
-                  data: absoluteDifference.map((data) => data.value),
+                  data: (absoluteDifference || []).map((data) => data.value),
                   backgroundColor: barChartGrouColorPallete,
                 },
               ]}
+              scaledToSix={false}
             />
           )}
         </Grid>
@@ -809,13 +810,12 @@ const DashboardNormGroupContent = (props: Props) => {
         <Grid item xs={6}>
           {isLoading[APILoadingStates.relativeDifference] ? (
             spinnerSection
-          ) : relativeDifference.length < 1 ? (
+          ) : relativeDifference && relativeDifference.length < 1 ? (
             noResponsesSection
           ) : (
             <HorizontalBarChart
               title="Relative Difference"
-              // labels={relativeDifference.map((data) => data.title)}
-              datasets={relativeDifference.map((data, index) => {
+              datasets={(relativeDifference || []).map((data, index) => {
                 return {
                   label: data.title,
                   data: [data.value],
