@@ -38,7 +38,27 @@
 
 
     },
+    "post-intervention-form": {
+        "Post-Intervention Measurement": "Post-Intervention Measurement",
+        "Post-Intervention Measurement.subtitle": "Here are some general questions about you?",
+        "Post-Intervention Measurement.Personal Details": "Personal Details",
+        "Post-Intervention Measurement.Part 01 Questions": "Part 01 Questions",
+        "Post-Intervention Measurement.Part 02 Questions": "Part 02 Questions",
+        "Post-Intervention Measurement.Next": "Next",
+        "Post-Intervention Measurement.Cancel": "Cancel",
+        "Post-Intervention Measurement.Complete": "Complete",
+        "Post-Intervention Measurement.Back": "Back",
+        "Post-Intervention Measurement.Submit": "Submitting...",
+        "Part 01.Description": "Below are a number of statements. You can answer these statements on a scale from 1 to 6",
+        "Part 01.Pre-Description": "1 to ",
+        "Part 01.Post-Description": "statements (1 = totally disagree, 2 = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 = totally agree).",
+        "Part 02.Description": "Below are a number of statements. You can answer these statements on a scale from 1 to 6",
+        "Part 02.Pre-Description": "1 to ",
+        "Part 02.Post-Description": "statements (1 = totally disagree, 2 = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 = totally agree)."
 
+
+    },
+  
     "Custome Scale": {
       "Disagree": "Totally disagree",
       "Agree": "Totally agree"

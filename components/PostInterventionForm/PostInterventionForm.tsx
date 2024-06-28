@@ -22,7 +22,7 @@ import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { Formik, useFormik } from "formik";
 import * as yup from "yup";
-
+import { useTranslation } from 'next-i18next';
 import { champBlackFontFamily } from "../../shared/typography";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import {
@@ -48,7 +48,7 @@ import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
 
 // constants
 
-const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
+// const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
 const questionSectionOne = 0;
 const questionSectionTwo = 1;
@@ -173,8 +173,9 @@ const customStyles = {
 };
 
 const PostInterventionForm = () => {
+  const { t } = useTranslation('common');
   const router = useRouter();
-
+  const steps = [t('post-intervention-form.Post-Intervention Measurement.Personal Details'), t('post-intervention-form.Post-Intervention Measurement.Part 01 Questions'), t('post-intervention-form.Post-Intervention Measurement.Part 02 Questions')];
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
 
@@ -555,14 +556,11 @@ const PostInterventionForm = () => {
   const questionPartOneForm = (
     <>
       <Typography variant="subtitle2" fontWeight={500}>
-        Below are a number of statements. You can answer these statements on a
-        scale from 1 to 6
+      {t('post-intervention-form.Part 01.Description')}
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartOne.length} statements (1 = totally disagree, 2 =
-        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
-        totally agree).
+      {t('pre-intervention-form.Part 01.Pre-Description')} {questionListPartOne.length} {t('pre-intervention-form.Part 01.Post-Description')}
       </Typography>
 
       <FormControl>
@@ -585,14 +583,11 @@ const PostInterventionForm = () => {
   const questionPartTwoForm = (
     <>
       <Typography variant="subtitle2" fontWeight={500}>
-        Below are a number of statements. You can answer these statements on a
-        scale from 1 to 6
+      {t('post-intervention-form.Part 02.Description')}
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartTwo.length} statements (1 = totally disagree, 2 =
-        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
-        totally agree).
+        {t('pre-intervention-form.Part 02.Pre-Description')} {questionListPartTwo.length} {t('pre-intervention-form.Part 02.Post-Description')}
       </Typography>
 
       <FormControl>
@@ -653,11 +648,11 @@ const PostInterventionForm = () => {
     <Stack sx={customStyles.stack}>
       <Box sx={customStyles.titleBox}>
         <Typography variant="h5" sx={customStyles.title}>
-          Post-Intervention Measurement
+        {t('post-intervention-form.Post-Intervention Measurement')}
         </Typography>
 
         <Typography variant="subtitle1" sx={customStyles.body}>
-          Here are some general questions about you?
+        {t('post-intervention-form.Post-Intervention Measurement.subtitle')}
         </Typography>
       </Box>
 
@@ -728,7 +723,7 @@ const PostInterventionForm = () => {
                   onClick={handleBack}
                   sx={customStyles.secondaryButton}
                 >
-                  Cancel
+                  {t('post-intervention-form.Post-Intervention Measurement.Cancel')}
                 </Button>
               ) : (
                 <Button
@@ -737,7 +732,7 @@ const PostInterventionForm = () => {
                   onClick={handleBack}
                   sx={customStyles.secondaryButton}
                 >
-                  Back
+                  {t('post-intervention-form.Post-Intervention Measurement.Back')}
                 </Button>
               )}
 
@@ -752,7 +747,7 @@ const PostInterventionForm = () => {
                     activeStep === 2 && !allAnsweredPartTwo && !isLoading
                   }
                 >
-                  {isLoading ? "Submitting..." : "Complete"}
+                  {isLoading ? t('post-intervention-form.Post-Intervention Measurement.Submit') : t('post-intervention-form.Post-Intervention Measurement.Complete')}
                 </Button>
               ) : (
                 <Button
@@ -765,7 +760,7 @@ const PostInterventionForm = () => {
                       : !allAnsweredPartOne
                   }
                 >
-                  Next
+                  {t('post-intervention-form.Post-Intervention Measurement.Next')}
                 </Button>
               )}
             </Box>
