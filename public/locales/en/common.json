@@ -105,6 +105,16 @@
       "Download QR": "Download QR",
       "Start": "Start",
       "View QR": "View QR Code"
+    },
+
+    "login": {
+      "login": "Log In",
+      "Description": "Welcome let’s get started.",
+      "Enter-email": "Enter email address",
+      "Enter-password": "Enter password",
+      "Remember-me": "Remember me",
+      "loginin":"Logging in...",
+      "Signin": "Sign In"
     }
 }
   

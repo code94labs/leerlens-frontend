@@ -19,6 +19,9 @@ import { useRouter } from "next/router";
 import { postLogin } from "../../../services/authentication.service";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, setUser } from "../../../redux/slices/userSlice";
+import { useTranslation } from "react-i18next";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { GetStaticProps } from 'next';
 
 const customStyles = {
   snackbarAlert: {
@@ -86,9 +89,17 @@ const customStyles = {
   },
 };
 
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common', 'footer'])),
+    },
+  };
+};
+
 const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
-
+  const {t} = useTranslation('common');
   const [showPassword, setShowPassword] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -169,14 +180,14 @@ const LoginPage = () => {
             fontFamily={champBlackFontFamily}
             textTransform="uppercase"
           >
-            Log In
+            {t('login.login')}
           </Typography>
-          <Typography mb={3}>Welcome let’s get started.</Typography>
+          <Typography mb={3}>{t('login.Description')}</Typography>
 
           <Stack flexDirection="column" alignItems="">
             <TextField
               variant="outlined"
-              label="Enter email address"
+              label={t('login.Enter-email')}
               required
               type="email"
               placeholder="abc@gmail.com"
@@ -190,7 +201,7 @@ const LoginPage = () => {
 
             <TextField
               variant="outlined"
-              label="Enter password"
+              label={t('login.Enter-password')}
               required
               type={showPassword ? "text" : "password"}
               disabled={isLoading}
@@ -223,7 +234,7 @@ const LoginPage = () => {
                 disabled={isLoading}
               />
               <Typography variant="body2" color="grey">
-                Remember Me
+                {t('login.Remember-me')}
               </Typography>
             </Stack>
 
@@ -244,7 +255,7 @@ const LoginPage = () => {
                 disableElevation
                 disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Sign In"}
+                {isLoading ? t('login.Loginin') : t('login.Signin')}
               </Button>
             </Stack>
           </Stack>
