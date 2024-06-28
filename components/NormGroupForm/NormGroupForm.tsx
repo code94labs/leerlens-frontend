@@ -20,6 +20,7 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import React, { Fragment, useMemo, useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { useTranslation } from 'next-i18next';
 import { useRouter } from "next/router";
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import {
@@ -160,14 +161,15 @@ const customStyles = {
   },
 };
 
-const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
+// const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
 const questionSectionOne = 0;
 const questionSectionTwo = 1;
 
 const NormGroupForm = () => {
   const router = useRouter();
-
+  const {t} = useTranslation('common');
+  const steps = [t('normgroup-form.Personal Details'), t('normgroup-form.Part 01 Questions'), t('normgroup-form.Part 02 Questions')];
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState("");
 
@@ -462,14 +464,11 @@ const NormGroupForm = () => {
   const questionPartOneForm = (
     <>
       <Typography variant="subtitle2" fontWeight={500}>
-        Below are a number of statements. You can answer these statements on a
-        scale from 1 to 6
+        {t('normgroup-form.Part 01.Description')}
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartOne.length} statements (1 = totally disagree, 2 =
-        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
-        totally agree).
+        {t('normgroup-form.Part 01.Pre-Description')} {questionListPartOne.length} {t('normgroup-form.Part 01.Post-Description')}
       </Typography>
 
       <FormControl>
@@ -490,14 +489,11 @@ const NormGroupForm = () => {
   const questionPartTwoForm = (
     <>
       <Typography variant="subtitle2" fontWeight={500}>
-        Below are a number of statements. You can answer these statements on a
-        scale from 1 to 6
+      {t('normgroup-form.Part 02.Description')}
       </Typography>
 
       <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartTwo.length} statements (1 = totally disagree, 2 =
-        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
-        totally agree).
+        {t('normgroup-form.Part 02.Pre-Description')} {questionListPartTwo.length} {t('normgroup-form.Part 02.Post-Description')}
       </Typography>
 
       <FormControl>
@@ -639,11 +635,11 @@ const NormGroupForm = () => {
     <Stack sx={customStyles.stack}>
       <Box sx={customStyles.titleBox}>
         <Typography variant="h5" sx={customStyles.title}>
-          normgroup
+        {t('normgroup-form.Title')}
         </Typography>
 
         <Typography variant="subtitle1" sx={customStyles.body}>
-          Here are some general questions about you?
+        {t('normgroup-form.Subtitle')}
         </Typography>
       </Box>
 
@@ -713,7 +709,7 @@ const NormGroupForm = () => {
                   onClick={handleBack}
                   sx={customStyles.secondaryButton}
                 >
-                  Cancel
+                  {t('normgroup-form.Cancel')}
                 </Button>
               ) : (
                 <Button
@@ -722,7 +718,7 @@ const NormGroupForm = () => {
                   onClick={handleBack}
                   sx={customStyles.secondaryButton}
                 >
-                  Back
+                  {t('normgroup-form.Back')}
                 </Button>
               )}
 
@@ -737,7 +733,7 @@ const NormGroupForm = () => {
                     activeStep === 2 && !allAnsweredPartTwo && !isLoading
                   }
                 >
-                  {isLoading ? "Submitting..." : "Complete"}
+                  {isLoading ? t('normgroup-form.Submit') : t('normgroup-form.Complete')}
                 </Button>
               ) : (
                 <Button
@@ -750,7 +746,7 @@ const NormGroupForm = () => {
                       : !allAnsweredPartOne
                   }
                 >
-                  Next
+                  {t('normgroup-form.Next')}
                 </Button>
               )}
             </Box>

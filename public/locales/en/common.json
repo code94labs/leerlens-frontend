@@ -15,6 +15,10 @@
       "Teachers": {
         "title": "Teachers",
         "description": "Great that you are participating in the learning scan! Completing the learning scan takes approximately five minutes. Answer the questions as honestly as possible: there is no right or wrong. With all the answers we collect we can investigate what you think about learning. Goodluck!"
+      },
+      "Norm group": {
+        "title": "NORMGROUP",
+        "description": "How cool that you did one or more training sessions with us. We have done our best to make it as fun and educational as possible for you and are very curious about what you thought of it. That's why we have a few questions for you. Answer them honestly, whether you are positive or negative about the training, we can learn from it! :)"
       }
     },
 
@@ -49,6 +53,27 @@
         "Post-Intervention Measurement.Complete": "Complete",
         "Post-Intervention Measurement.Back": "Back",
         "Post-Intervention Measurement.Submit": "Submitting...",
+        "Part 01.Description": "Below are a number of statements. You can answer these statements on a scale from 1 to 6",
+        "Part 01.Pre-Description": "1 to ",
+        "Part 01.Post-Description": "statements (1 = totally disagree, 2 = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 = totally agree).",
+        "Part 02.Description": "Below are a number of statements. You can answer these statements on a scale from 1 to 6",
+        "Part 02.Pre-Description": "1 to ",
+        "Part 02.Post-Description": "statements (1 = totally disagree, 2 = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 = totally agree)."
+
+
+    },
+
+    "normgroup-form": {
+        "Title": "Normgroup",
+        "Subtitle": "Here are some general questions about you?",
+        "Personal Details": "Personal Details",
+        "Part 01 Questions": "Part 01 Questions",
+        "Part 02 Questions": "Part 02 Questions",
+        "Next": "Next",
+        "Cancel": "Cancel",
+        "Complete": "Complete",
+        "Back": "Back",
+        "Submit": "Submitting...",
         "Part 01.Description": "Below are a number of statements. You can answer these statements on a scale from 1 to 6",
         "Part 01.Pre-Description": "1 to ",
         "Part 01.Post-Description": "statements (1 = totally disagree, 2 = disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 = totally agree).",

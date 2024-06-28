@@ -3,6 +3,17 @@ import React from "react";
 import Header from "../shared/Header/Header";
 import HomePageContent from "../components/HomePage/HomePageContent";
 import FormCard from "../components/HomePage/FormCard";
+import { useTranslation } from 'next-i18next';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { GetStaticProps } from 'next';
+
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common', 'common'])),
+    },
+  };
+};
 
 const customStyles = {
   stack: {
@@ -18,14 +29,15 @@ const customStyles = {
 };
 
 const LandingPage = () => {
+  const { t } = useTranslation('common');
   return (
     <Stack>
       <Header />
 
       <Stack sx={customStyles.stack} flexDirection="row" justifyContent="center">
          <FormCard
-          title="Normgroup"
-          description="How cool that you did one or more training sessions with us. We have done our best to make it as fun and educational as possible for you and are very curious about what you thought of it. That's why we have a few questions for you. Answer them honestly, whether you are positive or negative about the training, we can learn from it! :)"
+          title={t('home.Norm group.title')}
+          description={t('home.Norm group.description')}
           pagePath="/forms/normgroup"
         />
       </Stack>
