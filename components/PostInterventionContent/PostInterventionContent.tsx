@@ -16,7 +16,7 @@ import {
   FieldType,
   FormEvaluation,
   QuestionnaireSection,
-  QuestionnaireSet,
+  QuestionSetType,
 } from "../../utils/enum";
 import {
   getAllPostInterventionQuestions,
@@ -101,7 +101,7 @@ type Questionnaire = {
   minvalue: number;
   maxValue: number;
   isDelete: boolean;
-  questionSetId: QuestionnaireSet;
+  questionSetId: QuestionSetType;
   questionSection: QuestionnaireSection;
 };
 

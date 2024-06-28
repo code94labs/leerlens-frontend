@@ -1,4 +1,4 @@
-import { SentimentQuestionType, SummaryTypes } from "./enum";
+import { QuestionSetType, SentimentQuestionType, SummaryTypes } from "./enum";
 
 export const QuestionSetMenuItems = [
   {
@@ -13,22 +13,12 @@ export const QuestionSetMenuItems = [
     id: 2,
     title: "Question | Part 02",
   },
-  {
-    id: 3,
-    title: "Program and the supervisors",
-  },
-  {
-    id: 4,
-    title: "Final",
-  },
 ];
 
 export const questionSetTabs = {
   personalDetails: 0,
   quesitonSetOne: 1,
   quesitonSetTwo: 2,
-  programAndSupervisor: 3,
-  final: 4,
 };
 
 export const schoolList = [
@@ -207,7 +197,7 @@ export const remindProgramList = [
     id: 7,
     sentence: "Remind in de middag / Ondersteuningsprogramma",
     questionSetId: 2,
-  }
+  },
 ];
 
 // remindLearningProgram for filter
@@ -269,7 +259,18 @@ export const sentimentTypes = [
     id: SentimentQuestionType.Negative,
     label: "Negative",
   },
-]
+];
+
+export const questionSetTypes = [
+  {
+    id: QuestionSetType.allSchools,
+    label: "All Schools",
+  },
+  {
+    id: QuestionSetType.onlySeasonalSchools,
+    label: "Only Seasonal School",
+  },
+];
 
 export const chartColors = ["#EB7200", "#F5477C", "#A879FF", "#00A88D"];
 
@@ -282,5 +283,8 @@ export const barChartColorCombinations = [
 ];
 
 export const barChartGrouColorPallete = [
-  "#FFECAA", "#BDE5E5", "#CFC0D8", "#F8A0A0"
-]
+  "#FFECAA",
+  "#BDE5E5",
+  "#CFC0D8",
+  "#F8A0A0",
+];

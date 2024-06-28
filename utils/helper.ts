@@ -90,10 +90,8 @@ export const formContentFiltering = (
     return true;
   } else if (
     activeStep === 3 &&
-    item.sectionType === SectionType.ProgramAndSupervisor
+    item.sectionType === SectionType.EvaluationPartTwo
   ) {
-    return true;
-  } else if (activeStep === 4 && item.sectionType === SectionType.Final) {
     return true;
   }
 

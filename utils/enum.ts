@@ -15,8 +15,7 @@ export enum FieldType {
 
 export enum SectionType {
   PersonalDetails = 0,
-  ProgramAndSupervisor = 1,
-  Final = 2,
+  EvaluationPartTwo = 1,
 }
 
 export enum UserRole {
@@ -29,9 +28,9 @@ export enum QuestionnaireSection {
   QuestionPartTwo = 1,
 }
 
-export enum QuestionnaireSet {
-  QuestionSetOne = 0,
-  QuestionSetTwo = 1,
+export enum QuestionSetType {
+  allSchools = 0,
+  onlySeasonalSchools = 1,
 }
 
 /* We will be using this to differentiate the 2 sets of questions */

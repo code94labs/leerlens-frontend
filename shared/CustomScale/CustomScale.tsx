@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { FieldType } from "../../utils/enum";
 
 const customStyles = {
   stack: {
@@ -49,10 +50,8 @@ const customStyles = {
 };
 
 type CustomScaleProps = {
-  id: number;
   questionText: string;
-  minValue: number;
-  maxValue: number;
+  fieldType: FieldType;
   positionOrderId: number;
   updateAnswer: (answer: number) => void;
   isDisabled?: boolean;
@@ -69,18 +68,12 @@ const generateScaleArr = (min: number, max: number) => {
 };
 
 const CustomScale = (props: CustomScaleProps) => {
-  const {
-    questionText,
-    minValue,
-    maxValue,
-    positionOrderId,
-    updateAnswer,
-    isDisabled,
-  } = props;
+  const { questionText, fieldType, positionOrderId, updateAnswer, isDisabled } =
+    props;
 
   const [selectedValue, setSelectedValue] = useState(0);
 
-  const scale = generateScaleArr(minValue, maxValue);
+  const scale = generateScaleArr(1, fieldType === FieldType.Scale1to6 ? 6 : 10);
 
   const handleButtonClick = (value: number) => {
     setSelectedValue(value);
@@ -117,7 +110,7 @@ const CustomScale = (props: CustomScaleProps) => {
         alignItems="center"
         gap={2}
         justifyContent="space-between"
-        sx={{ width: maxValue === 6 ? 650 : 900 }}
+        sx={{ width: fieldType === FieldType.Scale1to6 ? 650 : 900 }}
       >
         <Typography
           color="grey"

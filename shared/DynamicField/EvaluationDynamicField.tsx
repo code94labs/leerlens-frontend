@@ -3,7 +3,6 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { useDispatch } from "react-redux";
 
-import { Theme, useTheme } from "@mui/material/styles";
 import {
   Box,
   Button,
@@ -30,9 +29,17 @@ import { setFormModified } from "../../redux/slices/formSlice";
 
 import { champBlackFontFamily } from "../typography";
 
-import { FieldType, SentimentQuestionType } from "../../utils/enum";
-import { FormQuestion } from "../../utils/types";
-import { sentimentTypes, summaryTypes } from "../../utils/constant";
+import {
+  FieldType,
+  QuestionSetType,
+  SentimentQuestionType,
+} from "../../utils/enum";
+import { EvaluationQuestion, FormQuestion } from "../../utils/types";
+import {
+  questionSetTypes,
+  sentimentTypes,
+  summaryTypes,
+} from "../../utils/constant";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -248,14 +255,14 @@ const validationSchema = yup.object({
 type Props = {
   title?: string;
   label?: string;
-  question?: FormQuestion;
-  handleQuestionUpdate?: (question: FormQuestion) => void;
+  question?: EvaluationQuestion;
+  handleQuestionUpdate?: (question: EvaluationQuestion) => void;
   handleQuestionSoftDelete?: (id: number) => void;
   moveItemUp: (orderId: number | undefined) => void;
   moveItemDown: (orderId: number | undefined) => void;
 };
 
-const QuestionnaireDynamicField = (props: Props) => {
+const EvaluationDynamicField = (props: Props) => {
   const {
     title,
     label,
@@ -267,35 +274,18 @@ const QuestionnaireDynamicField = (props: Props) => {
   } = props;
 
   const dispatch = useDispatch();
-  const theme = useTheme();
 
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedSummaryTypes, setSelectedSummaryTypes] = useState<number[]>(
-    question?.summaryTypes ?? []
+  const [questionType, setQuestionType] = useState<FieldType>(
+    question?.fieldType ?? FieldType.Scale1to6
   );
-  const [selectedSentimentTypes, setSelectedSentimentTypes] = useState<number>(
-    question?.sentiment
-      ? SentimentQuestionType.Positive
-      : SentimentQuestionType.Negative
-  );
-
-  const handleChange = (
-    event: SelectChangeEvent<typeof selectedSummaryTypes>
-  ) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedSummaryTypes(
-      // On autofill we get a stringified value.
-      typeof value === "string"
-        ? value.split(",").map((item) => Number(item))
-        : value
+  const [selectedQuestionSetType, setSelectedQuestionSetType] =
+    useState<QuestionSetType>(
+      question?.questionSetType ?? QuestionSetType.allSchools
     );
-    dispatch(setFormModified());
-  };
 
-  const onHandleSentimentUpdate = (event: any) => {
-    setSelectedSentimentTypes(event.target.value);
+  const handleQuestionSetTypeUpdate = (event: any) => {
+    setSelectedQuestionSetType(event.target.value);
   };
 
   const handleQuestionDeleteDialogOpen = () => {
@@ -304,6 +294,11 @@ const QuestionnaireDynamicField = (props: Props) => {
 
   const handleClose = () => {
     setOpenDialog(false);
+  };
+
+  const handleChangeQuestionType = (event: SelectChangeEvent) => {
+    setQuestionType(parseInt(event.target.value));
+    dispatch(setFormModified());
   };
 
   const formik = useFormik({
@@ -315,20 +310,6 @@ const QuestionnaireDynamicField = (props: Props) => {
       // handleSaveChanges(values.questionText);
     },
   });
-
-  useEffect(() => {
-    const handleSaveChanges = () => {
-      if (question && handleQuestionUpdate) {
-        const newQuestion: FormQuestion = question;
-        newQuestion.questionText = formik.values.questionText;
-        newQuestion.summaryTypes = selectedSummaryTypes;
-
-        handleQuestionUpdate(newQuestion);
-      }
-    };
-
-    handleSaveChanges();
-  }, [question, formik.values.questionText, selectedSummaryTypes]);
 
   const deleteQuestionDialogModal = (
     <Box sx={customStyles.modalContent}>
@@ -441,25 +422,29 @@ const QuestionnaireDynamicField = (props: Props) => {
       <Stack flexDirection="row" mt={1}>
         <FormControl sx={customStyles.dropdown}>
           <InputLabel>
-            Question Type
+            Select Question Type
             <span style={customStyles.dropdownAsterisk}> * </span>
           </InputLabel>
 
           <Select
+            value={questionType.toString()}
             label="Select Question Type"
+            onChange={handleChangeQuestionType}
             autoWidth
-            disabled
-            defaultValue={FieldType.Scale1to6.toString()}
           >
             <MenuItem value={FieldType.Scale1to6.toString()}>
               Scale 1 to 6
+            </MenuItem>
+
+            <MenuItem value={FieldType.Scale1to10.toString()}>
+              Scale 1 to 10
             </MenuItem>
           </Select>
         </FormControl>
 
         <TextField
           variant="outlined"
-          label={label ? label : "Type Question"}
+          label={label ?? "Type Question"}
           required
           type="text"
           // placeholder="abc@gmail.com"
@@ -480,57 +465,18 @@ const QuestionnaireDynamicField = (props: Props) => {
       </Stack>
 
       <Stack direction="row" justifyContent="flex-start" alignItems="center">
-        <FormControl sx={{ width: 400 }}>
-          <InputLabel sx={{ backgroundColor: "white", pr: 1 }}>
-            Select Summary Type{" "}
-            <span style={customStyles.dropdownAsterisk}> * </span>
-          </InputLabel>
-          <Select
-            label="Select Summary Type"
-            id="summary-type-select"
-            multiple
-            value={selectedSummaryTypes}
-            onChange={handleChange}
-            input={<OutlinedInput id="summary-type-select" label="Chip" />}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip
-                    key={value}
-                    label={
-                      summaryTypes.find((item: any) => item.id === value)
-                        ?.label || ""
-                    }
-                  />
-                ))}
-              </Box>
-            )}
-            MenuProps={MenuProps}
-          >
-            {summaryTypes.map((item) => (
-              <MenuItem
-                key={item.id}
-                value={item.id}
-                // style={getStyles(item.label, selectedSummaryTypes, theme)}
-              >
-                {item.label}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <FormControl sx={{ width: 150, ml: 2 }}>
+        <FormControl sx={{ width: 150 }}>
           <InputLabel>
-            Sentiment Type
+            Evaluation form type
             <span style={customStyles.dropdownAsterisk}> * </span>
           </InputLabel>
 
           <Select
-            defaultValue={selectedSentimentTypes}
-            onChange={onHandleSentimentUpdate}
+            defaultValue={selectedQuestionSetType}
+            onChange={handleQuestionSetTypeUpdate}
           >
-            {sentimentTypes.map((sentiment) => (
-              <MenuItem value={sentiment.id}>{sentiment.label}</MenuItem>
+            {questionSetTypes.map((set) => (
+              <MenuItem value={set.id}>{set.label}</MenuItem>
             ))}
           </Select>
         </FormControl>
@@ -551,6 +497,21 @@ const QuestionnaireDynamicField = (props: Props) => {
     </>
   );
 
+  useEffect(() => {
+    const handleSaveChanges = () => {
+      if (question && handleQuestionUpdate) {
+        const newQuestion: EvaluationQuestion = question;
+        newQuestion.questionText = formik.values.questionText;
+        newQuestion.fieldType = questionType;
+        newQuestion.questionSetType = selectedQuestionSetType;
+
+        handleQuestionUpdate(newQuestion);
+      }
+    };
+
+    handleSaveChanges();
+  }, [question, formik.values.questionText, selectedQuestionSetType]);
+
   return (
     <Stack mx={2} mt={2} px={3} py={1} sx={customStyles.stack}>
       {questionnaireField}
@@ -558,4 +519,4 @@ const QuestionnaireDynamicField = (props: Props) => {
   );
 };
 
-export default QuestionnaireDynamicField;
+export default EvaluationDynamicField;

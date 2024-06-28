@@ -15,7 +15,7 @@ import {
   FieldType,
   FormEvaluation,
   QuestionnaireSection,
-  QuestionnaireSet,
+  QuestionSetType,
   SectionType,
 } from "../../utils/enum";
 import {
@@ -23,6 +23,7 @@ import {
   getStudentFormInfoByFormType,
 } from "../../services/questionnaire.service";
 import { useRouter } from "next/navigation";
+import { EvaluationQuestion, QuestionResponse } from "../../utils/types";
 
 const customStyles = {
   snackbarAlert: {
@@ -86,27 +87,9 @@ const customStyles = {
 
 const formType = FormEvaluation.Evaluation;
 
-type StudentInfo = {
-  id: number;
-  formType: FormEvaluation;
-  questionText: string;
-  fieldType: FieldType;
-  sectionType: number;
-  positionOrderId: number;
-};
-
-type Questionnaire = {
-  id: number;
-  questionText: string;
-  positionOrderId: number;
-  minvalue: number;
-  maxValue: number;
-  isDelete: boolean;
-  questionSetId: QuestionnaireSet;
-  questionSection: QuestionnaireSection;
-};
-
 const EvaluationContent = () => {
+  const router = useRouter();
+
   const [value, setValue] = useState(0);
 
   const [displaySnackbarMsg, setDisplaySnackbarMsg] = useState(false);
@@ -115,15 +98,52 @@ const EvaluationContent = () => {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [evalQuestionnaireList, setEvalQuestionnaireList] = useState<
-    Questionnaire[]
-  >([]);
-  const [personalDetails, setPersonalDetails] = useState<StudentInfo[]>([]);
-
-  const router = useRouter();
+  const [personalDetails, setPersonalDetails] = useState<QuestionResponse[]>(
+    []
+  );
+  const [evaluationQuestionnaireList, setEvaluationQuestionnaireList] =
+    useState<EvaluationQuestion[]>([]);
 
   const handleChange = (event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
+  };
+
+  const fetchingStudentInfo = async () => {
+    await getStudentFormInfoByFormType(formType)
+      .then((res) => {
+        setPersonalDetails(res);
+      })
+      .catch((err) => {
+        console.log(err);
+
+        setIsError(true);
+
+        setNotificationMsg("Error when fetching personal details data...");
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  const fetchingQuestionnaire = async () => {
+    await getAllEvaluationQuestions()
+      .then((res) => {
+        setEvaluationQuestionnaireList(res);
+      })
+      .catch((err) => {
+        console.log(err);
+
+        setIsError(true);
+
+        setNotificationMsg(
+          "Error when fetching evaluation questionnaire data..."
+        );
+        setDisplaySnackbarMsg(true);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const titleButtonSection = (
@@ -162,32 +182,17 @@ const EvaluationContent = () => {
             />
           ));
       case 1:
-        return getQuestionList(QuestionnaireSection.QuestionPartOne).map(
-          (item) => (
-            <QuestionSet
-              key={item.id}
-              number={item.positionOrderId}
-              question={item.questionText}
-              answerType={FieldType.Scale1to6}
-            />
-          )
-        );
+        return evaluationQuestionnaireList.map((item) => (
+          <QuestionSet
+            key={item.id}
+            number={item.positionOrderId}
+            question={item.questionText}
+            answerType={FieldType.Scale1to6}
+          />
+        ));
       case 2:
-        return getQuestionList(QuestionnaireSection.QuestionPartTwo).map(
-          (item) => (
-            <QuestionSet
-              key={item.id}
-              number={item.positionOrderId}
-              question={item.questionText}
-              answerType={FieldType.Scale1to6}
-            />
-          )
-        );
-      case 3:
         return personalDetails
-          .filter(
-            (item) => item.sectionType === SectionType.ProgramAndSupervisor
-          )
+          .filter((item) => item.sectionType === SectionType.EvaluationPartTwo)
           .map((item, index) => (
             <QuestionSet
               key={item.id}
@@ -196,77 +201,34 @@ const EvaluationContent = () => {
               answerType={item.fieldType}
             />
           ));
-      case 4:
-        return personalDetails
-          .filter((item) => item.sectionType === SectionType.Final)
-          .map((item, index) => (
-            <QuestionSet
-              key={item.id}
-              number={++index}
-              question={item.questionText}
-              answerType={item.fieldType}
-            />
-          ));
+      // case 3:
+      //   return personalDetails
+      //     .filter(
+      //       (item) => item.sectionType === SectionType.ProgramAndSupervisor
+      //     )
+      //     .map((item, index) => (
+      //       <QuestionSet
+      //         key={item.id}
+      //         number={++index}
+      //         question={item.questionText}
+      //         answerType={item.fieldType}
+      //       />
+      //     ));
+      // case 4:
+      //   return personalDetails
+      //     .filter((item) => item.sectionType === SectionType.Final)
+      //     .map((item, index) => (
+      //       <QuestionSet
+      //         key={item.id}
+      //         number={++index}
+      //         question={item.questionText}
+      //         answerType={item.fieldType}
+      //       />
+      //     ));
       default:
         return null;
     }
   };
-
-  const getQuestionList = (section: QuestionnaireSection) => {
-    return evalQuestionnaireList.filter(
-      (question) => question.questionSection === section
-    );
-  };
-
-  const fetchingStudentInfo = async () => {
-    await getStudentFormInfoByFormType(formType)
-      .then((res) => {
-        setPersonalDetails(res);
-      })
-      .catch((err) => {
-        console.log(err);
-
-        setIsError(true);
-
-        setNotificationMsg("Error when fetching personal details data...");
-        setDisplaySnackbarMsg(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-
-  const fetchingQuestionnaire = async () => {
-    await getAllEvaluationQuestions()
-      .then((res) => {
-        setEvalQuestionnaireList(res);
-      })
-      .catch((err) => {
-        console.log(err);
-
-        setIsError(true);
-
-        setNotificationMsg(
-          "Error when fetching evaluation questionnaire data..."
-        );
-        setDisplaySnackbarMsg(true);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      setIsError(false);
-
-      await fetchingStudentInfo();
-      await fetchingQuestionnaire();
-    };
-
-    fetchData();
-  }, []);
 
   const loading = (
     <Stack
@@ -285,8 +247,6 @@ const EvaluationContent = () => {
         <Tab value={0} label="Personal Details" />
         <Tab value={1} label="Questions | Part 01" />
         <Tab value={2} label="Questions | Part 02" />
-        <Tab value={3} label="Program and the supervisors" />
-        <Tab value={4} label="Final" />
       </Tabs>
 
       <QuestionSet isHeading />
@@ -326,6 +286,18 @@ const EvaluationContent = () => {
       </Alert>
     </Snackbar>
   );
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      setIsError(false);
+
+      await fetchingStudentInfo();
+      await fetchingQuestionnaire();
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>

@@ -710,7 +710,7 @@ const ResponseAccordion = (props: Props) => {
 
   const personalDetails = (
     <Stack mt={-3}>
-      <DynamicListHeader titles={["Personal details", "Answers"]}/>
+      <DynamicListHeader titles={["Personal details", "Answers"]} />
 
       <Stack>
         {studentResponse.studentDetails
@@ -772,15 +772,13 @@ const ResponseAccordion = (props: Props) => {
     </Stack>
   );
 
-  const supervisorEvaluation = (
+  const evaluationPersonalDetailsPartTwo = (
     <Stack mt={-3}>
       <DynamicListHeader titles={["Program and Supervisor", "Answers"]} />
 
       <Stack>
         {studentResponse.studentDetails
-          .filter(
-            (item) => item.sectionType === SectionType.ProgramAndSupervisor
-          )
+          .filter((item) => item.sectionType === SectionType.EvaluationPartTwo)
           .map((studentInfo) => (
             <DynamicListContent
               key={studentInfo.questionId}
@@ -796,24 +794,6 @@ const ResponseAccordion = (props: Props) => {
     </Stack>
   );
 
-  const final = (
-    <Stack mt={-3}>
-      <DynamicListHeader titles={["Final", "Answers"]} />
-
-      <Stack>
-        {studentResponse.studentDetails
-          .filter((item) => item.sectionType === SectionType.Final)
-          .map((studentInfo) => (
-            <DynamicListContent
-              key={studentInfo.questionId}
-              question={studentInfo.questionTitle}
-              answer={studentInfo.answer}
-            />
-          ))}
-      </Stack>
-    </Stack>
-  );
-
   const accordionContent = (
     <AccordionDetails>
       {personalDetails}
@@ -822,9 +802,7 @@ const ResponseAccordion = (props: Props) => {
 
       {questionSetTwo}
 
-      {supervisorEvaluation}
-
-      {final}
+      {evaluationPersonalDetailsPartTwo}
     </AccordionDetails>
   );
 

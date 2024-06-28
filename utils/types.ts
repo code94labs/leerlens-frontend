@@ -2,6 +2,7 @@ import {
   ChartType,
   FieldType,
   FormEvaluation,
+  QuestionSetType,
   SectionType,
   SummaryTypes,
 } from "./enum";
@@ -45,6 +46,17 @@ export type FormQuestion = {
   summaryTypes: SummaryTypes[];
   chartType?: ChartType;
   sentiment: boolean;
+};
+
+export type EvaluationQuestion = {
+  id?: number;
+  questionText: string;
+  positionOrderId: number;
+  fieldType: FieldType;
+  isDelete: boolean;
+  isNewlyAdded: boolean;
+  questionSetType: QuestionSetType;
+  chartType?: ChartType[];
 };
 
 export type PersonalDetails = {

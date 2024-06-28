@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import {
   Alert,
   Box,
@@ -30,6 +30,7 @@ import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import {
   CreateStudentResponse,
   DropDownOptions,
+  EvaluationQuestion,
   FormQuestion,
   Question,
   QuestionResponse,
@@ -215,13 +216,7 @@ const Input = React.forwardRef(function CustomInput(
   );
 });
 
-const steps = [
-  "Personal Details",
-  "Part 01 Questions",
-  "Part 02 Questions",
-  "Program and the supervisors",
-  "Final",
-];
+const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
 const questionSectionOne = 0;
 const questionSectionTwo = 1;
@@ -239,15 +234,10 @@ const RemindEvaluationForm = () => {
     []
   );
 
-  const [programAndSupervisorsQuestions, setProgramAndSupervisorsQuestions] =
-    useState<QuestionResponse[]>([]);
-
-  const [finalQuestions, setFinalQuestions] = useState<QuestionResponse[]>([]);
-
   const [questionListPartOne, setQuestionListPartOne] = useState<
-    QuestionResponse[]
+    EvaluationQuestion[]
   >([]);
-  const [questionListPartTwo, setQuestionListPartTwo] = useState<
+  const [personalDetailsPartTwo, setPersonalDetailsPartTwo] = useState<
     QuestionResponse[]
   >([]);
 
@@ -272,32 +262,6 @@ const RemindEvaluationForm = () => {
 
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
-      const newAnswers = [...prevAnswers];
-      let isPresent = false;
-
-      newAnswers.map((item, index) => {
-        if (item.questionId === questionId) {
-          isPresent = true;
-
-          newAnswers[index] = {
-            questionId,
-            answer,
-          };
-        }
-      });
-
-      if (!isPresent) {
-        const appendAnswer = [...newAnswers, { questionId, answer }];
-
-        return appendAnswer;
-      }
-
-      return newAnswers;
-    });
-  };
-
-  const updateAnswerPartTwo = (questionId: number, answer: number) => {
-    setAnswersPartTwo((prevAnswers) => {
       const newAnswers = [...prevAnswers];
       let isPresent = false;
 
@@ -347,24 +311,15 @@ const RemindEvaluationForm = () => {
       studentFormInfo
     );
 
-    const programSupervisorInfo: StudentDetailsAnswer[] =
+    const personalDetailsPartTwoList: StudentDetailsAnswer[] =
       generateStudentDetails(
-        programAndSupervisorsFormik.values,
-        programAndSupervisorsQuestions
+        personalDetailsPartTwoFormik.values,
+        personalDetailsPartTwo
       );
-
-    const finalStudentInfo: StudentDetailsAnswer[] = generateStudentDetails(
-      finalQuestionsFormik.values,
-      finalQuestions
-    );
 
     const requestBody: CreateStudentResponse = {
       formType: FormEvaluation.Evaluation,
-      studentDetails: [
-        ...personDetailsInfo,
-        ...programSupervisorInfo,
-        ...finalStudentInfo,
-      ],
+      studentDetails: [...personDetailsInfo, ...personalDetailsPartTwoList],
       responses: [...answersPartOne, ...answersPartTwo],
     };
     setIsLoading(true);
@@ -557,13 +512,16 @@ const RemindEvaluationForm = () => {
 
       <FormControl>
         {questionListPartOne.map(
-          (questionDetails: QuestionResponse, index: number) => (
+          (questionDetails: EvaluationQuestion, index: number) => (
             <CustomScale
               key={questionDetails.id}
-              {...questionDetails}
+              questionText={questionDetails.questionText}
+              fieldType={questionDetails.fieldType}
+              positionOrderId={questionDetails.positionOrderId}
               isDisabled={isLoading}
-              updateAnswer={(answer: number) =>
-                updateAnswerPartOne(questionDetails.id, answer)
+              updateAnswer={
+                (answer: number) =>
+                  updateAnswerPartOne(questionDetails.id ?? 0, answer) // address this issue/temp fix
               }
             />
           )
@@ -572,42 +530,12 @@ const RemindEvaluationForm = () => {
     </>
   );
 
-  const questionPartTwoForm = (
-    <>
-      <Typography variant="subtitle2" fontWeight={500}>
-        Below are a number of statements. You can answer these statements on a
-        scale from 1 to 6
-      </Typography>
-
-      <Typography variant="subtitle2" fontWeight={500}>
-        1 to {questionListPartTwo.length} statements (1 = totally disagree, 2 =
-        disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
-        totally agree).
-      </Typography>
-
-      <FormControl>
-        {questionListPartTwo.map(
-          (questionDetails: QuestionResponse, index: number) => (
-            <CustomScale
-              key={questionDetails.id}
-              {...questionDetails}
-              isDisabled={isLoading}
-              updateAnswer={(answer: number) =>
-                updateAnswerPartTwo(questionDetails.id, answer)
-              }
-            />
-          )
-        )}
-      </FormControl>
-    </>
-  );
-
-  const programAndSupervisorValidationSchema = yup
+  const personalDetailsPartTwoValidationSchema = yup
     .object()
     .shape(
-      programAndSupervisorsQuestions.length > 0
+      personalDetailsPartTwo.length > 0
         ? Object.fromEntries(
-            programAndSupervisorsQuestions.map((field) => [
+            personalDetailsPartTwo.map((field) => [
               field.id,
               yup.string().required(`Response is required`),
             ])
@@ -615,20 +543,20 @@ const RemindEvaluationForm = () => {
         : {}
     );
 
-  const programAndSupervisorsFormik = useFormik({
-    initialValues: programAndSupervisorsQuestions
+  const personalDetailsPartTwoFormik = useFormik({
+    initialValues: personalDetailsPartTwo
       ? Object.fromEntries(
-          programAndSupervisorsQuestions.map((field) => [field.id, ""])
+          personalDetailsPartTwo.map((field) => [field.id, ""])
         )
       : {},
-    validationSchema: programAndSupervisorValidationSchema,
+    validationSchema: personalDetailsPartTwoValidationSchema,
     onSubmit: () => {},
   });
 
-  const programAndSupervisorForm = (
+  const evaluationPartTwo = (
     <Grid container rowSpacing={4} columnSpacing={4}>
-      {programAndSupervisorsQuestions &&
-        programAndSupervisorsQuestions.map((question: QuestionResponse) => (
+      {personalDetailsPartTwo &&
+        personalDetailsPartTwo.map((question: QuestionResponse) => (
           <Grid
             item
             xs={12}
@@ -655,10 +583,10 @@ const RemindEvaluationForm = () => {
                           id={String(question.id)}
                           name={String(question.id)}
                           value={
-                            programAndSupervisorsFormik.values[question.id]
+                            personalDetailsPartTwoFormik.values[question.id]
                           }
                           label={question.questionText}
-                          onChange={programAndSupervisorsFormik.handleChange}
+                          onChange={personalDetailsPartTwoFormik.handleChange}
                           onClose={() =>
                             setSearchStrings({
                               ...searchStrings,
@@ -666,13 +594,13 @@ const RemindEvaluationForm = () => {
                             })
                           }
                           renderValue={() =>
-                            programAndSupervisorsFormik.values[question.id]
+                            personalDetailsPartTwoFormik.values[question.id]
                           }
-                          onBlur={programAndSupervisorsFormik.handleBlur}
+                          onBlur={personalDetailsPartTwoFormik.handleBlur}
                           error={
-                            programAndSupervisorsFormik.touched[question.id] &&
+                            personalDetailsPartTwoFormik.touched[question.id] &&
                             Boolean(
-                              programAndSupervisorsFormik.errors[question.id]
+                              personalDetailsPartTwoFormik.errors[question.id]
                             )
                           }
                         >
@@ -727,13 +655,13 @@ const RemindEvaluationForm = () => {
                         placeholder={question.questionText}
                         id={String(question.id)}
                         name={String(question.id)}
-                        value={programAndSupervisorsFormik.values[question.id]}
-                        onChange={programAndSupervisorsFormik.handleChange}
-                        onBlur={programAndSupervisorsFormik.handleBlur}
+                        value={personalDetailsPartTwoFormik.values[question.id]}
+                        onChange={personalDetailsPartTwoFormik.handleChange}
+                        onBlur={personalDetailsPartTwoFormik.handleBlur}
                         error={
-                          programAndSupervisorsFormik.touched[question.id] &&
+                          personalDetailsPartTwoFormik.touched[question.id] &&
                           Boolean(
-                            programAndSupervisorsFormik.errors[question.id]
+                            personalDetailsPartTwoFormik.errors[question.id]
                           )
                         }
                       />
@@ -746,7 +674,7 @@ const RemindEvaluationForm = () => {
                         //   throw new Error("Function not implemented.");
                         // }}
                         updateAnswer={(answer: number) => {
-                          programAndSupervisorsFormik.setFieldValue(
+                          personalDetailsPartTwoFormik.setFieldValue(
                             String(question.id),
                             answer
                           );
@@ -759,154 +687,22 @@ const RemindEvaluationForm = () => {
                         id={String(question.id)}
                         name={String(question.id)}
                         label={question.questionText}
-                        value={programAndSupervisorsFormik.values[question.id]}
-                        onChange={programAndSupervisorsFormik.handleChange}
-                        onBlur={programAndSupervisorsFormik.handleBlur}
+                        value={personalDetailsPartTwoFormik.values[question.id]}
+                        onChange={personalDetailsPartTwoFormik.handleChange}
+                        onBlur={personalDetailsPartTwoFormik.handleBlur}
                         error={
-                          programAndSupervisorsFormik.touched[question.id] &&
+                          personalDetailsPartTwoFormik.touched[question.id] &&
                           Boolean(
-                            programAndSupervisorsFormik.errors[question.id]
+                            personalDetailsPartTwoFormik.errors[question.id]
                           )
                         }
                       />
                     );
                 }
               })()}
-              {programAndSupervisorsFormik.touched[question.id] && (
+              {personalDetailsPartTwoFormik.touched[question.id] && (
                 <FormHelperText sx={{ color: "red", mb: -2.5 }}>
-                  {programAndSupervisorsFormik.errors[question.id]}
-                </FormHelperText>
-              )}
-            </FormControl>
-          </Grid>
-        ))}
-    </Grid>
-  );
-
-  const finalQuestionsValidationSchema = yup
-    .object()
-    .shape(
-      finalQuestions.length > 0
-        ? Object.fromEntries(
-            finalQuestions.map((field) => [
-              field.id,
-              yup.string().required(`Response is required`),
-            ])
-          )
-        : {}
-    );
-
-  const finalQuestionsFormik = useFormik({
-    initialValues: finalQuestions
-      ? Object.fromEntries(finalQuestions.map((field) => [field.id, ""]))
-      : {},
-    validationSchema: finalQuestionsValidationSchema,
-    onSubmit: () => {},
-  });
-
-  const finalContentForm = (
-    <Grid container rowSpacing={4} columnSpacing={4}>
-      {finalQuestions &&
-        finalQuestions.map((question: QuestionResponse) => (
-          <Grid
-            item
-            xs={12}
-            md={question.fieldType === FieldType.TextArea ? 12 : 6}
-            key={question.id}
-          >
-            <FormControl fullWidth required>
-              {question.fieldType === FieldType.DropDown ? (
-                <>
-                  <InputLabel>{question.questionText}</InputLabel>
-                  <Select
-                    MenuProps={{
-                      autoFocus: false,
-                      PaperProps: {
-                        style: {
-                          maxHeight: 200,
-                        },
-                      },
-                    }}
-                    labelId={`search-select-`}
-                    id={String(question.id)}
-                    name={String(question.id)}
-                    value={finalQuestionsFormik.values[question.id]}
-                    label={question.questionText}
-                    onChange={finalQuestionsFormik.handleChange}
-                    onClose={() =>
-                      setSearchStrings({
-                        ...searchStrings,
-                        [question.id]: "",
-                      })
-                    }
-                    renderValue={() => finalQuestionsFormik.values[question.id]}
-                    onBlur={finalQuestionsFormik.handleBlur}
-                    error={
-                      finalQuestionsFormik.touched[question.id] &&
-                      Boolean(finalQuestionsFormik.errors[question.id])
-                    }
-                  >
-                    <ListSubheader>
-                      <TextField
-                        size="small"
-                        autoFocus
-                        placeholder="Type to search..."
-                        fullWidth
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchRoundedIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                        value={searchStrings[question.id] || ""}
-                        onChange={(e) =>
-                          setSearchStrings({
-                            ...searchStrings,
-                            [question.id]: e.target.value,
-                          })
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key !== "Escape") {
-                            e.stopPropagation();
-                          }
-                        }}
-                      />
-                    </ListSubheader>
-                    {question.dropdownOptions
-                      .filter((item) => !item.isDelete)
-                      .filter((option) =>
-                        containsText(
-                          option.item,
-                          searchStrings[question.id] || ""
-                        )
-                      )
-                      .map((item: DropDownOptions, index: number) => (
-                        <MenuItem value={item.item} key={index}>
-                          {item.item}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </>
-              ) : (
-                <Input
-                  aria-label={question.questionText}
-                  multiline
-                  placeholder={question.questionText}
-                  id={String(question.id)}
-                  name={String(question.id)}
-                  value={finalQuestionsFormik.values[question.id]}
-                  onChange={finalQuestionsFormik.handleChange}
-                  onBlur={finalQuestionsFormik.handleBlur}
-                  error={
-                    finalQuestionsFormik.touched[question.id] &&
-                    Boolean(finalQuestionsFormik.errors[question.id])
-                  }
-                />
-              )}
-              {finalQuestionsFormik.touched[question.id] && (
-                <FormHelperText sx={{ color: "red", mb: -2.5 }}>
-                  {finalQuestionsFormik.errors[question.id]}
+                  {personalDetailsPartTwoFormik.errors[question.id]}
                 </FormHelperText>
               )}
             </FormControl>
@@ -924,13 +720,7 @@ const RemindEvaluationForm = () => {
         return questionPartOneForm;
 
       case 2:
-        return questionPartTwoForm;
-
-      case 3:
-        return programAndSupervisorForm;
-
-      case 4:
-        return finalContentForm;
+        return evaluationPartTwo;
 
       default:
         break;
@@ -958,41 +748,7 @@ const RemindEvaluationForm = () => {
     </Snackbar>
   );
 
-  useMemo(() => {
-    const fetchQuestionnaireData = async () => {
-      try {
-        setIsLoading(true);
-
-        const evaluationQuestions = await getAllEvaluationQuestions();
-
-        const questionsWithAnswerValue = evaluationQuestions.map(
-          (question: Question) => ({
-            ...question,
-            answerValue: 0,
-          })
-        );
-
-        const questionSetOne = questionsWithAnswerValue.filter(
-          (question: FormQuestion) =>
-            question.questionSection === questionSectionOne
-        );
-
-        const questionSetTwo = questionsWithAnswerValue.filter(
-          (question: FormQuestion) =>
-            question.questionSection === questionSectionTwo
-        );
-
-        setQuestionListPartOne(questionSetOne);
-        setQuestionListPartTwo(questionSetTwo);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchQuestionnaireData();
-  }, []);
-
-  useMemo(() => {
+  useEffect(() => {
     const fetchDataStudentInfo = async () => {
       try {
         setIsLoading(true);
@@ -1005,18 +761,13 @@ const RemindEvaluationForm = () => {
             item.sectionType === SectionType.PersonalDetails
         );
 
-        const studentFormInfoProgram = studentFormInfoQuestions.filter(
+        const evaluationPartTwo = studentFormInfoQuestions.filter(
           (item: QuestionResponse) =>
-            item.sectionType === SectionType.ProgramAndSupervisor
-        );
-
-        const studentFormInfoFinal = studentFormInfoQuestions.filter(
-          (item: QuestionResponse) => item.sectionType === SectionType.Final
+            item.sectionType === SectionType.EvaluationPartTwo
         );
 
         setStudentFormInfo(studentFormInfoPersonal);
-        setProgramAndSupervisorsQuestions(studentFormInfoProgram);
-        setFinalQuestions(studentFormInfoFinal);
+        setPersonalDetailsPartTwo(evaluationPartTwo);
       } catch (error) {
         console.log(error);
       } finally {
@@ -1024,32 +775,55 @@ const RemindEvaluationForm = () => {
       }
     };
 
+    const fetchQuestionnaireData = async () => {
+      try {
+        setIsLoading(true);
+
+        const evaluationQuestions: EvaluationQuestion[] =
+          await getAllEvaluationQuestions();
+
+        const questionsWithAnswerValue = evaluationQuestions.map(
+          (question: EvaluationQuestion) => ({
+            ...question,
+            answerValue: 0,
+          })
+        );
+
+        const questionSetOne = questionsWithAnswerValue;
+
+        setQuestionListPartOne(questionSetOne);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
     fetchDataStudentInfo();
+    fetchQuestionnaireData();
   }, []);
 
-  useMemo(() => {
-    const partOneAllAnswered = () => {
-      if (answersPartOne.length !== questionListPartOne.length) {
-        return false;
-      }
+  // useEffect(() => {
+  //   const partOneAllAnswered = () => {
+  //     if (answersPartOne.length !== questionListPartOne.length) {
+  //       return false;
+  //     }
 
-      return true;
-    };
+  //     return true;
+  //   };
 
-    setAllAnsweredPartOne(partOneAllAnswered());
-  }, [answersPartOne, questionListPartOne]);
+  //   setAllAnsweredPartOne(partOneAllAnswered());
+  // }, [answersPartOne, questionListPartOne]);
 
-  useMemo(() => {
-    const partTwoAllAnswered = () => {
-      if (answersPartTwo.length !== questionListPartTwo.length) {
-        return false;
-      }
+  // useEffect(() => {
+  //   const partTwoAllAnswered = () => {
+  //     if (answersPartTwo.length !== questionListPartTwo.length) {
+  //       return false;
+  //     }
 
-      return true;
-    };
+  //     return true;
+  //   };
 
-    setAllAnsweredPartTwo(partTwoAllAnswered());
-  }, [answersPartTwo, questionListPartTwo]);
+  //   setAllAnsweredPartTwo(partTwoAllAnswered());
+  // }, [answersPartTwo, questionListPartTwo]);
 
   return (
     <Stack sx={customStyles.stack}>
@@ -1071,7 +845,7 @@ const RemindEvaluationForm = () => {
           handleStep={handleStep}
         />
 
-        {activeStep < 5 && (
+        {activeStep < 3 && (
           <Box
             sx={{
               width: "100%",
@@ -1084,7 +858,7 @@ const RemindEvaluationForm = () => {
               gap: 2,
             }}
           >
-            <CircularProgressWithLabel activeStep={activeStep} totalSteps={5} />
+            <CircularProgressWithLabel activeStep={activeStep} totalSteps={3} />
             <Box
               sx={{
                 display: "flex",
@@ -1097,7 +871,7 @@ const RemindEvaluationForm = () => {
               >
                 {steps[activeStep]}
               </Typography>
-              {activeStep < 4 && (
+              {activeStep < 2 && (
                 <Typography
                   variant="caption"
                   sx={{
@@ -1150,9 +924,10 @@ const RemindEvaluationForm = () => {
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
                   disabled={
-                    activeStep === 4 &&
+                    activeStep === 3 &&
                     !(
-                      finalQuestionsFormik.isValid && finalQuestionsFormik.dirty
+                      personalDetailsPartTwoFormik.isValid &&
+                      personalDetailsPartTwoFormik.dirty
                     ) &&
                     !isLoading
                   }
@@ -1164,21 +939,21 @@ const RemindEvaluationForm = () => {
                   variant="outlined"
                   onClick={handleNext}
                   sx={customStyles.primaryButton}
-                  disabled={
-                    activeStep === 0
-                      ? !(
-                          personalDetailsFormik.isValid &&
-                          personalDetailsFormik.dirty
-                        )
-                      : activeStep === 1
-                      ? !allAnsweredPartOne
-                      : activeStep === 2
-                      ? !allAnsweredPartTwo
-                      : !(
-                          programAndSupervisorsFormik.isValid &&
-                          programAndSupervisorsFormik.dirty
-                        )
-                  }
+                  // disabled={
+                  //   activeStep === 0
+                  //     ? !(
+                  //         personalDetailsFormik.isValid &&
+                  //         personalDetailsFormik.dirty
+                  //       )
+                  //     : activeStep === 1
+                  //     ? !allAnsweredPartOne
+                  //     : activeStep === 2
+                  //     ? !allAnsweredPartTwo
+                  //     : !(
+                  //         programAndSupervisorsFormik.isValid &&
+                  //         programAndSupervisorsFormik.dirty
+                  //       )
+                  // }
                 >
                   Next
                 </Button>

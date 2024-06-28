@@ -1,10 +1,6 @@
 import { leerLensApi } from "../api/api";
-import {
-  getRequest,
-  patchRequest,
-  postRequest,
-} from "../api/requests";
-import { FormQuestion } from "../utils/types";
+import { getRequest, patchRequest, postRequest } from "../api/requests";
+import { EvaluationQuestion, FormQuestion } from "../utils/types";
 
 export const getEvaluationQuestions = async () => {
   try {
@@ -21,14 +17,9 @@ export const getEvaluationQuestions = async () => {
   }
 };
 
-export const postEvaluationQuestions = async (
-  newQuestion: FormQuestion
-) => {
+export const postEvaluationQuestions = async (newQuestion: EvaluationQuestion) => {
   try {
-    const response = await postRequest(
-      leerLensApi.evaluation,
-      newQuestion
-    );
+    const response = await postRequest(leerLensApi.evaluation, newQuestion);
 
     if (response.status === 201) {
       return response.data;
@@ -41,15 +32,9 @@ export const postEvaluationQuestions = async (
   }
 };
 
-export const evaluationQuestionUpdateById = async (updateQuestion: {
-  id: number;
-  questionText: string;
-  positionOrderId: number;
-  minValue: number;
-  maxValue: number;
-  questionSetId: number;
-  questionSection: number;
-}) => {
+export const evaluationQuestionUpdateById = async (
+  updateQuestion: EvaluationQuestion
+) => {
   try {
     const response = await patchRequest(
       `${leerLensApi.evaluation}/${updateQuestion.id}`,
@@ -67,16 +52,8 @@ export const evaluationQuestionUpdateById = async (updateQuestion: {
   }
 };
 
-export const evaluationQuesionsUpdateBulk = async (
-  updateQuestions: {
-    id?: number;
-    questionText: string;
-    positionOrderId: number;
-    minValue: number;
-    maxValue: number;
-    questionSetId: number;
-    questionSection: number;
-  }[]
+export const evaluationQuestionsUpdateBulk = async (
+  updateQuestions: EvaluationQuestion[]
 ) => {
   try {
     const response = await patchRequest(
