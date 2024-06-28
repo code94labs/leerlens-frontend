@@ -37,6 +37,7 @@ interface VerticalBarChartType01Props {
   datasets: Dataset[];
   removeBarGaps?: boolean;
   tightPadding?: boolean;
+  scaledToSix?: boolean;
 }
 
 const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
@@ -46,6 +47,7 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
     datasets,
     removeBarGaps = false,
     tightPadding = false,
+    scaledToSix = true,
   } = props;
 
   const options = {
@@ -113,7 +115,7 @@ const VerticalBarChartType01 = (props: VerticalBarChartType01Props) => {
       },
       y: {
         display: false,
-        suggestedMax: 6,
+        suggestedMax: scaledToSix ? 6 : 0,
         grid: {
           display: false,
         },
