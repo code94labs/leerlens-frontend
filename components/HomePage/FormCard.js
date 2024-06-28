@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import LinkRoundedIcon from "@mui/icons-material/LinkRounded";
 import QRCode from "qrcode.react";
-
+import { useTranslation } from "react-i18next";
 import { champBlackFontFamily } from "../../shared/typography";
 
 import { useWindowSize } from "../../utils/hooks/useWindowSize";
@@ -234,7 +234,7 @@ const customStyles = {
 
 const FormCard = (props) => {
   const { title, description, pagePath } = props;
-
+  const {t} = useTranslation('common')
   const router = useRouter();
 
   const [openDialog, setOpenDialog] = useState(false);
@@ -277,7 +277,7 @@ const FormCard = (props) => {
   const qrDialogModel = (
     <Box sx={customStyles.modalContent}>
       <Typography variant="h6" sx={customStyles.modalTitle}>
-        Scan QR Code
+        {t('Form-card.Scan QR')}
       </Typography>
 
       <QRCode
@@ -321,7 +321,7 @@ const FormCard = (props) => {
           onClick={handleClose}
           disableElevation
         >
-          Cancel
+          {t('Form-card.Cancel')}
         </Button>
 
         <Button
@@ -337,7 +337,7 @@ const FormCard = (props) => {
           onClick={downloadQR}
           disableElevation
         >
-          Download QR
+          {t('Form-card.Download QR')}
         </Button>
       </Stack>
     </Box>
@@ -366,7 +366,7 @@ const FormCard = (props) => {
               onClick={handleFormNavigation}
               disableElevation
             >
-              Start {title}
+              {t('Form-card.Start')} {title}
             </Button>
 
             <Button
@@ -376,7 +376,7 @@ const FormCard = (props) => {
               onClick={handleOpen}
               disableElevation
             >
-              View QR Code
+              {t('Form-card.View QR')}
             </Button>
           </Box>
         </Stack>

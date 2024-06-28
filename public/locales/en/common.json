@@ -97,8 +97,14 @@
       "Facebook": "Follow us on Facebook",
       "Instagram": "Follow us on Instagram",
       "Tiktok": "Follow us on Tik Tok"
-
-
+    },
+    
+    "Form-card": {
+      "Scan QR": "Scan QR Code",
+      "Cancel": "Cancel",
+      "Download QR": "Download QR",
+      "Start": "Start",
+      "View QR": "View QR Code"
     }
 }
   
