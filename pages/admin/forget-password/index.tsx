@@ -5,6 +5,9 @@ import { champBlackFontFamily } from "../../../shared/typography";
 import AlertNotification from "../../../components/LoginPage/AlertNotification/AlertNotification";
 import { postForgotPassword } from "../../../services/authentication.service";
 import { gmailAddress } from "../../../utils/constant";
+import { UseTranslation, useTranslation } from "next-i18next";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { GetStaticProps } from 'next';
 
 const customStyles = {
   background: {
@@ -65,11 +68,18 @@ const customStyles = {
   },
 };
 
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common', 'footer'])),
+    },
+  };
+};
 
 const ForgetPasswordPage = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [email, setEmail] = useState<string>("");
-
+  const {t} = useTranslation('common')
   const [error, setError] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -102,28 +112,27 @@ const ForgetPasswordPage = () => {
         fontFamily={champBlackFontFamily}
         textTransform="uppercase"
       >
-        Enter your email address
+        {t('forget-password.Email')}
       </Typography>
       <Typography mb={3} textAlign="center">
-        Please enter your admin email address to receive a link to reset your
-        password.
+         {t('forget-password.Admin-email')}
       </Typography>
 
       <Stack flexDirection="column" alignItems="">
         <TextField
           variant="outlined"
-          label="Enter email address"
+          label={t('forget-password.Enter-email')}
           required
           type="email"
           disabled={isLoading}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="abc@gmail.com"
+          placeholder={t('forget-password.Email-placeholder')}
           sx={customStyles.textField}
         />
 
         {error && (
-          <AlertNotification message="Invalid Email" onClick={() => {}} />
+          <AlertNotification message={t('forget-password.Invalid')} onClick={() => {}} />
         )}
 
         <Stack flexDirection="row" justifyContent="center" mt={3}>
@@ -135,7 +144,7 @@ const ForgetPasswordPage = () => {
             disableElevation
             disabled={isLoading}
           >
-            {isLoading ? "Sending reset mail" : "Reset Password"}
+            {isLoading ? t('forget-password.Sending') : t('forget-password.Reset')}
           </Button>
         </Stack>
       </Stack>

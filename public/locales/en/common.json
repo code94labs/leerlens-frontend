@@ -114,7 +114,20 @@
       "Enter-password": "Enter password",
       "Remember-me": "Remember me",
       "loginin":"Logging in...",
-      "Signin": "Sign In"
+      "Signin": "Sign In",
+      "Invalid":"Invalid username or Passoword",
+      "Forget":"Forget Password"
+    },
+
+    "forget-password": {
+      "Email": "Enter your email address",
+      "Admin-email": "Please enter your admin email address to receive a link to reset your password.",
+      "Sending": "Sending reset mail",
+      "Reset": "Reset Password",
+      "Invalid": "Invalid Email",
+      "Enter-email": "Enter email address",
+      "Email-placeholder": "abc@gmail.com"
+
     }
 }
   

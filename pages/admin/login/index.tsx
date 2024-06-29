@@ -240,8 +240,8 @@ const LoginPage = () => {
 
             {isError && (
               <AlertNotification
-                message="Invalid username or Passoword"
-                linkText="Forget Password"
+                message={t('login.Invalid')}
+                linkText={t('login.Forget')}
                 onClick={handleForgetPassword}
               />
             )}
@@ -255,7 +255,7 @@ const LoginPage = () => {
                 disableElevation
                 disabled={isLoading}
               >
-                {isLoading ? t('login.Loginin') : t('login.Signin')}
+                {isLoading ? t('login.loginin') : t('login.Signin')}
               </Button>
             </Stack>
           </Stack>
