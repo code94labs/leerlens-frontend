@@ -216,6 +216,12 @@ const Input = React.forwardRef(function CustomInput(
   );
 });
 
+export const questionSetTabs = {
+  personalDetails: 0,
+  quesitonSetOne: 1,
+  personalDetailsPartTwo: 2,
+};
+
 const steps = ["Personal Details", "Part 01 Questions", "Part 02 Questions"];
 
 const questionSectionOne = 0;
@@ -244,12 +250,8 @@ const RemindEvaluationForm = () => {
   const [answersPartOne, setAnswersPartOne] = useState<QuestionniareAnswer[]>(
     []
   );
-  const [answersPartTwo, setAnswersPartTwo] = useState<QuestionniareAnswer[]>(
-    []
-  );
 
   const [allAnsweredPartOne, setAllAnsweredPartOne] = useState<boolean>(false);
-  const [allAnsweredPartTwo, setAllAnsweredPartTwo] = useState<boolean>(false);
 
   const [activeStep, setActiveStep] = useState(0);
   const [completed, setCompleted] = useState<{
@@ -320,11 +322,9 @@ const RemindEvaluationForm = () => {
     const requestBody: CreateStudentResponse = {
       formType: FormEvaluation.Evaluation,
       studentDetails: [...personDetailsInfo, ...personalDetailsPartTwoList],
-      responses: [...answersPartOne, ...answersPartTwo],
+      responses: [...answersPartOne],
     };
     setIsLoading(true);
-
-    console.log(requestBody);
 
     await createStudentResponse(requestBody)
       .then(() => {
@@ -368,6 +368,136 @@ const RemindEvaluationForm = () => {
     setActiveStep(step);
   };
 
+  // can be exported
+  const formSelect = (question: QuestionResponse) => (
+    <>
+      <InputLabel>{question.questionText}</InputLabel>
+      <Select
+        MenuProps={{
+          autoFocus: false,
+          PaperProps: {
+            style: {
+              maxHeight: 200,
+            },
+          },
+        }}
+        labelId={`search-select-`}
+        id={String(question.id)}
+        name={String(question.id)}
+        value={personalDetailsFormik.values[question.id]}
+        label={question.questionText}
+        onChange={personalDetailsFormik.handleChange}
+        onClose={() =>
+          setSearchStrings({
+            ...searchStrings,
+            [question.id]: "",
+          })
+        }
+        renderValue={() => personalDetailsFormik.values[question.id]}
+        onBlur={personalDetailsFormik.handleBlur}
+        error={
+          personalDetailsFormik.touched[question.id] &&
+          Boolean(personalDetailsFormik.errors[question.id])
+        }
+      >
+        <ListSubheader>
+          <TextField
+            size="small"
+            autoFocus
+            placeholder="Type to search..."
+            fullWidth
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchRoundedIcon />
+                </InputAdornment>
+              ),
+            }}
+            value={searchStrings[question.id] || ""}
+            onChange={(e) =>
+              setSearchStrings({
+                ...searchStrings,
+                [question.id]: e.target.value,
+              })
+            }
+            onKeyDown={(e) => {
+              if (e.key !== "Escape") {
+                e.stopPropagation();
+              }
+            }}
+          />
+        </ListSubheader>
+        {question.dropdownOptions
+          .filter((item) => !item.isDelete)
+          .filter((option) =>
+            containsText(option.item, searchStrings[question.id] || "")
+          )
+          .map((item: DropDownOptions, index: number) => (
+            <MenuItem value={item.item} key={index}>
+              {item.item}
+            </MenuItem>
+          ))}
+      </Select>
+    </>
+  );
+
+  // can be exported and used in common
+  const formTextField = (question: QuestionResponse) => (
+    <TextField
+      id={String(question.id)}
+      name={String(question.id)}
+      label={question.questionText}
+      value={personalDetailsFormik.values[question.id]}
+      onChange={personalDetailsFormik.handleChange}
+      onBlur={personalDetailsFormik.handleBlur}
+      error={
+        personalDetailsFormik.touched[question.id] &&
+        Boolean(personalDetailsFormik.errors[question.id])
+      }
+    />
+  );
+
+  const formTextArea = (question: QuestionResponse) => (
+    <Input
+      aria-label={question.questionText}
+      multiline
+      placeholder={question.questionText}
+      id={String(question.id)}
+      name={String(question.id)}
+      value={personalDetailsPartTwoFormik.values[question.id]}
+      onChange={personalDetailsPartTwoFormik.handleChange}
+      onBlur={personalDetailsPartTwoFormik.handleBlur}
+      error={
+        personalDetailsPartTwoFormik.touched[question.id] &&
+        Boolean(personalDetailsPartTwoFormik.errors[question.id])
+      }
+    />
+  );
+
+  const formCustomScale = (question: QuestionResponse) => (
+    <CustomScale
+      {...question}
+      updateAnswer={(answer: number) => {
+        personalDetailsPartTwoFormik.setFieldValue(String(question.id), answer);
+      }}
+    />
+  );
+
+  const getInputType = (question: QuestionResponse) => {
+    switch (question.fieldType) {
+      case FieldType.DropDown:
+        return formSelect(question);
+      case FieldType.TextArea:
+        return formTextArea(question);
+      case FieldType.Scale1to10:
+        return formCustomScale(question);
+      case FieldType.TextField:
+        return formTextField(question);
+      default:
+        return null;
+    }
+  };
+
   const personalDetailsValidationSchema = yup
     .object()
     .shape(
@@ -397,95 +527,7 @@ const RemindEvaluationForm = () => {
         studentFormInfo.map((question: QuestionResponse) => (
           <Grid item xs={12} md={6} key={question.id}>
             <FormControl fullWidth required>
-              {question.fieldType === FieldType.DropDown ? (
-                <>
-                  <InputLabel>{question.questionText}</InputLabel>
-                  <Select
-                    MenuProps={{
-                      autoFocus: false,
-                      PaperProps: {
-                        style: {
-                          maxHeight: 200,
-                        },
-                      },
-                    }}
-                    labelId={`search-select-`}
-                    id={String(question.id)}
-                    name={String(question.id)}
-                    value={personalDetailsFormik.values[question.id]}
-                    label={question.questionText}
-                    onChange={personalDetailsFormik.handleChange}
-                    onClose={() =>
-                      setSearchStrings({
-                        ...searchStrings,
-                        [question.id]: "",
-                      })
-                    }
-                    renderValue={() =>
-                      personalDetailsFormik.values[question.id]
-                    }
-                    onBlur={personalDetailsFormik.handleBlur}
-                    error={
-                      personalDetailsFormik.touched[question.id] &&
-                      Boolean(personalDetailsFormik.errors[question.id])
-                    }
-                  >
-                    <ListSubheader>
-                      <TextField
-                        size="small"
-                        autoFocus
-                        placeholder="Type to search..."
-                        fullWidth
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">
-                              <SearchRoundedIcon />
-                            </InputAdornment>
-                          ),
-                        }}
-                        value={searchStrings[question.id] || ""}
-                        onChange={(e) =>
-                          setSearchStrings({
-                            ...searchStrings,
-                            [question.id]: e.target.value,
-                          })
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key !== "Escape") {
-                            e.stopPropagation();
-                          }
-                        }}
-                      />
-                    </ListSubheader>
-                    {question.dropdownOptions
-                      .filter((item) => !item.isDelete)
-                      .filter((option) =>
-                        containsText(
-                          option.item,
-                          searchStrings[question.id] || ""
-                        )
-                      )
-                      .map((item: DropDownOptions, index: number) => (
-                        <MenuItem value={item.item} key={index}>
-                          {item.item}
-                        </MenuItem>
-                      ))}
-                  </Select>
-                </>
-              ) : (
-                <TextField
-                  id={String(question.id)}
-                  name={String(question.id)}
-                  label={question.questionText}
-                  value={personalDetailsFormik.values[question.id]}
-                  onChange={personalDetailsFormik.handleChange}
-                  onBlur={personalDetailsFormik.handleBlur}
-                  error={
-                    personalDetailsFormik.touched[question.id] &&
-                    Boolean(personalDetailsFormik.errors[question.id])
-                  }
-                />
-              )}
+              {getInputType(question)}
               {personalDetailsFormik.touched[question.id] && (
                 <FormHelperText sx={{ color: "red", mb: -2.5 }}>
                   {personalDetailsFormik.errors[question.id]}
@@ -564,142 +606,7 @@ const RemindEvaluationForm = () => {
             key={question.id}
           >
             <FormControl fullWidth required>
-              {(() => {
-                switch (question.fieldType) {
-                  case FieldType.DropDown:
-                    return (
-                      <>
-                        <InputLabel>{question.questionText}</InputLabel>
-                        <Select
-                          MenuProps={{
-                            autoFocus: false,
-                            PaperProps: {
-                              style: {
-                                maxHeight: 200,
-                              },
-                            },
-                          }}
-                          labelId={`search-select-`}
-                          id={String(question.id)}
-                          name={String(question.id)}
-                          value={
-                            personalDetailsPartTwoFormik.values[question.id]
-                          }
-                          label={question.questionText}
-                          onChange={personalDetailsPartTwoFormik.handleChange}
-                          onClose={() =>
-                            setSearchStrings({
-                              ...searchStrings,
-                              [question.id]: "",
-                            })
-                          }
-                          renderValue={() =>
-                            personalDetailsPartTwoFormik.values[question.id]
-                          }
-                          onBlur={personalDetailsPartTwoFormik.handleBlur}
-                          error={
-                            personalDetailsPartTwoFormik.touched[question.id] &&
-                            Boolean(
-                              personalDetailsPartTwoFormik.errors[question.id]
-                            )
-                          }
-                        >
-                          <ListSubheader>
-                            <TextField
-                              size="small"
-                              autoFocus
-                              placeholder="Type to search..."
-                              fullWidth
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    <SearchRoundedIcon />
-                                  </InputAdornment>
-                                ),
-                              }}
-                              value={searchStrings[question.id] || ""}
-                              onChange={(e) =>
-                                setSearchStrings({
-                                  ...searchStrings,
-                                  [question.id]: e.target.value,
-                                })
-                              }
-                              onKeyDown={(e) => {
-                                if (e.key !== "Escape") {
-                                  e.stopPropagation();
-                                }
-                              }}
-                            />
-                          </ListSubheader>
-                          {question.dropdownOptions
-                            .filter((item) => !item.isDelete)
-                            .filter((option) =>
-                              containsText(
-                                option.item,
-                                searchStrings[question.id] || ""
-                              )
-                            )
-                            .map((item: DropDownOptions, index: number) => (
-                              <MenuItem value={item.item} key={index}>
-                                {item.item}
-                              </MenuItem>
-                            ))}
-                        </Select>
-                      </>
-                    );
-                  case FieldType.TextArea:
-                    return (
-                      <Input
-                        aria-label={question.questionText}
-                        multiline
-                        placeholder={question.questionText}
-                        id={String(question.id)}
-                        name={String(question.id)}
-                        value={personalDetailsPartTwoFormik.values[question.id]}
-                        onChange={personalDetailsPartTwoFormik.handleChange}
-                        onBlur={personalDetailsPartTwoFormik.handleBlur}
-                        error={
-                          personalDetailsPartTwoFormik.touched[question.id] &&
-                          Boolean(
-                            personalDetailsPartTwoFormik.errors[question.id]
-                          )
-                        }
-                      />
-                    );
-                  case FieldType.Scale1to10:
-                    return (
-                      <CustomScale
-                        {...question}
-                        // updateAnswer={function (answer: number): void {
-                        //   throw new Error("Function not implemented.");
-                        // }}
-                        updateAnswer={(answer: number) => {
-                          personalDetailsPartTwoFormik.setFieldValue(
-                            String(question.id),
-                            answer
-                          );
-                        }}
-                      />
-                    );
-                  default:
-                    return (
-                      <TextField
-                        id={String(question.id)}
-                        name={String(question.id)}
-                        label={question.questionText}
-                        value={personalDetailsPartTwoFormik.values[question.id]}
-                        onChange={personalDetailsPartTwoFormik.handleChange}
-                        onBlur={personalDetailsPartTwoFormik.handleBlur}
-                        error={
-                          personalDetailsPartTwoFormik.touched[question.id] &&
-                          Boolean(
-                            personalDetailsPartTwoFormik.errors[question.id]
-                          )
-                        }
-                      />
-                    );
-                }
-              })()}
+              {getInputType(question)}
               {personalDetailsPartTwoFormik.touched[question.id] && (
                 <FormHelperText sx={{ color: "red", mb: -2.5 }}>
                   {personalDetailsPartTwoFormik.errors[question.id]}
@@ -713,13 +620,13 @@ const RemindEvaluationForm = () => {
 
   const formContent = () => {
     switch (activeStep) {
-      case 0:
+      case questionSetTabs.personalDetails:
         return personalDetailsForm;
 
-      case 1:
+      case questionSetTabs.quesitonSetOne:
         return questionPartOneForm;
 
-      case 2:
+      case questionSetTabs.personalDetailsPartTwo:
         return evaluationPartTwo;
 
       default:
@@ -801,29 +708,17 @@ const RemindEvaluationForm = () => {
     fetchQuestionnaireData();
   }, []);
 
-  // useEffect(() => {
-  //   const partOneAllAnswered = () => {
-  //     if (answersPartOne.length !== questionListPartOne.length) {
-  //       return false;
-  //     }
+  useEffect(() => {
+    const partOneAllAnswered = () => {
+      if (answersPartOne.length !== questionListPartOne.length) {
+        return false;
+      }
 
-  //     return true;
-  //   };
+      return true;
+    };
 
-  //   setAllAnsweredPartOne(partOneAllAnswered());
-  // }, [answersPartOne, questionListPartOne]);
-
-  // useEffect(() => {
-  //   const partTwoAllAnswered = () => {
-  //     if (answersPartTwo.length !== questionListPartTwo.length) {
-  //       return false;
-  //     }
-
-  //     return true;
-  //   };
-
-  //   setAllAnsweredPartTwo(partTwoAllAnswered());
-  // }, [answersPartTwo, questionListPartTwo]);
+    setAllAnsweredPartOne(partOneAllAnswered());
+  }, [answersPartOne, questionListPartOne]);
 
   return (
     <Stack sx={customStyles.stack}>
@@ -845,7 +740,7 @@ const RemindEvaluationForm = () => {
           handleStep={handleStep}
         />
 
-        {activeStep < 3 && (
+        {activeStep < totalSteps() && (
           <Box
             sx={{
               width: "100%",
@@ -858,7 +753,10 @@ const RemindEvaluationForm = () => {
               gap: 2,
             }}
           >
-            <CircularProgressWithLabel activeStep={activeStep} totalSteps={3} />
+            <CircularProgressWithLabel
+              activeStep={activeStep}
+              totalSteps={totalSteps()}
+            />
             <Box
               sx={{
                 display: "flex",
@@ -871,7 +769,7 @@ const RemindEvaluationForm = () => {
               >
                 {steps[activeStep]}
               </Typography>
-              {activeStep < 2 && (
+              {activeStep < totalSteps() - 1 && (
                 <Typography
                   variant="caption"
                   sx={{
@@ -896,7 +794,7 @@ const RemindEvaluationForm = () => {
             </Typography>
 
             <Box sx={{ display: "flex", flexDirection: "row", pt: 2 }}>
-              {activeStep === 0 ? (
+              {activeStep === questionSetTabs.personalDetails ? (
                 <Button
                   color="inherit"
                   variant="outlined"
@@ -924,7 +822,7 @@ const RemindEvaluationForm = () => {
                   onClick={handleSubmit}
                   sx={customStyles.primaryButton}
                   disabled={
-                    activeStep === 3 &&
+                    allStepsCompleted() &&
                     !(
                       personalDetailsPartTwoFormik.isValid &&
                       personalDetailsPartTwoFormik.dirty
@@ -939,21 +837,14 @@ const RemindEvaluationForm = () => {
                   variant="outlined"
                   onClick={handleNext}
                   sx={customStyles.primaryButton}
-                  // disabled={
-                  //   activeStep === 0
-                  //     ? !(
-                  //         personalDetailsFormik.isValid &&
-                  //         personalDetailsFormik.dirty
-                  //       )
-                  //     : activeStep === 1
-                  //     ? !allAnsweredPartOne
-                  //     : activeStep === 2
-                  //     ? !allAnsweredPartTwo
-                  //     : !(
-                  //         programAndSupervisorsFormik.isValid &&
-                  //         programAndSupervisorsFormik.dirty
-                  //       )
-                  // }
+                  disabled={
+                    activeStep === questionSetTabs.personalDetails
+                      ? !(
+                          personalDetailsFormik.isValid &&
+                          personalDetailsFormik.dirty
+                        )
+                      : !allAnsweredPartOne
+                  }
                 >
                   Next
                 </Button>

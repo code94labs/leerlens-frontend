@@ -253,19 +253,15 @@ const validationSchema = yup.object({
 });
 
 type Props = {
-  title?: string;
-  label?: string;
-  question?: EvaluationQuestion;
-  handleQuestionUpdate?: (question: EvaluationQuestion) => void;
-  handleQuestionSoftDelete?: (id: number) => void;
+  question: EvaluationQuestion;
+  handleQuestionUpdate: (question: EvaluationQuestion) => void;
+  handleQuestionSoftDelete: (id: number) => void;
   moveItemUp: (orderId: number | undefined) => void;
   moveItemDown: (orderId: number | undefined) => void;
 };
 
 const EvaluationDynamicField = (props: Props) => {
   const {
-    title,
-    label,
     question,
     handleQuestionUpdate,
     handleQuestionSoftDelete,
@@ -277,12 +273,10 @@ const EvaluationDynamicField = (props: Props) => {
 
   const [openDialog, setOpenDialog] = useState(false);
   const [questionType, setQuestionType] = useState<FieldType>(
-    question?.fieldType ?? FieldType.Scale1to6
+    question.fieldType
   );
   const [selectedQuestionSetType, setSelectedQuestionSetType] =
-    useState<QuestionSetType>(
-      question?.questionSetType ?? QuestionSetType.allSchools
-    );
+    useState<QuestionSetType>(question.questionSetType);
 
   const handleQuestionSetTypeUpdate = (event: any) => {
     setSelectedQuestionSetType(event.target.value);
@@ -303,7 +297,7 @@ const EvaluationDynamicField = (props: Props) => {
 
   const formik = useFormik({
     initialValues: {
-      questionText: question?.questionText ?? "",
+      questionText: question.questionText,
     },
     validationSchema: validationSchema,
     onSubmit: (values, { resetForm }) => {
@@ -318,7 +312,7 @@ const EvaluationDynamicField = (props: Props) => {
       </Typography>
 
       <Typography variant="body1">
-        Are you sure want to delete question no. {question?.positionOrderId} ?
+        Are you sure want to delete question no. {question.positionOrderId} ?
       </Typography>
 
       <Stack sx={customStyles.dialogBtnStack}>
@@ -349,9 +343,7 @@ const EvaluationDynamicField = (props: Props) => {
           }}
           fullWidth
           onClick={() => {
-            handleQuestionSoftDelete &&
-              question?.id &&
-              handleQuestionSoftDelete(question?.id);
+            question?.id && handleQuestionSoftDelete(question?.id);
             setOpenDialog(false);
           }}
           disableElevation
@@ -375,11 +367,11 @@ const EvaluationDynamicField = (props: Props) => {
           fontFamily={champBlackFontFamily}
           textTransform="uppercase"
         >
-          {title ? title : `Question : ${question?.positionOrderId}`}
+          {`Question : ${question.positionOrderId}`}
         </Typography>
 
         <Box>
-          {question?.isNewlyAdded && (
+          {question.isNewlyAdded && (
             <Tooltip title="Delete Question">
               <IconButton
                 sx={customStyles.button}
@@ -393,7 +385,7 @@ const EvaluationDynamicField = (props: Props) => {
           <Tooltip title="Move the question down the order">
             <IconButton
               sx={customStyles.button}
-              onClick={() => moveItemDown(question?.positionOrderId)}
+              onClick={() => moveItemDown(question.positionOrderId)}
             >
               <KeyboardArrowDownIcon fontSize="small" />
             </IconButton>
@@ -402,7 +394,7 @@ const EvaluationDynamicField = (props: Props) => {
           <Tooltip title="Move the question up the order">
             <IconButton
               sx={customStyles.button}
-              onClick={() => moveItemUp(question?.positionOrderId)}
+              onClick={() => moveItemUp(question.positionOrderId)}
             >
               <KeyboardArrowUpIcon fontSize="small" />
             </IconButton>
@@ -444,7 +436,7 @@ const EvaluationDynamicField = (props: Props) => {
 
         <TextField
           variant="outlined"
-          label={label ?? "Type Question"}
+          label={"Type Question"}
           required
           type="text"
           // placeholder="abc@gmail.com"
@@ -499,18 +491,21 @@ const EvaluationDynamicField = (props: Props) => {
 
   useEffect(() => {
     const handleSaveChanges = () => {
-      if (question && handleQuestionUpdate) {
-        const newQuestion: EvaluationQuestion = question;
-        newQuestion.questionText = formik.values.questionText;
-        newQuestion.fieldType = questionType;
-        newQuestion.questionSetType = selectedQuestionSetType;
+      const newQuestion: EvaluationQuestion = question;
+      newQuestion.questionText = formik.values.questionText;
+      newQuestion.fieldType = questionType;
+      newQuestion.questionSetType = selectedQuestionSetType;
 
-        handleQuestionUpdate(newQuestion);
-      }
+      handleQuestionUpdate(newQuestion);
     };
 
     handleSaveChanges();
-  }, [question, formik.values.questionText, selectedQuestionSetType]);
+  }, [
+    question,
+    formik.values.questionText,
+    questionType,
+    selectedQuestionSetType,
+  ]);
 
   return (
     <Stack mx={2} mt={2} px={3} py={1} sx={customStyles.stack}>

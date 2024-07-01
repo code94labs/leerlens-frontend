@@ -184,6 +184,7 @@ const EditEvaluationForm = () => {
   const [partOneQuestions, setPartOneQuestions] = useState<
     EvaluationQuestion[]
   >([]);
+
   const [personalDetailsPartTwoQuestions, setPersonalDetailsPartTwoQuestions] =
     useState<QuestionResponse[]>([]);
 
@@ -552,35 +553,37 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      // case questionSetTabs.quesitonSetTwo:
-      //   return (
-      //     <>
-      //       {partTwoQuestions
-      //         .sort((a, b) => a.positionOrderId - b.positionOrderId)
-      //         .map((question: EvaluationQuestion) => (
-      //           <QuestionnaireDynamicField
-      //             key={question.id}
-      //             question={question}
-      //             handleQuestionUpdate={handleEvaluationQuestionUpdate}
-      //             handleQuestionSoftDelete={handleEvaluationSoftDelete}
-      //             moveItemUp={moveItemUp}
-      //             moveItemDown={moveItemDown}
-      //           />
-      //         ))}
+      case questionSetTabs.quesitonSetTwo:
+        return (
+          <>
+            {personalDetailsPartTwoQuestions
+              .sort((a, b) => a.positionOrderId - b.positionOrderId)
+              .map((question: QuestionResponse) => (
+                <DynamicField
+                  key={question.id}
+                  fieldType={question.fieldType as FieldType}
+                  isQuestionnaireType
+                  question={question}
+                  handleQuestionUpdate={handlePersonalDetailsQuestionUpdate}
+                  handleQuestionSoftDelete={handlePersonalDetailsSoftDelete}
+                  moveItemUp={moveItemUp}
+                  moveItemDown={moveItemDown}
+                />
+              ))}
 
-      //       {displayNewQuestion && (
-      //         <AddNewField
-      //           handleNewQuestionDelete={handleNewQuestionDelete}
-      //           handleNewQuestionSave={handleNewQuestionnaireQuestionSave}
-      //           questionnaireType
-      //         />
-      //       )}
+            {displayNewQuestion && (
+              <AddNewField
+                handleNewQuestionDelete={handleNewQuestionDelete}
+                handleNewQuestionSave={handleNewPersonalDetailsQuestionSave}
+                questionnaireType
+              />
+            )}
 
-      //       {addQuestionButton}
+            {addQuestionButton}
 
-      //       {updateButtonGroup}
-      //     </>
-      //   );
+            {updateButtonGroup}
+          </>
+        );
       // case questionSetTabs.programAndSupervisor:
       //   return (
       //     <>

@@ -55,6 +55,7 @@ type CustomScaleProps = {
   positionOrderId: number;
   updateAnswer: (answer: number) => void;
   isDisabled?: boolean;
+  evaluationQuestionnaire?: boolean;
 };
 
 const generateScaleArr = (min: number, max: number) => {
@@ -68,8 +69,14 @@ const generateScaleArr = (min: number, max: number) => {
 };
 
 const CustomScale = (props: CustomScaleProps) => {
-  const { questionText, fieldType, positionOrderId, updateAnswer, isDisabled } =
-    props;
+  const {
+    questionText,
+    fieldType,
+    positionOrderId,
+    updateAnswer,
+    isDisabled,
+    evaluationQuestionnaire = false,
+  } = props;
 
   const [selectedValue, setSelectedValue] = useState(0);
 
@@ -97,12 +104,16 @@ const CustomScale = (props: CustomScaleProps) => {
           mb: 3,
         }}
       >
-        <Typography color="grey" sx={customStyles.scaleText}>
-          Totally disagree
-        </Typography>
-        <Typography color="grey" sx={customStyles.scaleText}>
-          Totally agree
-        </Typography>
+        {!(fieldType == FieldType.Scale1to10) && (
+          <Typography color="grey" sx={customStyles.scaleText}>
+            Totally disagree
+          </Typography>
+        )}
+        {!(fieldType == FieldType.Scale1to10) && (
+          <Typography color="grey" sx={customStyles.scaleText}>
+            Totally agree
+          </Typography>
+        )}
       </Stack>
 
       <Stack
@@ -112,16 +123,18 @@ const CustomScale = (props: CustomScaleProps) => {
         justifyContent="space-between"
         sx={{ width: fieldType === FieldType.Scale1to6 ? 650 : 900 }}
       >
-        <Typography
-          color="grey"
-          sx={customStyles.scaleText}
-          display={{
-            xs: "none",
-            md: "flex",
-          }}
-        >
-          Totally disagree
-        </Typography>
+        {!(fieldType == FieldType.Scale1to10) && (
+          <Typography
+            color="grey"
+            sx={customStyles.scaleText}
+            display={{
+              xs: "none",
+              md: "flex",
+            }}
+          >
+            Totally disagree
+          </Typography>
+        )}
 
         {scale.map((scaleValue, index) => (
           <IconButton
@@ -138,16 +151,18 @@ const CustomScale = (props: CustomScaleProps) => {
           </IconButton>
         ))}
 
-        <Typography
-          color="grey"
-          sx={customStyles.scaleText}
-          display={{
-            xs: "none",
-            md: "flex",
-          }}
-        >
-          Totally agree
-        </Typography>
+        {!(fieldType == FieldType.Scale1to10) && (
+          <Typography
+            color="grey"
+            sx={customStyles.scaleText}
+            display={{
+              xs: "none",
+              md: "flex",
+            }}
+          >
+            Totally agree
+          </Typography>
+        )}
       </Stack>
     </Stack>
   );
