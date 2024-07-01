@@ -480,6 +480,7 @@ const RemindEvaluationForm = () => {
       updateAnswer={(answer: number) => {
         personalDetailsPartTwoFormik.setFieldValue(String(question.id), answer);
       }}
+      evaluationQuestionnaire={true}
     />
   );
 
@@ -565,6 +566,7 @@ const RemindEvaluationForm = () => {
                 (answer: number) =>
                   updateAnswerPartOne(questionDetails.id ?? 0, answer) // address this issue/temp fix
               }
+              evaluationQuestionnaire
             />
           )
         )}

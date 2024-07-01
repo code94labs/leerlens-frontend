@@ -75,7 +75,7 @@ const CustomScale = (props: CustomScaleProps) => {
     positionOrderId,
     updateAnswer,
     isDisabled,
-    evaluationQuestionnaire = false,
+    evaluationQuestionnaire,
   } = props;
 
   const [selectedValue, setSelectedValue] = useState(0);
@@ -106,12 +106,12 @@ const CustomScale = (props: CustomScaleProps) => {
       >
         {!(fieldType == FieldType.Scale1to10) && (
           <Typography color="grey" sx={customStyles.scaleText}>
-            Totally disagree
+            {!evaluationQuestionnaire ? "Totally disagree" : "Not valuable"}
           </Typography>
         )}
         {!(fieldType == FieldType.Scale1to10) && (
           <Typography color="grey" sx={customStyles.scaleText}>
-            Totally agree
+            {!evaluationQuestionnaire ? "Totally agree" : "Very valuable"}
           </Typography>
         )}
       </Stack>
@@ -121,7 +121,7 @@ const CustomScale = (props: CustomScaleProps) => {
         alignItems="center"
         gap={2}
         justifyContent="space-between"
-        sx={{ width: fieldType === FieldType.Scale1to6 ? 650 : 900 }}
+        sx={{ width: fieldType === FieldType.Scale1to6 ? 650 : 650 }}
       >
         {!(fieldType == FieldType.Scale1to10) && (
           <Typography
@@ -132,7 +132,7 @@ const CustomScale = (props: CustomScaleProps) => {
               md: "flex",
             }}
           >
-            Totally disagree
+            {!evaluationQuestionnaire ? "Totally disagree" : "Not valuable"}
           </Typography>
         )}
 
@@ -160,7 +160,7 @@ const CustomScale = (props: CustomScaleProps) => {
               md: "flex",
             }}
           >
-            Totally agree
+            {!evaluationQuestionnaire ? "Totally agree" : "Very valuable"}
           </Typography>
         )}
       </Stack>
