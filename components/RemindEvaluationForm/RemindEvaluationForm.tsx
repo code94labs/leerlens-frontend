@@ -25,6 +25,7 @@ import * as yup from "yup";
 
 import CustomScale from "../../shared/CustomScale/CustomScale";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
+import SnackbarComponent from "../../shared/Snackbar";
 
 import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
 import {
@@ -636,27 +637,6 @@ const RemindEvaluationForm = () => {
     }
   };
 
-  const snackbar = (
-    <Snackbar
-      open={displaySnackbarMsg}
-      autoHideDuration={6000}
-      onClose={() => setDisplaySnackbarMsg(false)}
-      anchorOrigin={{
-        vertical: "bottom",
-        horizontal: "right",
-      }}
-    >
-      <Alert
-        onClose={() => setDisplaySnackbarMsg(false)}
-        severity={isError ? "error" : "success"}
-        variant="outlined"
-        sx={customStyles.snackbarAlert}
-      >
-        {notificationMsg}
-      </Alert>
-    </Snackbar>
-  );
-
   useEffect(() => {
     const fetchDataStudentInfo = async () => {
       try {
@@ -856,7 +836,12 @@ const RemindEvaluationForm = () => {
         </Box>
       </Box>
 
-      {snackbar}
+      <SnackbarComponent
+        displaySnackbarMsg={displaySnackbarMsg}
+        setDisplaySnackbarMsg={setDisplaySnackbarMsg}
+        notificationMsg={notificationMsg}
+        isError={isError}
+      />
     </Stack>
   );
 };
