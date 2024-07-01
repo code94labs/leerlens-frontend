@@ -27,7 +27,12 @@ import CustomScale from "../../shared/CustomScale/CustomScale";
 import { CircularProgressWithLabel } from "../../shared/CircularProgress/CircularProgressWithLabel";
 import SnackbarComponent from "../../shared/Snackbar";
 
-import { FieldType, FormEvaluation, SectionType } from "../../utils/enum";
+import {
+  FieldType,
+  FormEvaluation,
+  QuestionSetType,
+  SectionType,
+} from "../../utils/enum";
 import {
   CreateStudentResponse,
   DropDownOptions,
@@ -262,6 +267,9 @@ const RemindEvaluationForm = () => {
   const [searchStrings, setSearchStrings] = useState<{ [key: string]: string }>(
     {}
   );
+
+  const [seasonalSchoolSelected, setSeasonalSchoolSelected] =
+    useState<boolean>(false);
 
   const updateAnswerPartOne = (questionId: number, answer: number) => {
     setAnswersPartOne((prevAnswers) => {
@@ -514,9 +522,9 @@ const RemindEvaluationForm = () => {
     );
 
   const personalDetailsFormik = useFormik({
-    initialValues: studentFormInfo
-      ? Object.fromEntries(studentFormInfo.map((field) => [field.id, ""]))
-      : {},
+    initialValues: Object.fromEntries(
+      studentFormInfo.map((field) => [field.id, ""])
+    ),
     validationSchema: personalDetailsValidationSchema,
     onSubmit: () => {},
   });
@@ -543,7 +551,7 @@ const RemindEvaluationForm = () => {
 
   const questionPartOneForm = (
     <>
-      <Typography variant="subtitle2" fontWeight={500}>
+      {/* <Typography variant="subtitle2" fontWeight={500}>
         Below are a number of statements. You can answer these statements on a
         scale from 1 to 6
       </Typography>
@@ -552,11 +560,16 @@ const RemindEvaluationForm = () => {
         1 to {questionListPartOne.length} statements (1 = totally disagree, 2 =
         disagree, 3 = somewhat disagree, 4 = somewhat agree, 5 = agree, 6 =
         totally agree).
-      </Typography>
+      </Typography> */}
 
       <FormControl>
-        {questionListPartOne.map(
-          (questionDetails: EvaluationQuestion, index: number) => (
+        {questionListPartOne
+          .filter((question) =>
+            !seasonalSchoolSelected
+              ? question.questionSetType !== QuestionSetType.onlySeasonalSchools
+              : true
+          )
+          .map((questionDetails: EvaluationQuestion) => (
             <CustomScale
               key={questionDetails.id}
               questionText={questionDetails.questionText}
@@ -569,8 +582,7 @@ const RemindEvaluationForm = () => {
               }
               evaluationQuestionnaire
             />
-          )
-        )}
+          ))}
       </FormControl>
     </>
   );
@@ -692,7 +704,14 @@ const RemindEvaluationForm = () => {
 
   useEffect(() => {
     const partOneAllAnswered = () => {
-      if (answersPartOne.length !== questionListPartOne.length) {
+      if (
+        answersPartOne.length !==
+        questionListPartOne.filter((question) =>
+          !seasonalSchoolSelected
+            ? question.questionSetType !== QuestionSetType.onlySeasonalSchools
+            : true
+        ).length
+      ) {
         return false;
       }
 
@@ -701,6 +720,17 @@ const RemindEvaluationForm = () => {
 
     setAllAnsweredPartOne(partOneAllAnswered());
   }, [answersPartOne, questionListPartOne]);
+
+  useEffect(() => {
+    if (
+      personalDetailsFormik.values?.["53"] ===
+      "Zomerschool, herfstschool of lenteschool"
+    ) {
+      setSeasonalSchoolSelected(true);
+    } else {
+      setSeasonalSchoolSelected(false);
+    }
+  }, [personalDetailsFormik.values]);
 
   return (
     <Stack sx={customStyles.stack}>
