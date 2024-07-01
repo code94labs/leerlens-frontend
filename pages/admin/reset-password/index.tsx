@@ -15,6 +15,9 @@ import Image from "next/image";
 import { champBlackFontFamily } from "../../../shared/typography";
 import { useRouter } from "next/router";
 import { postResetPassword } from "../../../services/authentication.service";
+import { useTranslation } from "react-i18next";
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
+import { GetStaticProps } from 'next';
 
 const customStyles = {
   snackbarAlert: {
@@ -82,9 +85,17 @@ const customStyles = {
   },
 };
 
+export const getStaticProps: GetStaticProps = async ({ locale }) => {
+  return {
+    props: {
+      ...(await serverSideTranslations(locale ?? 'en', ['common', 'footer'])),
+    },
+  };
+};
+
 const ResetPasswordPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
-
+  const {t} = useTranslation('common');
   const [token, setToken] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
 
@@ -138,14 +149,14 @@ const ResetPasswordPage = () => {
 
       setIsError(false);
 
-      setNotificationMsg("Successfully completed password reset");
+      setNotificationMsg(t('reset-password.Success'));
       setDisplaySnackbarMsg(true);
     } catch (error) {
       console.log((error as Error).message);
 
       setIsError(true);
 
-      setNotificationMsg("Something went wrong when resetting password");
+      setNotificationMsg(t('reset-password.Error'));
       setDisplaySnackbarMsg(true);
     } finally {
       setIsLoading(false);
@@ -180,9 +191,9 @@ const ResetPasswordPage = () => {
             fontFamily={champBlackFontFamily}
             textTransform="uppercase"
           >
-            Reset Password
+            {t('reset-password.Reset')}
           </Typography>
-          <Typography mb={3}>Please enter your new password.</Typography>
+          <Typography mb={3}>{t('reset-password.Password')}</Typography>
 
           <Stack flexDirection="column" alignItems="">
             <TextField
@@ -242,7 +253,7 @@ const ResetPasswordPage = () => {
                 disableElevation
                 disabled={!token || isLoading}
               >
-                {isLoading ? "Resetting..." : "Reset Password"}
+                {isLoading ? t('reset-password.Resetting') : t('reset-password.Reset')}
               </Button>
             </Stack>
           </Stack>

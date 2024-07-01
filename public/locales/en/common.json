@@ -116,7 +116,9 @@
       "loginin":"Logging in...",
       "Signin": "Sign In",
       "Invalid":"Invalid username or Passoword",
-      "Forget":"Forget Password"
+      "Forget":"Forget Password",
+      "Error": "Something went wrong when resetting password",
+      "Success": "Successfully logged in..."
     },
 
     "forget-password": {
@@ -126,8 +128,31 @@
       "Reset": "Reset Password",
       "Invalid": "Invalid Email",
       "Enter-email": "Enter email address",
-      "Email-placeholder": "abc@gmail.com"
+      "Email-placeholder": "abc@gmail.com",
+      "Error": "Something went wrong when resetting password",
+      "Success": "Successfully completed password reset"
 
+    },
+
+    "reset-password": {
+      "Reset": "Reset Password",
+      "Password": "Please enter your new password.",
+      "Resetting": "Resetting...",
+      "Error": "Something went wrong when resetting password",
+      "Success": "Successfully completed password reset"
+
+    },
+
+    "dashboard": {
+      "pre-post-intervention": {
+        "title": "Dashboard - Pre-Post Interventions"
+      },
+      "post-intervention": {
+        "title": "Post-intervention"
+      },
+      "Remind Evaluation": {
+        "title": "Remind Evaluation"
     }
+  }
 }
   

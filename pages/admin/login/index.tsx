@@ -134,7 +134,7 @@ const LoginPage = () => {
         })
       );
 
-      setNotificationMsg("Successfully logged in...");
+      setNotificationMsg(t('login.Success'));
       setDisplaySnackbarMsg(true);
 
       router.push("/admin/dashboard");
@@ -143,7 +143,7 @@ const LoginPage = () => {
 
       setIsError(true);
 
-      setNotificationMsg("Something went wrong when resetting password");
+      setNotificationMsg(t('login.Error'));
       setDisplaySnackbarMsg(true);
     } finally {
       setIsLoading(false);
