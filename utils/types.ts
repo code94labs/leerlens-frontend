@@ -148,6 +148,6 @@ export type DashboardStatistics = {
 export type DashboardEvaluationChart = {
   questionId: number;
   questionText: string;
-  chartType: ChartType;
+  chartTypes: ChartType[];
   answerStatistics: number[];
 };

@@ -50,6 +50,7 @@ import InputLabel from "@mui/material/InputLabel";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import ProgressSpinner from "../../shared/CircularProgress/ProgressSpinner";
+import Container from "@mui/material/Container";
 
 ChartJS.register(
   CategoryScale,
@@ -114,6 +115,8 @@ const DashboardEvaluationContent = (props: Props) => {
     DashboardEvaluationChart[]
   >([]);
 
+  console.log(statisticsData);
+
   const [displayFiltersDiv, setDisplayFiltersDiv] = useState<boolean>(false);
   const [filterSchool, setFilterSchool] = useState<number>(schoolList[0].id);
   const [filterGrade, setFilterGrade] = useState<number>(gradeList[0].id);
@@ -154,8 +157,12 @@ const DashboardEvaluationContent = (props: Props) => {
     setFilterDate(dateFilterList[0]);
   };
 
-  const getChartComponent = (stat: DashboardEvaluationChart, index: number) => {
-    switch (stat.chartType) {
+  const getChartComponent = (
+    stat: DashboardEvaluationChart,
+    chartType: ChartType,
+    index: number
+  ) => {
+    switch (chartType) {
       case ChartType.numericalRepresentation:
         return (
           <NumericalDigit
@@ -165,7 +172,7 @@ const DashboardEvaluationContent = (props: Props) => {
         );
       case ChartType.progressIndicatorTypeOne:
         return (
-          <ProgressIndicator
+          <ProgressBar
             title={`${index + 1}.${stat.questionText}`}
             value={getWeightedAverage(stat.answerStatistics)}
             color={chartColors[index % chartColors.length]}
@@ -174,7 +181,7 @@ const DashboardEvaluationContent = (props: Props) => {
         );
       case ChartType.progressIndicatorTypeTwo:
         return (
-          <ProgressBar
+          <ProgressIndicator
             title={`${index + 1}.${stat.questionText}`}
             value={getWeightedAverage(stat.answerStatistics)}
             color={chartColors[index % chartColors.length]}
@@ -419,19 +426,25 @@ const DashboardEvaluationContent = (props: Props) => {
   );
 
   const statisticsCharts = (
-    <Grid container p={2} spacing={2}>
-      {isLoading
-        ? spinnerSection
-        : statisticsData && statisticsData.length < 1
-        ? noResponsesSection
-        : statisticsData.map(
-            (stat: DashboardEvaluationChart, index: number) => (
-              <Grid item xs={4} key={stat.questionId}>
-                {getChartComponent(stat, index)}
-              </Grid>
-            )
-          )}
-    </Grid>
+    <Container maxWidth="lg">
+      <Stack spacing={2}>
+        {isLoading
+          ? spinnerSection
+          : statisticsData && statisticsData.length < 1
+          ? noResponsesSection
+          : (statisticsData ?? []).map(
+              (stat: DashboardEvaluationChart, index: number) => (
+                <Grid container columnSpacing={2}>
+                  {stat.chartTypes.map((chartType) => (
+                    <Grid item xs={6} key={stat.questionId}>
+                      {getChartComponent(stat, chartType, index)}
+                    </Grid>
+                  ))}
+                </Grid>
+              )
+            )}
+      </Stack>
+    </Container>
   );
 
   useEffect(() => {
