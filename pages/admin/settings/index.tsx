@@ -10,7 +10,7 @@ const SettingsPage = () => {
       <Sidebar />
 
       <Stack width={"100%"}>
-        <AdminHeader title="Settings" shouldDisplayBreadcrumb/>
+        <AdminHeader title="Settings"/>
         <UserProfile/>
       </Stack>
     </Stack>
