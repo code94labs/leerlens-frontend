@@ -5,6 +5,7 @@ import * as Yup from 'yup';
 // import { getUserProfile } from '../services/userService';
 import ManageUsers from './ManageUsers';
 import {countryCodes} from './Countrycodes';
+import { color } from 'framer-motion';
 
 const customStyles = {
   container: {
@@ -13,10 +14,10 @@ const customStyles = {
     borderRadius: 2,
   },
   avatar: {
-    width: 80,
-    height: 80,
+    width: 150,
+    height: 150,
     borderRadius: '50%',
-    backgroundColor: '#673ab7',
+    backgroundColor: '#A879FF',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -31,6 +32,7 @@ const customStyles = {
   },
   inputField: {
     backgroundColor: 'white',
+    width: '40%'
   },
   sectionTitle: {
     color: '#333',
@@ -41,8 +43,10 @@ const customStyles = {
   },
   outlinedButton: {
     mt: 1,
-    borderColor: '#673ab7',
-    color: '#673ab7',
+    color: '#A879FF',
+    border: '2px #A879FF solid',
+    width: '20%',
+    borderRadius: 2
   },
   tabContainer: {
     borderBottom: 1,
@@ -51,6 +55,7 @@ const customStyles = {
   tab: {
     minWidth: 100,
     width: 150,
+    // color:'#A879FF'
   },
   contact: {
     mt: 4,
@@ -99,8 +104,8 @@ const UserProfile = () => {
     <Box sx={customStyles.container}>
       <Box sx={customStyles.tabContainer}>
         <Tabs value={selectedTab} onChange={handleTabChange} aria-label="user profile tabs">
-          <Tab label="User Profile" sx={customStyles.tab} />
-          {userData.role && <Tab label="Manage Users" sx={customStyles.tab} />}
+          <Tab style={selectedTab === 0? {color:'#A879FF'}: {color:'grey'}} label="User Profile" sx={customStyles.tab} />
+          {userData.role && <Tab label="Manage Users" style={selectedTab === 1? {color:'#A879FF'}: {color:'grey'}} sx={customStyles.tab} />}
         </Tabs>
       </Box>
 
@@ -127,9 +132,9 @@ const UserProfile = () => {
                 </Box>
                 <Box>
                   <Typography variant="h4" sx={customStyles.headerText}>
-                    JOHN DOE
+                    {userData.firstName.toUpperCase()+" "+userData.lastName.toUpperCase()}
                   </Typography>
-                  <Typography variant="subtitle1" sx={customStyles.subheaderText}>Super admin</Typography>
+                  <Typography variant="subtitle1" sx={customStyles.subheaderText}>{userData.role && "Super Admin"}</Typography>
                 </Box>
               </Box>
 
@@ -184,6 +189,7 @@ const UserProfile = () => {
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   sx={customStyles.inputField}
+                  style={{width:'26.4%'}}
                 />
                 <ErrorMessage name="contactNumber" component="div" />
               </Box>
@@ -203,7 +209,7 @@ const UserProfile = () => {
               </Box>
 
               <Box mt={4} pl={3} mb={4}>
-                <Button type="submit" variant="contained" color="primary">Save Changes</Button>
+                <Button type="submit" sx={customStyles.outlinedButton} variant="contained" style={{backgroundColor:'#A879FF', color:'white'}}>Save Changes</Button>
               </Box>
             </Form>
           )}
