@@ -575,7 +575,6 @@ const EditEvaluationForm = () => {
               <AddNewField
                 handleNewQuestionDelete={handleNewQuestionDelete}
                 handleNewQuestionSave={handleNewPersonalDetailsQuestionSave}
-                questionnaireType
               />
             )}
 
@@ -584,66 +583,6 @@ const EditEvaluationForm = () => {
             {updateButtonGroup}
           </>
         );
-      // case questionSetTabs.programAndSupervisor:
-      //   return (
-      //     <>
-      //       {programAndSupervisorsQuestions
-      //         .sort((a, b) => a.positionOrderId - b.positionOrderId)
-      //         .map((question: QuestionResponse) => (
-      //           <DynamicField
-      //             key={question.id}
-      //             fieldType={question.fieldType as FieldType}
-      //             isQuestionnaireType
-      //             question={question}
-      //             handleQuestionUpdate={handlePersonalDetailsQuestionUpdate}
-      //             handleQuestionSoftDelete={handlePersonalDetailsSoftDelete}
-      //             moveItemUp={moveItemUp}
-      //             moveItemDown={moveItemDown}
-      //           />
-      //         ))}
-
-      //       {displayNewQuestion && (
-      //         <AddNewField
-      //           handleNewQuestionDelete={handleNewQuestionDelete}
-      //           handleNewQuestionSave={handleNewPersonalDetailsQuestionSave}
-      //         />
-      //       )}
-
-      //       {addQuestionButton}
-
-      //       {updateButtonGroup}
-      //     </>
-      //   );
-      // case questionSetTabs.final:
-      // return (
-      //   <>
-      //     {finalQuestions
-      //       .sort((a, b) => a.positionOrderId - b.positionOrderId)
-      //       .map((question: QuestionResponse) => (
-      //         <DynamicField
-      //           key={question.id}
-      //           fieldType={question.fieldType as FieldType}
-      //           isQuestionnaireType
-      //           question={question}
-      //           handleQuestionUpdate={handlePersonalDetailsQuestionUpdate}
-      //           handleQuestionSoftDelete={handlePersonalDetailsSoftDelete}
-      //           moveItemUp={moveItemUp}
-      //           moveItemDown={moveItemDown}
-      //         />
-      //       ))}
-
-      //     {displayNewQuestion && (
-      //       <AddNewField
-      //         handleNewQuestionDelete={handleNewQuestionDelete}
-      //         handleNewQuestionSave={handleNewPersonalDetailsQuestionSave}
-      //       />
-      //     )}
-
-      //     {addQuestionButton}
-
-      //     {updateButtonGroup}
-      //   </>
-      // );
       default:
         return null;
     }

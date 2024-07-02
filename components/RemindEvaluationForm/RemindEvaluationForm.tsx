@@ -617,7 +617,7 @@ const RemindEvaluationForm = () => {
           <Grid
             item
             xs={12}
-            md={question.fieldType === FieldType.Scale1to10 ? 12 : 6}
+            // md={question.fieldType === FieldType.Scale1to10 ? 12 : 6}
             key={question.id}
           >
             <FormControl fullWidth required>
