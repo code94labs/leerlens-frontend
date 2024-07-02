@@ -427,7 +427,7 @@ const DashboardEvaluationContent = (props: Props) => {
 
   const statisticsCharts = (
     <Container maxWidth="lg">
-      <Stack spacing={2}>
+      <Stack spacing={2} mb={4}>
         {isLoading
           ? spinnerSection
           : statisticsData && statisticsData.length < 1

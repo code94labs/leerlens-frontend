@@ -4,7 +4,6 @@ import { Box, Stack, Typography } from "@mui/material";
 import { livvic } from "../../../public/theme/theme";
 import { champBlackFontFamily } from "../../typography";
 
-
 type Props = {
   title: string;
   color: string;
@@ -17,6 +16,7 @@ const customStyles = {
     border: "2px #E6E6E6 solid",
     width: "100%",
     height: "100%",
+    minHeight: 270,
     borderRadius: 2,
     // p: 3,
   },
@@ -131,7 +131,7 @@ const ProgressBar = (props: Props) => {
 
       {toolTip}
 
-      <Stack flexDirection="row" alignItems="center" mb={5}>
+      <Stack flexDirection="row" alignItems="center" mb={5} px={5}>
         {startScaleValue}
 
         {progressIndicator}

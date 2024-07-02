@@ -20,6 +20,7 @@ const customStyles = {
     fontFamily: champBlackFontFamily,
     color: "#333333",
     my: 6,
+    width: "100%",
   },
   stack: {
     border: "2px #E6E6E6 solid",
@@ -34,10 +35,16 @@ const NumericalDigit = (props: Props) => {
   const { title, value } = props;
 
   return (
-    <Stack sx={customStyles.stack} alignItems="center">
+    <Stack sx={customStyles.stack} alignItems="start">
       <Typography sx={customStyles.title}> {title}</Typography>
 
-      <Typography sx={customStyles.label}>{value.toFixed(1)}</Typography>
+      <Typography
+        sx={customStyles.label}
+        display="flex"
+        justifyContent={"center"}
+      >
+        {value.toFixed(1)}
+      </Typography>
     </Stack>
   );
 };
