@@ -422,7 +422,7 @@ const DashboardEvaluationContent = (props: Props) => {
     <Grid container p={2} spacing={2}>
       {isLoading
         ? spinnerSection
-        : statisticsData.length < 1
+        : statisticsData && statisticsData.length < 1
         ? noResponsesSection
         : statisticsData.map(
             (stat: DashboardEvaluationChart, index: number) => (

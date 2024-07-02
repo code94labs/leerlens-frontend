@@ -63,9 +63,9 @@ const SharedDashboardPage = () => {
         </Typography>
 
         <Stack flexDirection="row" justifyContent="space-evenly" my={5}>
-          <HorizontalBarChart />
+          <HorizontalBarChart datasets={[]} />
 
-          <HorizontalBarChart />
+          <HorizontalBarChart datasets={[]} />
         </Stack>
       </Typography>
     </Stack>
