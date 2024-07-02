@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useFormik } from "formik";
+import * as yup from "yup";
+
 import {
   Box,
   Button,
@@ -15,10 +18,11 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { useFormik } from "formik";
-import * as yup from "yup";
+import Switch, { SwitchProps } from "@mui/material/Switch";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Chip from "@mui/material/Chip";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { styled } from "@mui/material/styles";
 
 import { champBlackFontFamily } from "../typography";
 
@@ -127,6 +131,57 @@ const customStyles = {
   },
 };
 
+const IOSSwitch = styled((props: SwitchProps) => (
+  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
+))(({ theme }) => ({
+  width: 42,
+  height: 26,
+  padding: 0,
+  "& .MuiSwitch-switchBase": {
+    padding: 0,
+    margin: 2,
+    transitionDuration: "300ms",
+    "&.Mui-checked": {
+      transform: "translateX(16px)",
+      color: "#fff",
+      "& + .MuiSwitch-track": {
+        backgroundColor: "#A879FF",
+        opacity: 1,
+        border: 0,
+      },
+      "&.Mui-disabled + .MuiSwitch-track": {
+        opacity: 0.5,
+      },
+    },
+    "&.Mui-focusVisible .MuiSwitch-thumb": {
+      color: "#33cf4d",
+      border: "6px solid #fff",
+    },
+    "&.Mui-disabled .MuiSwitch-thumb": {
+      color:
+        theme.palette.mode === "light"
+          ? theme.palette.grey[100]
+          : theme.palette.grey[600],
+    },
+    "&.Mui-disabled + .MuiSwitch-track": {
+      opacity: theme.palette.mode === "light" ? 0.7 : 0.3,
+    },
+  },
+  "& .MuiSwitch-thumb": {
+    boxSizing: "border-box",
+    width: 22,
+    height: 22,
+  },
+  "& .MuiSwitch-track": {
+    borderRadius: 26 / 2,
+    backgroundColor: theme.palette.mode === "light" ? "#E9E9EA" : "#39393D",
+    opacity: 1,
+    transition: theme.transitions.create(["background-color"], {
+      duration: 500,
+    }),
+  },
+}));
+
 const validationSchema = yup.object({
   questionText: yup.string().required("Question text is required"),
 });
@@ -147,11 +202,11 @@ const AddNewEvaluationField = (props: Props) => {
     FieldType.Scale1to6
   );
 
-  const [selectedQuestionSetType, setSelectedQuestionSetType] =
-    useState<QuestionSetType>(QuestionSetType.allSchools);
+  const [onlySeasonalSchoolSelected, setOnlySeasonalSchoolSelected] =
+    useState<boolean>(false);
 
-  const handleQuestionSetTypeUpdate = (event: any) => {
-    setSelectedQuestionSetType(event.target.value);
+  const handleSeasonalSchoolSelectionToggle = () => {
+    setOnlySeasonalSchoolSelected((prev) => !prev);
   };
 
   const formik = useFormik({
@@ -175,7 +230,9 @@ const AddNewEvaluationField = (props: Props) => {
       handleNewQuestionSave({
         fieldType: questionType,
         questionText,
-        questionSetType: selectedQuestionSetType,
+        questionSetType: onlySeasonalSchoolSelected
+          ? QuestionSetType.onlySeasonalSchools
+          : QuestionSetType.allSchools,
       });
   };
 
@@ -252,22 +309,19 @@ const AddNewEvaluationField = (props: Props) => {
         />
       </Stack>
 
-      <Stack direction="row" justifyContent="flex-start" alignItems="center">
-        <FormControl sx={{ width: 150 }}>
-          <InputLabel>
-            Evaluation form type
-            <span style={customStyles.dropdownAsterisk}> * </span>
-          </InputLabel>
-
-          <Select
-            defaultValue={selectedQuestionSetType}
-            onChange={handleQuestionSetTypeUpdate}
-          >
-            {questionSetTypes.map((set) => (
-              <MenuItem value={set.id}>{set.label}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+      <Stack direction="row" justifyContent="flex-end" alignItems="center">
+        <FormControlLabel
+          control={<IOSSwitch sx={{ m: 1 }} />}
+          checked={onlySeasonalSchoolSelected}
+          onChange={handleSeasonalSchoolSelectionToggle}
+          label={
+            <InputLabel>
+              Only seasonal schools
+              {/* <span style={customStyles.dropdownAsterisk}> * </span> */}
+            </InputLabel>
+          }
+          labelPlacement="start"
+        />
       </Stack>
 
       <Stack
